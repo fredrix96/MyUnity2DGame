@@ -17,8 +17,7 @@ public class PlayerHealth : MonoBehaviour
     public void Init(GameObject inGo, int inHealth, CameraManager inCam)
     {
         // Head object
-        go = new GameObject();
-        go.name = inGo.name + "_healthbar";
+        go = new GameObject { name = inGo.name + "_healthbar" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
 
         // Canvas

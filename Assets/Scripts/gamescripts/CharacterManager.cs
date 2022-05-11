@@ -23,17 +23,19 @@ public class CharacterManager
     List<Enemy> enemies;
     List<Soldier> soldiers;
     Player player;
+    CoinManager coinMan;
 
     GameObject enemyObjects, soldierObjects;
 
     float enemySpawnDelay, soldierSpawnDelay, playerSpawnDelay;
     double enemySpawnTimer, soldierSpawnTimer, playerSpawnTimer;
 
-    public CharacterManager(Graphics inGfx, GridManager inGm, Player inPlayer)
+    public CharacterManager(Graphics inGfx, GridManager inGm, Player inPlayer, CoinManager inCoinMan)
     {
         gfx = inGfx;
         gm = inGm;
         player = inPlayer;
+        coinMan = inCoinMan;
 
         enemyObjects = new GameObject { name = "enemies" };
         enemyObjects.transform.parent = GameManager.GameManagerObject.transform;
@@ -44,7 +46,7 @@ public class CharacterManager
         soldiers = new List<Soldier>();
 
         enemySpawnDelay = 1.0f;
-        soldierSpawnDelay = 2.0f;
+        soldierSpawnDelay = 3.0f;
         playerSpawnDelay = 5.0f;
 
         enemySpawnTimer = 0;
@@ -134,7 +136,7 @@ public class CharacterManager
 
     void SpawnEnemy()
     {
-        enemies.Add(new Enemy(gfx, enemyObjects, gm));
+        enemies.Add(new Enemy(gfx, enemyObjects, gm, coinMan));
         EnemyCounter.counter++;
         EnemyCounter.nrOfEnemies++;
     }

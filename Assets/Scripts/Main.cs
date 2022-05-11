@@ -21,9 +21,9 @@ public class Main : MonoBehaviour
         camMan = new CameraManager();
         am = new AudioManager();
 
-        if (!am.PlayAudio("Game Background Music", 0.5f, true))
+        if (!am.PlayBackgroundMusic("Game Background Music", 0.5f, true))
         {
-            Debug.LogWarning("Warning: Could not play audio!");
+            Debug.LogWarning("Warning: Could not play background music!");
         }
 
         Vector2 res = new Vector2((int)(Screen.width / 10), (int)(Screen.height / camMan.GetCamera().aspect / 10));
@@ -31,7 +31,8 @@ public class Main : MonoBehaviour
 
         player = new Player(gm, camMan);
         ctrl = new Controller(gfx, camMan, player);
-        charMan = new CharacterManager(gfx, gm, player);
+        coinMan = new CoinManager(camMan, am);
+        charMan = new CharacterManager(gfx, gm, player, coinMan);
 
         // Start at the left side of the world
         camMan.SetPosX(gfx.GetWorldLimits().x + camMan.GetWorldSpaceWidth() / 2);
@@ -42,6 +43,7 @@ public class Main : MonoBehaviour
         camMan.Update();
         ctrl.Update();
         charMan.Update();
+        coinMan.Update();
 
         if (Tools.DebugMode)
         {

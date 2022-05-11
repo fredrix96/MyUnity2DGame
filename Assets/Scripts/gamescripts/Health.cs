@@ -29,7 +29,6 @@ public class Health : MonoBehaviour
         go.transform.localScale = sr.size;
         go.GetComponent<RectTransform>().sizeDelta = sr.size;
 
-
         health = inHealth;
 
         if (go.transform.parent.GetComponent<BoxCollider2D>() == null)

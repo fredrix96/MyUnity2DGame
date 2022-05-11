@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class Enemy : Character
 {
-    public Enemy(Graphics inGfx, GameObject inGo, GridManager inGm)
+    CoinManager coinMan;
+    int value;
+
+    public Enemy(Graphics inGfx, GameObject inGo, GridManager inGm, CoinManager inCoinMan, int inValue = 1)
     {
         gfx = inGfx;
         gm = inGm;
+        coinMan = inCoinMan;
+        value = inValue;
 
         go = new GameObject { name = "enemy" + EnemyCounter.counter };
         go.transform.parent = inGo.transform;
@@ -132,6 +137,8 @@ public class Enemy : Character
                 bc.isTrigger = true;
                 rb.useFullKinematicContacts = false;
                 currTile.DecreaseCharacters(this);
+                coinMan.CreateCoin(go.transform.position, new Vector2(0.2f, 0.2f), Vector3.up, 1, 1.5f, true);
+                coinMan.AddCoins(value);
             }
         }
         else
