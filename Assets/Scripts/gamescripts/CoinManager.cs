@@ -82,15 +82,12 @@ public class CoinManager
         canvas.worldCamera = inCam.GetCamera();
 
         cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         cs.referenceResolution = new Vector2(1920, 1080);
-        cs.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        cs.matchWidthOrHeight = 1; // match with height (1)
 
         // Value object
         valueObject = new GameObject { name = "value" };
         valueObject.transform.SetParent(canvas.transform);
-        valueObject.transform.localScale = new Vector2(1.5f, 0.8f);
+        valueObject.transform.localScale = new Vector2(1.0f, 0.5f);
 
         value = valueObject.AddComponent<Text>();
         value.text = nrOfCoins.ToString();
@@ -104,6 +101,6 @@ public class CoinManager
         value.rectTransform.sizeDelta = new Vector2(184, 100);
 
         // Anchor the image
-        value.rectTransform.anchoredPosition = new Vector3(2130, 1030, 1);
+        value.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - 155, canvas.pixelRect.height - 30, 0);
     }
 }

@@ -33,15 +33,12 @@ public class Coin
         canvas.worldCamera = inCam.GetCamera();
 
         cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         cs.referenceResolution = new Vector2(1920, 1080);
-        cs.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        cs.matchWidthOrHeight = 1; // match with height (1)
 
         // Image object
         imageObject = new GameObject { name = "coin" };
         imageObject.transform.SetParent(canvasObject.transform);
-        imageObject.transform.localScale = new Vector2(0.5f, 0.5f);
+        imageObject.transform.localScale = new Vector2(0.3f, 0.3f);
 
         coin = imageObject.AddComponent<Image>();
         coin.sprite = Resources.Load<Sprite>("Sprites/Coin");
@@ -51,7 +48,7 @@ public class Coin
         coin.rectTransform.anchorMax = Vector2.zero;
 
         // Anchor the image
-        coin.rectTransform.anchoredPosition = new Vector3(2300, 1031, 0);
+        coin.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - 40, canvas.pixelRect.height - 30, 0);
 
         shouldBeRemoved = false;
     }
