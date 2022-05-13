@@ -35,7 +35,7 @@ public class Main : MonoBehaviour
         charMan = new CharacterManager(gfx, gm, player, coinMan);
 
         // Start at the left side of the world
-        camMan.SetPosX(gfx.GetWorldLimits().x + camMan.GetWorldSpaceWidth() / 2);
+        camMan.SetPosX(gfx.GetLevelLimits().x + camMan.GetWorldSpaceWidth() / 2);
     }
 
     void Update()

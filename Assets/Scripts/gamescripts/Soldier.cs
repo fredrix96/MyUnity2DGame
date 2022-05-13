@@ -20,8 +20,8 @@ public class Soldier : Character
 
         go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
 
-        float randomY = Random.Range(gfx.GetWorldLimits().z + sm.GetCurrentSize(go.transform.localScale).y / 2, gfx.GetWorldLimits().w - sm.GetCurrentSize(go.transform.localScale).y / 2);
-        go.transform.position = new Vector3(gfx.GetWorldLimits().x, randomY, 0);
+        float randomY = Random.Range(gfx.GetLevelLimits().z + sm.GetCurrentSize(go.transform.localScale).y / 2, gfx.GetLevelLimits().w - sm.GetCurrentSize(go.transform.localScale).y / 2);
+        go.transform.position = new Vector3(gfx.GetLevelLimits().x, randomY, 0);
 
         bc = go.AddComponent<BoxCollider2D>();
         bc.size = new Vector2(bc.size.x / 2, bc.size.y);
@@ -55,7 +55,7 @@ public class Soldier : Character
                 Vector2 newPos = pf.GetNextTile(currTile, typeof(Enemy), typeof(Soldier), out targetFound, true);
 
                 // If the soldier has reached half of the field, then stop if there are no enemies nearby
-                if (!targetFound && go.transform.position.x > gfx.GetWorldLimits().y / 2)
+                if (!targetFound && go.transform.position.x > gfx.GetLevelLimits().y / 2)
                 {
                     sm.StartIdle();
                 }

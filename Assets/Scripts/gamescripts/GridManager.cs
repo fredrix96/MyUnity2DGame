@@ -27,12 +27,12 @@ public class GridManager
     void GenerateGrid()
     {
         // Size of each tile
-        float length = Tools.CalculateDistance(gfx.GetWorldLimits().y, gfx.GetWorldLimits().x);
-        float height = Tools.CalculateDistance(gfx.GetWorldLimits().w, gfx.GetWorldLimits().z);
+        float length = Tools.CalculateDistance(gfx.GetLevelLimits().y, gfx.GetLevelLimits().x);
+        float height = Tools.CalculateDistance(gfx.GetLevelLimits().w, gfx.GetLevelLimits().z);
         Vector2 tileSize = new Vector2(length / res.x, height / res.y);
 
         // Start position
-        Vector2 currPosition = new Vector2(gfx.GetWorldLimits().x + tileSize.x / 2, gfx.GetWorldLimits().w - tileSize.y / 2);
+        Vector2 currPosition = new Vector2(gfx.GetLevelLimits().x + tileSize.x / 2, gfx.GetLevelLimits().w - tileSize.y / 2);
 
         for (int y = 0; y < (int)res.y; y++)
         {
@@ -47,7 +47,7 @@ public class GridManager
                 currPosition = new Vector2(currPosition.x + tileSize.x, currPosition.y);
             }
 
-            currPosition = new Vector2(gfx.GetWorldLimits().x + tileSize.x / 2, currPosition.y - tileSize.y);
+            currPosition = new Vector2(gfx.GetLevelLimits().x + tileSize.x / 2, currPosition.y - tileSize.y);
         }
     }
 

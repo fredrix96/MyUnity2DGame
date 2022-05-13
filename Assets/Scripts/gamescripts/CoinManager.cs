@@ -60,15 +60,15 @@ public class CoinManager
         am.PlayAudio3D("Coin Sound", 0.1f, pos, 30, 2);
     }
 
-    public void AddCoins(int nrToAdd)
+    public void AddCoins(int amount)
     {
-        nrOfCoins += nrToAdd;
+        nrOfCoins += amount;
         value.text = nrOfCoins.ToString();
     }
 
-    public void RemoveCoins(int nrToRemove)
+    public void RemoveCoins(int amount)
     {
-        nrOfCoins -= nrToRemove;
+        nrOfCoins -= amount;
         value.text = nrOfCoins.ToString();
     }
 

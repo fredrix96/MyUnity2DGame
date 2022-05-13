@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class Graphics
 {
-    GameObject level;
+    GameObject level, background;
 
-    Vector4 worldLimits;
+    Vector4 worldLimits, levelLimits;
 
     // Start is called before the first frame update
     public Graphics()
@@ -26,13 +26,29 @@ public class Graphics
         level.name = "level";
         level.transform.parent = GameManager.GameManagerObject.transform;
 
-        SpriteRenderer sr = level.AddComponent<SpriteRenderer>();
-        sr.sprite = Resources.Load<Sprite>("Sprites/Level");
-        sr.sortingLayerName = "Level";
-        RectTransform transform = level.AddComponent<RectTransform>();
+        SpriteRenderer srLvl = level.AddComponent<SpriteRenderer>();
+        srLvl.sprite = Resources.Load<Sprite>("Sprites/Level");
+        srLvl.sortingLayerName = "Level";
+        RectTransform transformLvl = level.AddComponent<RectTransform>();
+
+        background = new GameObject();
+        background.name = "background";
+        background.transform.parent = GameManager.GameManagerObject.transform;
+
+        SpriteRenderer srBg = background.AddComponent<SpriteRenderer>();
+        srBg.sprite = Resources.Load<Sprite>("Sprites/Background2");
+        srBg.sortingLayerName = "Level";
+        RectTransform transformBg = background.AddComponent<RectTransform>();
+        transformBg.anchoredPosition = new Vector3(transformLvl.position.x, transformLvl.position.y + transformLvl.rect.height, transformLvl.position.z);
 
         // X min, X max, Y min, Y max
-        worldLimits = new Vector4(-transform.rect.width / 2, transform.rect.width / 2, -transform.rect.height / 2, transform.rect.height / 2);
+        levelLimits = new Vector4(-transformLvl.rect.width / 2, transformLvl.rect.width / 2, -transformLvl.rect.height / 2, transformLvl.rect.height / 2);
+        worldLimits = new Vector4(-transformLvl.rect.width / 2, transformLvl.rect.width / 2, -transformLvl.rect.height / 2, transformLvl.rect.height / 2 + transformBg.rect.height);
+    }
+
+    public Vector4 GetLevelLimits()
+    {
+        return levelLimits;
     }
 
     public Vector4 GetWorldLimits()

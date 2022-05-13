@@ -26,8 +26,8 @@ public class Enemy : Character
 
         go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
 
-        float randomY = Random.Range(gfx.GetWorldLimits().z + sm.GetCurrentSize(go.transform.localScale).y / 2, gfx.GetWorldLimits().w - sm.GetCurrentSize(go.transform.localScale).y / 2);
-        go.transform.position = new Vector3(gfx.GetWorldLimits().y, randomY, 0);
+        float randomY = Random.Range(gfx.GetLevelLimits().z + sm.GetCurrentSize(go.transform.localScale).y / 2, gfx.GetLevelLimits().w - sm.GetCurrentSize(go.transform.localScale).y / 2);
+        go.transform.position = new Vector3(gfx.GetLevelLimits().y, randomY, 0);
 
         bc = go.AddComponent<BoxCollider2D>();
         bc.size = new Vector2(bc.size.x / 2, bc.size.y);

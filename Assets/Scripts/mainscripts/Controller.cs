@@ -67,7 +67,7 @@ public class Controller
             {
                 cm.SetPosX(gfx.GetWorldLimits().x + cm.GetWorldSpaceWidth() / 2);
             }
-            else if (gfx.GetWorldLimits().y < cm.GetPosX() + cm.GetWorldSpaceWidth() / 2)
+            else if (gfx.GetLevelLimits().y < cm.GetPosX() + cm.GetWorldSpaceWidth() / 2)
             {
                 cm.SetPosX(gfx.GetWorldLimits().y - cm.GetWorldSpaceWidth() / 2);
             }
@@ -94,20 +94,20 @@ public class Controller
                 player.Attack();
             }
 
-            if (Input.GetKey(KeyCode.W) && player.GetPosition().y < gfx.GetWorldLimits().w)
+            if (Input.GetKey(KeyCode.W) && player.GetPosition().y < gfx.GetLevelLimits().w)
             {
                 player.SetDirY(1);
             }
-            else if (Input.GetKey(KeyCode.S) && player.GetPosition().y > gfx.GetWorldLimits().z + player.GetSize().y / 2f)
+            else if (Input.GetKey(KeyCode.S) && player.GetPosition().y > gfx.GetLevelLimits().z + player.GetSize().y / 2f)
             {
                 player.SetDirY(-1);
             }
 
-            if (Input.GetKey(KeyCode.A) && player.GetPosition().x > gfx.GetWorldLimits().x)
+            if (Input.GetKey(KeyCode.A) && player.GetPosition().x > gfx.GetLevelLimits().x)
             {
                 player.SetDirX(-1);
             }
-            else if (Input.GetKey(KeyCode.D) && player.GetPosition().x < gfx.GetWorldLimits().y)
+            else if (Input.GetKey(KeyCode.D) && player.GetPosition().x < gfx.GetLevelLimits().y)
             {
                 player.SetDirX(1);
             }
