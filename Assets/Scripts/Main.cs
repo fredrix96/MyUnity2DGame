@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEditor;
 
 public class Main : MonoBehaviour 
 {
@@ -8,8 +9,10 @@ public class Main : MonoBehaviour
     Player player;
     CharacterManager charMan;
     Controller ctrl;
-    GridManager gm;
+    GridManager gridMan;
     CoinManager coinMan;
+    ShopManager shopMan;
+    BuildingManager buildings;
 
     void Start() 
     {
@@ -27,12 +30,17 @@ public class Main : MonoBehaviour
         }
 
         Vector2 res = new Vector2((int)(Screen.width / 10), (int)(Screen.height / camMan.GetCamera().aspect / 10));
-        gm = new GridManager(gfx, res);
+        gridMan = new GridManager(gfx, res);
 
-        player = new Player(gm, camMan);
-        ctrl = new Controller(gfx, camMan, player);
+        player = new Player(gridMan, camMan);
         coinMan = new CoinManager(camMan, am);
-        charMan = new CharacterManager(gfx, gm, player, coinMan);
+        charMan = new CharacterManager(gfx, gridMan, player, coinMan);
+        
+        buildings = GameManager.GameManagerObject.AddComponent<BuildingManager>();
+        buildings.Init(camMan);
+
+        shopMan = new ShopManager(camMan, coinMan, buildings, gridMan);
+        ctrl = new Controller(gfx, camMan, player, shopMan, gridMan);
 
         // Start at the left side of the world
         camMan.SetPosX(gfx.GetLevelLimits().x + camMan.GetWorldSpaceWidth() / 2);
@@ -44,6 +52,7 @@ public class Main : MonoBehaviour
         ctrl.Update();
         charMan.Update();
         coinMan.Update();
+        shopMan.Update();
 
         if (Tools.DebugMode)
         {

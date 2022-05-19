@@ -21,13 +21,14 @@ public class Enemy : Character
         cm = go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/StickFigureMonster", "GameObjects");
+        sm.Init(go, "Sprites/StickFigureMonster", "Character");
         sm.FlipX();
 
         go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
 
-        float randomY = Random.Range(gfx.GetLevelLimits().z + sm.GetCurrentSize(go.transform.localScale).y / 2, gfx.GetLevelLimits().w - sm.GetCurrentSize(go.transform.localScale).y / 2);
-        go.transform.position = new Vector3(gfx.GetLevelLimits().y, randomY, 0);
+        float randomY = Random.Range(0, gm.GetRes().y - 1);
+        Vector2 spawnTile = new Vector2(gm.GetRes().x - 1, randomY);
+        go.transform.position = gm.GetTile(spawnTile).GetPos();
 
         bc = go.AddComponent<BoxCollider2D>();
         bc.size = new Vector2(bc.size.x / 2, bc.size.y);
@@ -43,7 +44,7 @@ public class Enemy : Character
         damage = 10;
         direction = -1;
 
-        currTile = gm.GetTileFromWorldPosition(go.transform.position);
+        currTile = gm.GetTile(spawnTile);
         currTile.IncreaseCharacters(this);
 
         pf = new PathFinding(gm);

@@ -31,6 +31,7 @@ public class Coin
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = inCam.GetCamera();
+        canvas.sortingLayerName = "UI";
 
         cs = canvasObject.AddComponent<CanvasScaler>();
         cs.referenceResolution = new Vector2(1920, 1080);
@@ -65,6 +66,7 @@ public class Coin
 
         sr.sprite = Resources.Load<Sprite>("Sprites/Coin");
         sr.size = scale;
+        sr.sortingLayerName = "UI";
 
         go.transform.localScale = sr.size;
         go.GetComponent<RectTransform>().sizeDelta = sr.size;

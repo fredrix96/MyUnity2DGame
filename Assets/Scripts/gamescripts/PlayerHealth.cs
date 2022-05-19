@@ -18,7 +18,7 @@ public class PlayerHealth : MonoBehaviour
     {
         // Head object
         go = new GameObject { name = inGo.name + "_healthbar" };
-        go.transform.SetParent(GameManager.GameManagerObject.transform);
+        go.transform.SetParent(inGo.transform);
 
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
@@ -26,6 +26,7 @@ public class PlayerHealth : MonoBehaviour
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = inCam.GetCamera();
+        canvas.sortingLayerName = "UI";
 
         cs = canvasObject.AddComponent<CanvasScaler>();
         cs.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;

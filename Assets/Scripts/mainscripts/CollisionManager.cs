@@ -4,10 +4,6 @@ using UnityEngine;
 
 public class CollisionManager : MonoBehaviour
 {
-    void Start()
-    {    
-    }
-
     void OnCollisionEnter2D(Collision2D col)
     {   
         // If a soldier collides with an enemy
@@ -20,6 +16,12 @@ public class CollisionManager : MonoBehaviour
         if (col.collider.name[0] == 'e' && (col.otherCollider.name[0] == 's' || col.otherCollider.name[0] == 'p'))
         {
             col.gameObject.GetComponent<SpriteManager>().StartAttacking();
+        }
+
+        // If the player collides with an enemy
+        if (col.collider.name[0] == 'p' && col.otherCollider.name[0] == 'e')
+        {
+            // Nothing for now
         }
     }
 }

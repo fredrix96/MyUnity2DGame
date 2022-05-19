@@ -35,7 +35,7 @@ public class PathFinding
                 if (y != startTile.GetTilePosition().y)
                 {
                     Tile yTile = gm.GetTile(new Vector2(startTile.GetTilePosition().x, y));
-                    if (yTile.IsCharacterPresent(target) && !yTile.IsCharacterPresent(friend))
+                    if (yTile.IsCharacterPresent(target) && !yTile.IsCharacterPresent(friend) && !yTile.IsObjectPresent())
                     {
                         // The closer the target is, the lower value it gets
                         float dist = Tools.CalculateDistance(startTile.GetTilePosition().y, yTile.GetTilePosition().y);
@@ -63,7 +63,7 @@ public class PathFinding
                         {
                             // If the target is closer on the x-axis, move forward
                             Tile xTile = gm.GetTile(new Vector2(x, startTile.GetTilePosition().y));
-                            if (xTile.IsCharacterPresent(target) && !xTile.IsCharacterPresent(friend))
+                            if (xTile.IsCharacterPresent(target) && !xTile.IsCharacterPresent(friend) && !xTile.IsObjectPresent())
                             {
                                 Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y));
                                 return nextTileXFront.GetPos();
@@ -79,7 +79,7 @@ public class PathFinding
                         {
                             // If the target is closer on the x-axis, move forward
                             Tile xTile = gm.GetTile(new Vector2(x, startTile.GetTilePosition().y));
-                            if (xTile.IsCharacterPresent(target) && !xTile.IsCharacterPresent(friend))
+                            if (xTile.IsCharacterPresent(target) && !xTile.IsCharacterPresent(friend) && !xTile.IsObjectPresent())
                             {
                                 Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y));
                                 return nextTileXFront.GetPos();
@@ -92,7 +92,7 @@ public class PathFinding
                 if (targets[0].GetTilePosition().y > startTile.GetTilePosition().y)
                 {
                     Tile nextTileYUp = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
-                    if (!nextTileYUp.IsCharacterPresent(friend))
+                    if (!nextTileYUp.IsCharacterPresent(friend) && !nextTileYUp.IsObjectPresent())
                     {
                         return nextTileYUp.GetPos();
                     }
@@ -100,7 +100,7 @@ public class PathFinding
                 else
                 {
                     Tile nextTileYDown = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
-                    if (!nextTileYDown.IsCharacterPresent(friend))
+                    if (!nextTileYDown.IsCharacterPresent(friend) && !nextTileYDown.IsObjectPresent())
                     {
                         return nextTileYDown.GetPos();
                     }
@@ -109,30 +109,104 @@ public class PathFinding
             // Else if no target was found, move to the next tile
             else
             {
-                if (right)
-                {
-                    if (startTile.GetTilePosition().x + 1 < gm.GetRes().x)
-                    {
-                        Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y));
-                        return nextTileXFront.GetPos();
-                    }
-                }
-                else
-                {
-                    if (startTile.GetTilePosition().x - 1 > 0)
-                    {
-                        Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y));
-                        return nextTileXFront.GetPos();
-                    }
-                }
-
-                // Do not leave the borders
-                return startTile.GetPos();
+                // Look for a tile with the most effective path
+                return FindMostEffectivePosition(startTile, right);
             }
         }
 
         // The target is on this tile
         targetFound = true;
+        return startTile.GetPos();
+    }
+
+    Vector2 FindMostEffectivePosition(Tile startTile, bool right)
+    {
+        bool openPathUp = false;
+        bool openPathDown = false;
+        int steps = 1;
+
+        // If the character moves to the right
+        if (right)
+        {
+            // If the next tile is inside the playarea and it does not have an object on it
+            if (startTile.GetTilePosition().x + 1 < gm.GetRes().x && !gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y)).IsObjectPresent())
+            {
+                Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y));
+                return nextTileXFront.GetPos();
+            }
+            // If the next tile has an object on it. Find the shortest path around it
+            else if (gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y)).IsObjectPresent())
+            {
+                while (!openPathUp && !openPathDown)
+                {                 
+                    if (startTile.GetTilePosition().y + steps < gm.GetRes().y && !gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y + steps)).IsObjectPresent())
+                    {
+                        openPathUp = true;
+                    }
+                    else if (startTile.GetTilePosition().y - steps > 0 && !gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y - steps)).IsObjectPresent())
+                    {
+                        openPathDown = true;
+                    }
+                    else
+                    {
+                        steps++;
+                    }
+                }
+
+                if (openPathUp)
+                {
+                    Tile nextTileYUp = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
+                    return nextTileYUp.GetPos();
+                }
+                else
+                {
+                    Tile nextTileYUp = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
+                    return nextTileYUp.GetPos();
+                }
+            }
+        }
+        // If the character moves to the left
+        else
+        {
+            // If the next tile is inside the playarea and it does not have an object on it
+            if (startTile.GetTilePosition().x - 1 > 0 && !gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y)).IsObjectPresent())
+            {
+                Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y));
+                return nextTileXFront.GetPos();
+            }
+            // If the next tile has an object on it. Find the shortest path around it
+            else if (gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y)).IsObjectPresent())
+            {
+                while (!openPathUp && !openPathDown)
+                {
+                    if (startTile.GetTilePosition().y + steps < gm.GetRes().y && !gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y + steps)).IsObjectPresent())
+                    {
+                        openPathUp = true;
+                    }
+                    else if (startTile.GetTilePosition().y - steps > 0 && !gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y - steps)).IsObjectPresent())
+                    {
+                        openPathDown = true;
+                    }
+                    else
+                    {
+                        steps++;
+                    }
+                }
+
+                if (openPathUp)
+                {
+                    Tile nextTileYUp = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
+                    return nextTileYUp.GetPos();
+                }
+                else
+                {
+                    Tile nextTileYDown = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
+                    return nextTileYDown.GetPos();
+                }
+            }
+        }
+
+        // Do not leave the borders
         return startTile.GetPos();
     }
 
@@ -144,7 +218,7 @@ public class PathFinding
         if (inPos.y + 1 < gm.GetRes().y)
         {
             Tile nextTileYUp = gm.GetTile(new Vector2(inPos.x, inPos.y + 1));
-            if (nextTileYUp.IsCharacterPresent(target) && !nextTileYUp.IsCharacterPresent(friend))
+            if (nextTileYUp.IsCharacterPresent(target) && !nextTileYUp.IsCharacterPresent(friend) && !nextTileYUp.IsObjectPresent())
             {
                 return nextTileYUp.GetPos();
             }
@@ -152,7 +226,7 @@ public class PathFinding
         if (inPos.y - 1 > 0)
         {
             Tile nextTileYDown = gm.GetTile(new Vector2(inPos.x, inPos.y - 1));
-            if (nextTileYDown.IsCharacterPresent(target) && !nextTileYDown.IsCharacterPresent(friend))
+            if (nextTileYDown.IsCharacterPresent(target) && !nextTileYDown.IsCharacterPresent(friend) && !nextTileYDown.IsObjectPresent())
             {
                 return nextTileYDown.GetPos();
             }
@@ -164,7 +238,7 @@ public class PathFinding
             if (inPos.x - 1 > 0)
             {
                 Tile nextTileXBack = gm.GetTile(new Vector2(inPos.x - 1, inPos.y));
-                if (nextTileXBack.IsCharacterPresent(target) && !nextTileXBack.IsCharacterPresent(friend))
+                if (nextTileXBack.IsCharacterPresent(target) && !nextTileXBack.IsCharacterPresent(friend) && !nextTileXBack.IsObjectPresent())
                 {
                     return nextTileXBack.GetPos();
                 }
@@ -172,7 +246,7 @@ public class PathFinding
             else if (inPos.x + 1 < gm.GetRes().x)
             {
                 Tile nextTileXFront = gm.GetTile(new Vector2(inPos.x + 1, inPos.y));
-                if (nextTileXFront.IsCharacterPresent(target) && !nextTileXFront.IsCharacterPresent(friend))
+                if (nextTileXFront.IsCharacterPresent(target) && !nextTileXFront.IsCharacterPresent(friend) && !nextTileXFront.IsObjectPresent())
                 {
                     return nextTileXFront.GetPos();
                 }
@@ -184,7 +258,7 @@ public class PathFinding
             if (inPos.x + 1 < gm.GetRes().x)
             {
                 Tile nextTileXFront = gm.GetTile(new Vector2(inPos.x + 1, inPos.y));
-                if (nextTileXFront.IsCharacterPresent(target) && !nextTileXFront.IsCharacterPresent(friend))
+                if (nextTileXFront.IsCharacterPresent(target) && !nextTileXFront.IsCharacterPresent(friend) && !nextTileXFront.IsObjectPresent())
                 {
                     return nextTileXFront.GetPos();
                 }
@@ -192,7 +266,7 @@ public class PathFinding
             if (inPos.x - 1 > 0)
             {
                 Tile nextTileXBack = gm.GetTile(new Vector2(inPos.x - 1, inPos.y));
-                if (nextTileXBack.IsCharacterPresent(target) && !nextTileXBack.IsCharacterPresent(friend))
+                if (nextTileXBack.IsCharacterPresent(target) && !nextTileXBack.IsCharacterPresent(friend) && !nextTileXBack.IsObjectPresent())
                 {
                     return nextTileXBack.GetPos();
                 }

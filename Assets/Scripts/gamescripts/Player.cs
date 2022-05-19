@@ -30,7 +30,7 @@ public class Player
 
         maxHealth = 300;
         regenerationDelay = 0.3f;
-        playerSpeed = 14;
+        playerSpeed = 5;
         damage = 20;
 
         Respawn();
@@ -65,8 +65,6 @@ public class Player
             else if (sm.IsWalking())
             {
                 Walk();
-                SetDirX();
-                SetDirY();
             }
             else if (sm.IsIdle())
             {
@@ -92,20 +90,19 @@ public class Player
 
     public void SetDirX(int x = 0)
     {
-        if (!isDead)
-        {
-            sm.StartWalking();
-            dirVector = new Vector2(x, dirVector.y);
-        }
+        if (!isDead) sm.StartWalking();
+        dirVector.x = x;
     }
 
     public void SetDirY(int y = 0)
     {
-        if (!isDead)
-        {
-            sm.StartWalking();
-            dirVector = new Vector2(dirVector.x, y);
-        }
+        if (!isDead) sm.StartWalking();
+        dirVector.y = y;
+    }
+
+    void ResetDir()
+    {
+        dirVector = Vector2.zero;
     }
 
     public void Attack()
@@ -132,7 +129,12 @@ public class Player
             sm.FlipX();
         }
 
+        // To avoid faster speeds at the diagonal
+        dirVector = dirVector.normalized;
+
         go.transform.position = new Vector2(go.transform.position.x + playerSpeed * Time.deltaTime * dirVector.x, go.transform.position.y + playerSpeed * Time.deltaTime * dirVector.y);
+
+        ResetDir();
 
         sm.Walk();
 
@@ -143,7 +145,7 @@ public class Player
     {
         Tile newTile = gm.GetTileFromWorldPosition(go.transform.position);
 
-        if (newTile != currTile)
+        if (newTile != currTile && newTile != null)
         {
             newTile.PlayerOnTile(true);
             currTile.PlayerOnTile(false);
@@ -178,10 +180,12 @@ public class Player
 
     public void Respawn()
     {
+        Vector2 spawnTile = new Vector2(0, 3);
+
         go = new GameObject { name = "player" };
         go.transform.parent = GameManager.GameManagerObject.transform;
         go.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
-        go.transform.position = new Vector3(-30f, 0, 0);
+        go.transform.position = gm.GetTile(spawnTile).GetPos();
         go.layer = LayerMask.NameToLayer("Player");
 
         cm = go.AddComponent<CollisionManager>();
@@ -190,11 +194,11 @@ public class Player
         sm.Init(go, "Sprites/StickFigureKing", "Player");
 
         bc = go.AddComponent<BoxCollider2D>();
-        bc.size = new Vector2(bc.size.x / 2, bc.size.y);
+        bc.size = new Vector2(bc.size.x / 2, bc.size.y / 3);
 
         rb = go.AddComponent<Rigidbody2D>();
-        rb.isKinematic = true;
-        rb.useFullKinematicContacts = true;
+        rb.gravityScale = 0;
+        rb.freezeRotation = true;
 
         health = go.AddComponent<PlayerHealth>();
         health.Init(go, maxHealth, cam);
@@ -203,7 +207,7 @@ public class Player
         isDead = false;
         shouldBeRemoved = false;
 
-        currTile = gm.GetTileFromWorldPosition(go.transform.position);
+        currTile = gm.GetTile(spawnTile);
         currTile.PlayerOnTile(true);
     }
 

@@ -20,7 +20,7 @@ public class SpriteManager : MonoBehaviour
         sprites = Resources.LoadAll<Sprite>(spritePath);
         sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = sprites[idle];
-        sr.sortingLayerName = sortingLayer;
+        sr.sortingLayerID = SortingLayer.NameToID(sortingLayer);
 
         ResetAnimations();
 

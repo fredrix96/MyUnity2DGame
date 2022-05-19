@@ -16,6 +16,7 @@ public class CoinManager
     Canvas canvas;
     CanvasScaler cs;
     Text value;
+    PopUpMessage message;
 
     List<Coin> coinList;
 
@@ -28,11 +29,25 @@ public class CoinManager
         go = new GameObject { name = "coins" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
 
+        message = go.AddComponent<PopUpMessage>();
+        message.Init(go, inCam);
+
         coin = new Coin(go, inCam);
 
         coinList = new List<Coin>();
 
         nrOfCoins = 500;
+
+        // Canvas
+        canvasObject = new GameObject { name = "canvas" };
+        canvasObject.transform.parent = go.transform;
+        canvas = canvasObject.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        canvas.worldCamera = inCam.GetCamera();
+        canvas.sortingLayerName = "UI";
+
+        cs = canvasObject.AddComponent<CanvasScaler>();
+        cs.referenceResolution = new Vector2(1920, 1080);
 
         CreateValueUI(inCam);
     }
@@ -72,18 +87,22 @@ public class CoinManager
         value.text = nrOfCoins.ToString();
     }
 
+    public bool SpendMoney(int amount)
+    {
+        if (nrOfCoins >= amount)
+        {
+            RemoveCoins(amount);
+            return true;
+        }
+
+        // Error message
+        message.SendPopUpMessage("Not enough money!", 1.5f);
+
+        return false;
+    }
+
     void CreateValueUI(CameraManager inCam)
     {
-        // Canvas
-        canvasObject = new GameObject { name = "canvas" };
-        canvasObject.transform.parent = go.transform;
-        canvas = canvasObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = inCam.GetCamera();
-
-        cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.referenceResolution = new Vector2(1920, 1080);
-
         // Value object
         valueObject = new GameObject { name = "value" };
         valueObject.transform.SetParent(canvas.transform);
@@ -103,4 +122,6 @@ public class CoinManager
         // Anchor the image
         value.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - 155, canvas.pixelRect.height - 30, 0);
     }
+
+
 }

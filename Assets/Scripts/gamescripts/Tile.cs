@@ -11,7 +11,7 @@ public class Tile
 
     uint nrOfEnemiesOnTile, nrOfSoldiersOnTile;
 
-    bool enemyOnTile, soldierOnTile, playerOnTile;
+    bool enemyOnTile, soldierOnTile, playerOnTile, objectOnTile, buildPermission;
     float value;
 
     public Tile(GameObject grid, Vector2 inTilePosition)
@@ -25,11 +25,14 @@ public class Tile
         {
             sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = Resources.Load<Sprite>("Sprites/Tile");
+            sr.color = Color.white;
         }
 
         enemyOnTile = false;
         soldierOnTile = false;
         playerOnTile = false;
+        objectOnTile = false;
+        buildPermission = true;
         nrOfEnemiesOnTile = 0;
         nrOfSoldiersOnTile = 0;
 
@@ -105,6 +108,53 @@ public class Tile
     public void PlayerOnTile(bool onTile)
     {
         playerOnTile = onTile;
+
+        if (Tools.DebugMode && playerOnTile)
+        {
+            sr.color = Color.black;
+        }
+        else if (Tools.DebugMode && !playerOnTile)
+        {
+            sr.color = Color.white;
+        }
+    }
+
+    public void ObjectOnTile(bool onTile)
+    {
+        objectOnTile = onTile;
+
+        if (Tools.DebugMode && objectOnTile)
+        {
+            sr.color = Color.black;
+        }
+        else if (Tools.DebugMode && !objectOnTile)
+        {
+            sr.color = Color.white;
+        }
+    }
+
+    public void SetPermissionToBuild(bool permission)
+    {
+        buildPermission = permission;
+
+        if (Tools.DebugMode && buildPermission)
+        {
+            sr.color = Color.white;
+        }
+        else if (Tools.DebugMode && !buildPermission)
+        {
+            sr.color = Color.black;
+        }
+    }
+
+    public bool IsObjectPresent()
+    {
+        return objectOnTile;
+    }
+
+    public bool BuildPermission()
+    {
+        return buildPermission;
     }
 
     public bool IsCharacterPresent(Type type)

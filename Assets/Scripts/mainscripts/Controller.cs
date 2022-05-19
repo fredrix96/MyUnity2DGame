@@ -7,12 +7,16 @@ public class Controller
     Graphics gfx;
     CameraManager cm;
     Player player;
+    ShopManager shopMan;
+    GridManager gridMan;
 
-    public Controller(Graphics inGfx, CameraManager inCm, Player inPlayer)
+    public Controller(Graphics inGfx, CameraManager inCm, Player inPlayer, ShopManager inShopMan, GridManager inGridMan)
     {
         gfx = inGfx;
         cm = inCm;
         player = inPlayer;
+        shopMan = inShopMan;
+        gridMan = inGridMan;
     }
 
     public void Update()
@@ -85,6 +89,7 @@ public class Controller
 
     void UpdateKeys()
     {
+        // Player related keys
         if (!player.Remove())
         {
             player.Idle();
@@ -94,23 +99,29 @@ public class Controller
                 player.Attack();
             }
 
-            if (Input.GetKey(KeyCode.W) && player.GetPosition().y < gfx.GetLevelLimits().w)
+            Vector2 playerPos = player.GetPosition();
+            if (Input.GetKey(KeyCode.W) && playerPos.y <= gridMan.GetTile(new Vector2(0,0)).GetPos().y)
             {
                 player.SetDirY(1);
             }
-            else if (Input.GetKey(KeyCode.S) && player.GetPosition().y > gfx.GetLevelLimits().z + player.GetSize().y / 2f)
+            else if (Input.GetKey(KeyCode.S) && playerPos.y >= gridMan.GetTile(new Vector2(0, gridMan.GetRes().y - 1)).GetPos().y)
             {
                 player.SetDirY(-1);
             }
 
-            if (Input.GetKey(KeyCode.A) && player.GetPosition().x > gfx.GetLevelLimits().x)
+            if (Input.GetKey(KeyCode.A) && playerPos.x >= gridMan.GetTile(new Vector2(0,0)).GetPos().x)
             {
                 player.SetDirX(-1);
             }
-            else if (Input.GetKey(KeyCode.D) && player.GetPosition().x < gfx.GetLevelLimits().y)
+            else if (Input.GetKey(KeyCode.D) && playerPos.x <= gridMan.GetTile(new Vector2(gridMan.GetRes().x - 1, 0)).GetPos().x)
             {
                 player.SetDirX(1);
             }
+        }
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            shopMan.ChangeActive();
         }
     }
 }

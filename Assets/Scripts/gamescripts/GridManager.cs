@@ -53,12 +53,26 @@ public class GridManager
 
     public Tile GetTile(Vector2 tilePosition)
     {
+        // Return null if the incoming tile position is outside of the grid
+        if (tilePosition.x < 0 || tilePosition.x > res.x - 1
+            || tilePosition.y < 0 || tilePosition.y > res.y - 1)
+        {
+            return null;
+        }
+
         return grid[(int)tilePosition.x, (int)tilePosition.y];
     }
 
     public Tile GetTileFromWorldPosition(Vector2 pos)
     {
-        Tile outTile = grid[0, 0];
+        Tile outTile = null;
+
+        // Return null if the incoming position is outside of the grid
+        if (pos.x < grid[0, 0].GetPos().x || pos.x > grid[(int)res.x - 1, (int)res.y - 1].GetPos().x
+            || pos.y > grid[0, 0].GetPos().y || pos.y < grid[(int)res.x - 1, (int)res.y - 1].GetPos().y)
+        {
+            return outTile;
+        }
 
         // Go through every tile to find where the position is. Worst-case time: O(n^2)
         {
@@ -145,6 +159,142 @@ public class GridManager
         }
 
         return outTile;
+    }
+
+    public Tile FindClosestTile(Vector2 pos)
+    {
+        bool found = false;
+        Tile tile = null;
+        float step = 0;
+
+        // Start at left upper corner
+        if (pos.x < grid[0, 0].GetPos().x && pos.y > grid[0, 0].GetPos().y)
+        {
+            while (!found)
+            {
+                tile = GetTileFromWorldPosition(new Vector2(pos.x + step, pos.y - step));
+
+                step += 0.1f;
+
+                if (tile != null)
+                {
+                    found = true;
+                }
+            }
+        }
+        // Start at right upper corner
+        else if (pos.x > grid[(int)res.x - 1, 0].GetPos().x && pos.y > grid[0, 0].GetPos().y)
+        {
+            while (!found)
+            {
+                tile = GetTileFromWorldPosition(new Vector2(pos.x - step, pos.y - step));
+
+                step += 0.1f;
+
+                if (tile != null)
+                {
+                    found = true;
+                }
+            }
+        }
+        // Start at left lower corner
+        else if (pos.x < grid[0, 0].GetPos().x && pos.y < grid[0, (int)res.y - 1].GetPos().y)
+        {
+            while (!found)
+            {
+                tile = GetTileFromWorldPosition(new Vector2(pos.x + step, pos.y + step));
+
+                step += 0.1f;
+
+                if (tile != null)
+                {
+                    found = true;
+                }
+            }
+        }
+        // Start at right lower corner
+        else if (pos.x > grid[(int)res.x - 1, 0].GetPos().x && pos.y < grid[0, (int)res.y - 1].GetPos().y)
+        {
+            while (!found)
+            {
+                tile = GetTileFromWorldPosition(new Vector2(pos.x - step, pos.y + step));
+
+                step += 0.1f;
+
+                if (tile != null)
+                {
+                    found = true;
+                }
+            }
+        }
+        // Start above grid
+        else if (pos.y > grid[0, 0].GetPos().y)
+        {
+            while (!found)
+            {
+                tile = GetTileFromWorldPosition(new Vector2(pos.x, pos.y - step));
+
+                step += 0.1f;
+
+                if (tile != null)
+                {
+                    found = true;
+                }
+            }
+        }
+        // Start below grid
+        else if (pos.y < grid[0, (int)res.y - 1].GetPos().y)
+        {
+            while (!found)
+            {
+                tile = GetTileFromWorldPosition(new Vector2(pos.x, pos.y + step));
+
+                step += 0.1f;
+
+                if (tile != null)
+                {
+                    found = true;
+                }
+            }
+        }
+        // Start to the left of grid
+        else if (pos.x < grid[0, 0].GetPos().x)
+        {
+            while (!found)
+            {
+                tile = GetTileFromWorldPosition(new Vector2(pos.x + step, pos.y));
+
+                step += 0.1f;
+
+                if (tile != null)
+                {
+                    found = true;
+                }
+            }
+        }
+        // Start to the right of grid
+        else if (pos.x > grid[(int)res.x - 1, 0].GetPos().x)
+        {
+            while (!found)
+            {
+                tile = GetTileFromWorldPosition(new Vector2(pos.x - step, pos.y));
+
+                step += 0.1f;
+
+                if (tile != null)
+                {
+                    found = true;
+                }
+            }
+        }
+        else
+        {
+            // Default
+            tile = grid[0, 0];
+        }
+
+        // Return default
+        return tile;
     }
 
     public Tile[,] GetGrid()
