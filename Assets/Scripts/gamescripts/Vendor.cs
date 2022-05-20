@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Selector : MonoBehaviour
+public class Vendor : MonoBehaviour
 {
     GameObject go;
     GameObject tmpObject;

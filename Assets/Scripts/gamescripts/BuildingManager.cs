@@ -41,13 +41,16 @@ public class BuildingManager : MonoBehaviour
     CanvasScaler cs;
     List<Building> buildings;
     List<Sprite> sprites;
+    AudioManager audioMan;
 
     void Start()
     {
     }
 
-    public void Init(CameraManager inCam)
+    public void Init(CameraManager inCam, AudioManager inAudioMan)
     {
+        audioMan = inAudioMan;
+
         go = new GameObject() { name = "buildings" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
 
@@ -71,6 +74,8 @@ public class BuildingManager : MonoBehaviour
 
     public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, GridManager inGridMan)
     {
+        audioMan.PlayAudio3D("Construct", 0.4f, inPos.GetPos());
+
         if (type == BuildingInformation.TYPE_OF_BUILDING.CASTLE)
         {
             Castle castle = new Castle(go, inPos, inGridMan);

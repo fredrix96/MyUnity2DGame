@@ -68,7 +68,7 @@ public class ShopManager
         castle.rectTransform.anchorMax = Vector2.zero;
         castle.rectTransform.anchoredPosition = new Vector3(20, canvas.pixelRect.height * 0.8f, 0);
 
-        Selector selector = castleObject.AddComponent<Selector>();
+        Vendor selector = castleObject.AddComponent<Vendor>();
         selector.Init(castleObject, coinMan, inCam, inGridMan, BuildingInformation.TYPE_OF_BUILDING.CASTLE);
 
         buildingImages.Add(castleObject);

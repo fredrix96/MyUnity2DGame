@@ -74,7 +74,7 @@ public class AudioManager
         return found;
     }
 
-    public bool PlayAudio3D(string audioName, float volume, Vector3 pos, float fadeDist, float atMaxDist, float dopplerLevel = 0, bool loop = false)
+    public bool PlayAudio3D(string audioName, float volume, Vector3 pos, float fadeDist = 30, float atMaxDist = 2, float dopplerLevel = 0, bool loop = false)
     {
         bool found = false;
 

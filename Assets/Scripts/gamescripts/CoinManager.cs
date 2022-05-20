@@ -72,7 +72,7 @@ public class CoinManager
     {
         Coin coin = new Coin(go, pos, scale, dir, speed, lifeTime, rotate);
         coinList.Add(coin);
-        am.PlayAudio3D("Coin Sound", 0.1f, pos, 30, 2);
+        am.PlayAudio3D("Coin Sound", 0.1f, pos);
     }
 
     public void AddCoins(int amount)

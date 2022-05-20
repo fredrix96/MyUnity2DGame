@@ -12,11 +12,11 @@ public class Main : MonoBehaviour
     GridManager gridMan;
     CoinManager coinMan;
     ShopManager shopMan;
-    BuildingManager buildings;
+    BuildingManager buildMan;
 
     void Start() 
     {
-        Tools.DebugMode = true;
+        Tools.DebugMode = false;
 
         GameManager.Init();
 
@@ -29,11 +29,8 @@ public class Main : MonoBehaviour
             Debug.LogWarning("Warning: Could not play background music!");
         }
 
-        // 42 width
-        //Vector2 res = new Vector2((int)(Screen.width / 10), (int)(Screen.height / camMan.GetCamera().aspect / 10));
         float width = 200;
         Vector2 res = new Vector2(width, (int)(width / camMan.GetCamera().orthographicSize));
-        Debug.Log(res.y);
         gridMan = new GridManager(gfx, res);
 
         player = new Player(gridMan, camMan);
@@ -41,10 +38,10 @@ public class Main : MonoBehaviour
         coinMan = new CoinManager(camMan, am, moneyToStartWith);
         charMan = new CharacterManager(gfx, gridMan, camMan, player, coinMan);
         
-        buildings = GameManager.GameManagerObject.AddComponent<BuildingManager>();
-        buildings.Init(camMan);
+        buildMan = GameManager.GameManagerObject.AddComponent<BuildingManager>();
+        buildMan.Init(camMan, am);
 
-        shopMan = new ShopManager(camMan, coinMan, buildings, gridMan);
+        shopMan = new ShopManager(camMan, coinMan, buildMan, gridMan);
         ctrl = new Controller(gfx, camMan, player, shopMan, gridMan);
 
         // Start at the left side of the world
