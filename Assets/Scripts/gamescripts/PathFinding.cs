@@ -52,6 +52,13 @@ public class PathFinding
 
                 targets.Sort(Tools.SortByValue);
 
+                // Find out if there is an obstacle between the character and its target
+                if (LookForObstaclesBetweenTiles(targets[0], startTile))
+                {
+                    // Look for a tile with the most effective path
+                    return FindMostEffectivePosition(startTile, right);
+                }
+
                 float shortestDist = targets[0].GetValue();
 
                 // Find out if the target is closer on the x-axis if that distance is inside the grid
@@ -208,6 +215,37 @@ public class PathFinding
 
         // Do not leave the borders
         return startTile.GetPos();
+    }
+
+    bool LookForObstaclesBetweenTiles(Tile tile1, Tile tile2)
+    {
+        bool obstacle = false;
+
+        if (tile1.GetTilePosition().y < tile2.GetTilePosition().y)
+        {
+            for (int y = (int)tile1.GetTilePosition().y; y < (int)tile2.GetTilePosition().y; y++)
+            {
+                Tile tile = gm.GetTile(new Vector2(tile2.GetTilePosition().x, y));
+                if (tile.IsObjectPresent())
+                {
+                    obstacle = true;
+                }
+            }
+        }
+        else
+        {
+            for (int y = (int)tile2.GetTilePosition().y; y < (int)tile1.GetTilePosition().y; y++)
+            {
+                Tile tile = gm.GetTile(new Vector2(tile2.GetTilePosition().x, y));
+                if (tile.IsObjectPresent())
+                {
+                    obstacle = true;
+
+                }
+            }
+        }
+
+        return obstacle;
     }
 
     Vector2 GetPosFromNeighboringTile(Vector2 inPos, Type target, Type friend, bool right)
