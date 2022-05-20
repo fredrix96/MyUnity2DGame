@@ -14,11 +14,8 @@ public class Building
     {
     }
 
-    protected void MarkTiles(BuildingInformation.TYPE_OF_BUILDING type)
+    protected void MarkTiles(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos)
     {
-        // Place over a specific number of tiles
-        Tile tmpTile = gridMan.GetTileFromWorldPosition(go.transform.position);
-
         // Vector2(max, min)
         Vector2 height = Vector2.zero;
         Vector2 width = Vector2.zero;
@@ -33,7 +30,7 @@ public class Building
         {
             for (int y = startY; y < endY; y++)
             {
-                Tile currTile = gridMan.GetTile(new Vector2(tmpTile.GetTilePosition().x + x, tmpTile.GetTilePosition().y + y));
+                Tile currTile = gridMan.GetTile(new Vector2(inPos.GetTilePosition().x + x, inPos.GetTilePosition().y + y));
                 if (currTile != null)
                 {
                     currTile.ObjectOnTile(true);
@@ -54,6 +51,7 @@ public class Building
             }
         }
 
+        // Make sure that no objects can be built tightly together
         startX -= 1;
         endX += 1;
         startY -= 1;
@@ -64,7 +62,7 @@ public class Building
             {
                 if (x == startX || x == endX - 1 || y == startY || y == endY - 1)
                 {
-                    Tile currTile = gridMan.GetTile(new Vector2(tmpTile.GetTilePosition().x + x, tmpTile.GetTilePosition().y + y));
+                    Tile currTile = gridMan.GetTile(new Vector2(inPos.GetTilePosition().x + x, inPos.GetTilePosition().y + y));
                     if (currTile != null)
                     {
                         currTile.SetPermissionToBuild(false);
@@ -73,6 +71,6 @@ public class Building
             }
         }
 
-        go.transform.localScale = new Vector3(tmpTile.GetSize().x * size.x / sr.size.x, tmpTile.GetSize().y * size.y / sr.size.y, 1);
+        go.transform.localScale = new Vector3(inPos.GetSize().x * size.x / sr.size.x, inPos.GetSize().y * size.y / sr.size.y, 1);
     }
 }

@@ -35,7 +35,7 @@ public class Soldier : Character
         health.Init(go,"Sprites/SoldierHealth", 100);
 
         speed = 2.0f;
-        damage = 30;
+        damage = 20; //30
         direction = 1;
 
         currTile = gm.GetTile(spawnTile);

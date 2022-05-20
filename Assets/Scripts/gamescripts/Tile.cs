@@ -113,7 +113,7 @@ public class Tile
         {
             sr.color = Color.black;
         }
-        else if (Tools.DebugMode && !playerOnTile)
+        else if (Tools.DebugMode && !playerOnTile && !objectOnTile && buildPermission)
         {
             sr.color = Color.white;
         }
@@ -174,6 +174,18 @@ public class Tile
 
         Debug.LogWarning("Could not find type " + type.Name + ". Can not tell if " + go.name + " is occupied!");
         return true;
+    }
+
+    public bool IsPlaceable()
+    {
+        bool placeable = true;
+
+        if (!BuildPermission() || IsObjectPresent() || IsCharacterPresent(typeof(Player)) || IsCharacterPresent(typeof(Enemy)) || IsCharacterPresent(typeof(Soldier)))
+        {
+            placeable = false;
+        }
+
+        return placeable;
     }
 
     public void SetSize(Vector2 newSize)

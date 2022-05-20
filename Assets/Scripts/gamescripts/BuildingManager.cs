@@ -17,9 +17,10 @@ public static class BuildingInformation
         50
     };
 
+    // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
     static readonly Vector2[] size = new Vector2[] 
     {
-        new Vector2(3,5)
+        new Vector2(5,9)
     };
 
     public static int GetBuildingCost(TYPE_OF_BUILDING type)
@@ -68,11 +69,11 @@ public class BuildingManager : MonoBehaviour
         cs.referenceResolution = new Vector2(1920, 1080);
     }
 
-    public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Vector3 position, GridManager inGridMan)
+    public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, GridManager inGridMan)
     {
         if (type == BuildingInformation.TYPE_OF_BUILDING.CASTLE)
         {
-            Castle castle = new Castle(go, position, inGridMan);
+            Castle castle = new Castle(go, inPos, inGridMan);
             buildings.Add(castle);
         }
     }

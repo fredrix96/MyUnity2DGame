@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Castle : Building
 {
-    public Castle(GameObject parent, Vector3 inPos, GridManager inGridMan)
+    public Castle(GameObject parent, Tile inPos, GridManager inGridMan)
     {
         go = new GameObject { name = "castle" + BuildingInformation.CastleCounter.ToString() };
         go.transform.SetParent(parent.transform);
@@ -13,10 +13,10 @@ public class Castle : Building
         sr.sprite = Resources.Load<Sprite>("Sprites/Castle");
         sr.sortingLayerName = "Buildings";
 
-        go.transform.position = inPos;
+        go.transform.position = inPos.GetPos();
         gridMan = inGridMan;
 
-        MarkTiles(BuildingInformation.TYPE_OF_BUILDING.CASTLE);
+        MarkTiles(BuildingInformation.TYPE_OF_BUILDING.CASTLE, inPos);
 
         collider = go.AddComponent<BoxCollider2D>();
         rb = go.AddComponent<Rigidbody2D>();

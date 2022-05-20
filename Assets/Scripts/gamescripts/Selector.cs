@@ -71,30 +71,20 @@ public class Selector : MonoBehaviour
     {
         if (draging)
         {
-            Vector3 screenPoint = Input.mousePosition;
+            Tile tile = MousePosToTilePos();
 
-            // Distance of the plane from the camera
-            screenPoint.z = cam.GetCamera().nearClipPlane;
+            // Follow the mouse
+            tmpObject.transform.position = tile.GetPos();
 
-            Vector3 worldPoint = cam.GetCamera().ScreenToWorldPoint(screenPoint);
-            Tile tile = gridMan.GetTileFromWorldPosition(worldPoint);
-
-            // If the mouse pointer is not on a tile, find the closest tile
-            if (tile == null)
-            {
-                tile = gridMan.FindClosestTile(worldPoint);
-            }
-
-            // If there is no obstacle, follow the mouse
-            if (AvoidObstacles(tile))
-            {
-                tmpObject.transform.position = tile.GetPos();
-                tmpObject.GetComponent<Image>().color = Color.white;
-            }
-            else
+            // If there is obstacles on the tiles, mark the building red
+            if (!AvoidObstacles(tile))
             {
                 // Indicate with red color that the building can not be placed here
                 tmpObject.GetComponent<Image>().color = new Color(0.8f, 0.2f, 0.2f, 0.8f);
+            }
+            else
+            {
+                tmpObject.GetComponent<Image>().color = Color.white;
             }
         }
     }
@@ -103,19 +93,13 @@ public class Selector : MonoBehaviour
     {
         if (draging)
         {
-            Vector3 screenPoint = Input.mousePosition;
-
-            // Distance of the plane from the camera
-            screenPoint.z = cam.GetCamera().nearClipPlane;
-
-            Vector3 worldPoint = cam.GetCamera().ScreenToWorldPoint(screenPoint);
-            Tile tile = gridMan.GetTileFromWorldPosition(worldPoint);
+            Tile tile = MousePosToTilePos();
 
             // If there is no obstacle, create the building
             if (AvoidObstacles(tile))
             {
                 // Use Gameobject.find?
-                GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding((BuildingInformation.TYPE_OF_BUILDING)type, tmpObject.transform.position, gridMan);
+                GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding((BuildingInformation.TYPE_OF_BUILDING)type, tile, gridMan);
             }
             else
             {
@@ -148,6 +132,7 @@ public class Selector : MonoBehaviour
     bool AvoidObstacles(Tile tile)
     {
         bool placeable = true;
+
         if (tile == null)
         {
             placeable = false;
@@ -159,17 +144,33 @@ public class Selector : MonoBehaviour
             int endX = Mathf.CeilToInt(size.x / 2f);
             int startY = -Mathf.FloorToInt(size.y / 2f);
             int endY = Mathf.CeilToInt(size.y / 2f);
+
+            Tile bottomRightTile = gridMan.GetTile(new Vector2(tile.GetTilePosition().x + endX - 1, tile.GetTilePosition().y + endY - 1));
+            Tile bottomLeftTile = gridMan.GetTile(new Vector2(tile.GetTilePosition().x + startX, tile.GetTilePosition().y + endY - 1));
+            Tile tileBelowBuilding = gridMan.GetTile(new Vector2(tile.GetTilePosition().x + startX, tile.GetTilePosition().y + endY));
+
+            // The "door" to the building can not be placed at the very bottom of the grid, however, it is allowed to be placed at the very top
             for (int x = startX; x < endX; x++)
             {
                 for (int y = startY; y < endY; y++)
                 {
                     Tile currTile = gridMan.GetTile(new Vector2(tile.GetTilePosition().x + x, tile.GetTilePosition().y + y));
+
                     if (currTile != null)
                     {
-                        if (!currTile.BuildPermission() || currTile.IsObjectPresent()
-                            || currTile.IsCharacterPresent(typeof(Player)) || currTile.IsCharacterPresent(typeof(Enemy)) || currTile.IsCharacterPresent(typeof(Soldier)))
+                        if (!currTile.IsPlaceable() || tileBelowBuilding == null)
                         {
                             placeable = false;
+                        }
+                    }
+                    else if (currTile == null && bottomLeftTile != null && bottomRightTile != null)
+                    {
+                        if (bottomLeftTile.IsPlaceable() && bottomRightTile.IsPlaceable())
+                        {
+                            if (tileBelowBuilding != null)
+                            {
+                                continue;
+                            }
                         }
                     }
                     else
@@ -181,5 +182,24 @@ public class Selector : MonoBehaviour
         }
 
         return placeable;
+    }
+
+    Tile MousePosToTilePos()
+    {
+        Vector3 screenPoint = Input.mousePosition;
+
+        // Distance of the plane from the camera
+        screenPoint.z = cam.GetCamera().nearClipPlane;
+
+        Vector3 worldPoint = cam.GetCamera().ScreenToWorldPoint(screenPoint);
+        Tile tile = gridMan.GetTileFromWorldPosition(worldPoint);
+
+        // If the mouse pointer is not on a tile, find the closest tile
+        if (tile == null)
+        {
+            tile = gridMan.FindClosestTile(worldPoint);
+        }
+
+        return tile;
     }
 }

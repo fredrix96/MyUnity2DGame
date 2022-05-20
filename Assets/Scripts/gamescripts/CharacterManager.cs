@@ -24,23 +24,29 @@ public class CharacterManager
     List<Soldier> soldiers;
     Player player;
     CoinManager coinMan;
+    PopUpMessage message;
 
-    GameObject enemyObjects, soldierObjects;
+    GameObject chracterObjects, enemyObjects, soldierObjects;
 
     float enemySpawnDelay, soldierSpawnDelay, playerSpawnDelay;
     double enemySpawnTimer, soldierSpawnTimer, playerSpawnTimer;
 
-    public CharacterManager(Graphics inGfx, GridManager inGm, Player inPlayer, CoinManager inCoinMan)
+    public CharacterManager(Graphics inGfx, GridManager inGm, CameraManager inCam, Player inPlayer, CoinManager inCoinMan)
     {
         gfx = inGfx;
         gm = inGm;
         player = inPlayer;
         coinMan = inCoinMan;
 
+        chracterObjects = new GameObject { name = "characters" };
+        chracterObjects.transform.SetParent(GameManager.GameManagerObject.transform);
+        message = chracterObjects.AddComponent<PopUpMessage>();
+        message.Init(chracterObjects, inCam);
+
         enemyObjects = new GameObject { name = "enemies" };
-        enemyObjects.transform.parent = GameManager.GameManagerObject.transform;
+        enemyObjects.transform.SetParent(chracterObjects.transform);
         soldierObjects = new GameObject { name = "soldiers" };
-        soldierObjects.transform.parent = GameManager.GameManagerObject.transform;
+        soldierObjects.transform.SetParent(chracterObjects.transform);
 
         enemies = new List<Enemy>();
         soldiers = new List<Soldier>();
@@ -120,6 +126,7 @@ public class CharacterManager
         {
             player.Destroy();
             playerSpawnTimer += Time.deltaTime;
+            message.SendPopUpMessage("The King is dead!", 2.5f, Color.red);
         }
         else if (playerSpawnTimer > 0)
         {
@@ -130,6 +137,7 @@ public class CharacterManager
             {
                 player.Respawn();
                 playerSpawnTimer = 0;
+                message.SendPopUpMessage("A new King has arrived!" + System.Environment.NewLine + "All hail the new King!", 2.5f, Color.white);
             }
         }
     }

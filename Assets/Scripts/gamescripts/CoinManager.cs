@@ -22,7 +22,7 @@ public class CoinManager
 
     int nrOfCoins;
 
-    public CoinManager(CameraManager inCam, AudioManager inAm)
+    public CoinManager(CameraManager inCam, AudioManager inAm, int startAmount)
     {
         am = inAm;
 
@@ -36,7 +36,7 @@ public class CoinManager
 
         coinList = new List<Coin>();
 
-        nrOfCoins = 500;
+        nrOfCoins = startAmount;
 
         // Canvas
         canvasObject = new GameObject { name = "canvas" };

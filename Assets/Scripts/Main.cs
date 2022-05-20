@@ -16,7 +16,7 @@ public class Main : MonoBehaviour
 
     void Start() 
     {
-        Tools.DebugMode = false;
+        Tools.DebugMode = true;
 
         GameManager.Init();
 
@@ -29,12 +29,17 @@ public class Main : MonoBehaviour
             Debug.LogWarning("Warning: Could not play background music!");
         }
 
-        Vector2 res = new Vector2((int)(Screen.width / 10), (int)(Screen.height / camMan.GetCamera().aspect / 10));
+        // 42 width
+        //Vector2 res = new Vector2((int)(Screen.width / 10), (int)(Screen.height / camMan.GetCamera().aspect / 10));
+        float width = 200;
+        Vector2 res = new Vector2(width, (int)(width / camMan.GetCamera().orthographicSize));
+        Debug.Log(res.y);
         gridMan = new GridManager(gfx, res);
 
         player = new Player(gridMan, camMan);
-        coinMan = new CoinManager(camMan, am);
-        charMan = new CharacterManager(gfx, gridMan, player, coinMan);
+        int moneyToStartWith = 500000;
+        coinMan = new CoinManager(camMan, am, moneyToStartWith);
+        charMan = new CharacterManager(gfx, gridMan, camMan, player, coinMan);
         
         buildings = GameManager.GameManagerObject.AddComponent<BuildingManager>();
         buildings.Init(camMan);

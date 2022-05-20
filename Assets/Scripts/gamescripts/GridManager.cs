@@ -140,7 +140,7 @@ public class GridManager
         // Then find where the position is on the x axis with the help of the y position
         for (int x = 0; x < (int)res.x; x++)
         {
-            bool atThisTile = false;
+            bool atThisTile;
         
             if (x + 1 >= (int)res.x)
             {

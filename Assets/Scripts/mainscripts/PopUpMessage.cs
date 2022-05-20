@@ -71,7 +71,7 @@ public class PopUpMessage : MonoBehaviour
         // Reset anchor
         message.rectTransform.anchorMin = Vector2.zero;
         message.rectTransform.anchorMax = Vector2.zero;
-        message.rectTransform.sizeDelta = new Vector2(5000, 100);
+        message.rectTransform.sizeDelta = new Vector2(1920, 1080);
 
         // Anchor the image
         message.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width / 2, canvas.pixelRect.height / 2, 0);
@@ -79,8 +79,11 @@ public class PopUpMessage : MonoBehaviour
         messageObject.SetActive(false);
     }
 
-    public void SendPopUpMessage(string text, float lifeTime)
+    public void SendPopUpMessage(string text, float lifeTime, Color? color = null)
     {
+        // Returns left value if it is not null, otherwise it returns the value to the right
+        message.color = color ?? Color.white;
+
         messageLifeTime = lifeTime;
         message.text = text;
         messageObject.SetActive(true);
