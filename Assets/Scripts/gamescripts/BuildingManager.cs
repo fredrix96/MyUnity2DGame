@@ -42,14 +42,16 @@ public class BuildingManager : MonoBehaviour
     List<Building> buildings;
     List<Sprite> sprites;
     AudioManager audioMan;
+    CoinManager coinMan;
 
     void Start()
     {
     }
 
-    public void Init(CameraManager inCam, AudioManager inAudioMan)
+    public void Init(CameraManager inCam, AudioManager inAudioMan, CoinManager inCoinMan)
     {
         audioMan = inAudioMan;
+        coinMan = inCoinMan;
 
         go = new GameObject() { name = "buildings" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
@@ -72,13 +74,21 @@ public class BuildingManager : MonoBehaviour
         cs.referenceResolution = new Vector2(1920, 1080);
     }
 
+    void Update()
+    {
+        foreach (Building building in buildings)
+        {
+            building.Update();
+        }
+    }
+
     public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, GridManager inGridMan)
     {
         audioMan.PlayAudio3D("Construct", 0.4f, inPos.GetPos());
 
         if (type == BuildingInformation.TYPE_OF_BUILDING.CASTLE)
         {
-            Castle castle = new Castle(go, inPos, inGridMan);
+            Castle castle = new Castle(go, inPos, inGridMan, coinMan);
             buildings.Add(castle);
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Building
 {
@@ -9,10 +10,15 @@ public class Building
     protected SpriteRenderer sr;
     protected BoxCollider2D collider;
     protected Rigidbody2D rb;
+    protected Selector selector;
+    protected CoinManager coinMan;
+    protected Material outline;
 
     public Building()
     {
     }
+
+    public virtual void Update() { }
 
     protected void MarkTiles(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos)
     {

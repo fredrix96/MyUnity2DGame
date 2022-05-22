@@ -9,6 +9,39 @@ public static class Tools
     static double time = 0;
     static bool timeStarted = false;
 
+    // This struct makes it easier to understand the code for the outline properties
+    public struct OutlineMaterialSettings
+    {
+        public static void Enable(ref SpriteRenderer sr, bool boolEnable)
+        {
+            byte byteEnable = System.Convert.ToByte(boolEnable);
+            sr.material.SetInt("_OutlineEnabled", byteEnable);
+        }
+
+        public static void SetSpriteColor(ref SpriteRenderer sr, Color color)
+        {
+            sr.material.SetColor("_Color", color);
+        }
+
+        public static void SetOutlineColor(ref SpriteRenderer sr, Color color)
+        {
+            sr.material.SetColor("_SolidOutline", color);
+        }
+
+        /// <summary> Recommended width is 0 - 100 </summary>
+        public static void SetWidth(ref SpriteRenderer sr, int width)
+        {
+            sr.material.SetInt("_Thickness", width);
+        }
+
+        // The names of the properties differ between the string call and the display name in the inspector...
+        // This function is only used for debug purposes
+        //public static string FindPropertyName(ref SpriteRenderer sr, int pos)
+        //{
+        //    return sr.material.shader.GetPropertyName(pos);
+        //}
+    }
+
     public static float CalculateDistance(float x1, float x2)
     {
         float dist;

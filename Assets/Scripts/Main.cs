@@ -39,7 +39,7 @@ public class Main : MonoBehaviour
         charMan = new CharacterManager(gfx, gridMan, camMan, player, coinMan);
         
         buildMan = GameManager.GameManagerObject.AddComponent<BuildingManager>();
-        buildMan.Init(camMan, am);
+        buildMan.Init(camMan, am, coinMan);
 
         shopMan = new ShopManager(camMan, coinMan, buildMan, gridMan);
         ctrl = new Controller(gfx, camMan, player, shopMan, gridMan);
