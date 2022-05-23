@@ -13,6 +13,7 @@ public class Building
     protected Selector selector;
     protected CoinManager coinMan;
     protected Material outline;
+    protected BuildingInformation.TYPE_OF_BUILDING type;
 
     public Building()
     {

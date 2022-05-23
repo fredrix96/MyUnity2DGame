@@ -16,26 +16,22 @@ public class Enemy : Character
 
         go = new GameObject { name = "enemy" + EnemyCounter.counter };
         go.transform.parent = inGo.transform;
+        go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
         go.layer = LayerMask.NameToLayer("Enemies");
 
         cm = go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/StickFigureMonster", "Character");
+        sm.Init(go, gm, "Sprites/StickFigureMonster", "Character");
         sm.FlipX();
-
-        go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
 
         float randomY = Random.Range(0, gm.GetRes().y - 1);
         Vector2 spawnTile = new Vector2(gm.GetRes().x - 1, randomY);
         go.transform.position = gm.GetTile(spawnTile).GetPos();
 
-        bc = go.AddComponent<BoxCollider2D>();
-        bc.size = new Vector2(bc.size.x / 2, bc.size.y);
-
-        rb = go.AddComponent<Rigidbody2D>();
-        rb.isKinematic = true;
-        rb.useFullKinematicContacts = true;
+        // This is to make sure that feet of the character wont walk on another sprite
+        pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
+        go.transform.position = sm.GetColliderPivotPoint(go);
 
         health = go.AddComponent<Health>();
         health.Init(go, "Sprites/EnemyHealth", 100);
@@ -67,18 +63,15 @@ public class Enemy : Character
                     newPos = pf.GetNextTile(currTile, typeof(Player), typeof(Enemy), out targetFound, false);
                 }
 
+                // Notice how we adjust based on the pivot difference
                 go.transform.position = new Vector3(Mathf.MoveTowards(go.transform.position.x, newPos.x, speed * Time.deltaTime),
-                        Mathf.MoveTowards(go.transform.position.y, newPos.y, speed * Time.deltaTime), 0);
+                        Mathf.MoveTowards(go.transform.position.y, newPos.y + pivotHeightDiff, speed * Time.deltaTime), 0);
             }
             else if (sm.IsAttacking())
             {
                 if (sm.Attack())
                 {
-                    ContactFilter2D filter = new ContactFilter2D();
-                    filter.layerMask = LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player");
-                    filter.useLayerMask = true;
-                    List<Collider2D> results = new List<Collider2D>();
-                    bc.OverlapCollider(filter, results);
+                    List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player"));
 
                     foreach (Collider2D col in results)
                     {
@@ -135,8 +128,6 @@ public class Enemy : Character
             if (health.GetHealth() <= 0)
             {
                 isDead = true;
-                bc.isTrigger = true;
-                rb.useFullKinematicContacts = false;
                 currTile.DecreaseCharacters(this);
                 coinMan.CreateCoin(go.transform.position, new Vector2(0.2f, 0.2f), Vector3.up, 1, 1.5f, true);
                 coinMan.AddCoins(value);
@@ -153,7 +144,8 @@ public class Enemy : Character
 
     void MarkTile()
     {
-        Tile newTile = gm.GetTileFromWorldPosition(go.transform.position);
+        Vector3 correctPivotToTilePos = new Vector3(go.transform.position.x, go.transform.position.y - pivotHeightDiff, go.transform.position.z);
+        Tile newTile = gm.GetTileFromWorldPosition(correctPivotToTilePos);
 
         if (newTile != currTile)
         {

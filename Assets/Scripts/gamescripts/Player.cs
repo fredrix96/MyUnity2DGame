@@ -7,8 +7,6 @@ public class Player
     GameObject go;
     SpriteManager sm;
     PlayerHealth health;
-    BoxCollider2D bc;
-    Rigidbody2D rb;
     GridManager gm;
     Tile currTile;
     CollisionManager cm;
@@ -47,10 +45,7 @@ public class Player
             {
                 if (sm.Attack())
                 {
-                    ContactFilter2D filter = new ContactFilter2D();
-                    filter.SetLayerMask(LayerMask.GetMask("Enemies"));
-                    List<Collider2D> results = new List<Collider2D>();
-                    bc.OverlapCollider(filter, results);
+                    List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"));
 
                     foreach (Collider2D col in results)
                     {
@@ -74,8 +69,6 @@ public class Player
             if (health.GetHealth() <= 0)
             {
                 isDead = true;
-                bc.isTrigger = true;
-                rb.useFullKinematicContacts = false;
                 currTile.PlayerOnTile(false);
             }
         }
@@ -191,14 +184,7 @@ public class Player
         cm = go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/StickFigureKing", "Player");
-
-        bc = go.AddComponent<BoxCollider2D>();
-        bc.size = new Vector2(bc.size.x / 2, bc.size.y / 3);
-
-        rb = go.AddComponent<Rigidbody2D>();
-        rb.gravityScale = 0;
-        rb.freezeRotation = true;
+        sm.Init(go, gm, "Sprites/StickFigureKing", "Player", false);
 
         health = go.AddComponent<PlayerHealth>();
         health.Init(go, maxHealth, cam);
@@ -214,10 +200,5 @@ public class Player
     public Vector3 GetPosition()
     {
         return go.transform.position;
-    }
-
-    public Vector2 GetSize()
-    {
-        return bc.bounds.size;
     }
 }

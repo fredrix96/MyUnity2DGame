@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Castle : Building
+public class House : Building
 {
-    public Castle(GameObject parent, Tile inPos, GridManager inGridMan, CoinManager inCoinMan)
+    public House(GameObject parent, Tile inPos, GridManager inGridMan, CoinManager inCoinMan)
     {
-        type = BuildingInformation.TYPE_OF_BUILDING.Castle;
+        type = BuildingInformation.TYPE_OF_BUILDING.House;
 
         coinMan = inCoinMan;
 
-        go = new GameObject { name = type.ToString() + BuildingInformation.GetCounter(type) };
+        go = new GameObject { name = type.ToString() + BuildingInformation.GetCounter(type).ToString() };
         go.transform.SetParent(parent.transform);
 
         sr = go.AddComponent<SpriteRenderer>();
@@ -37,6 +37,5 @@ public class Castle : Building
 
     public override void Update()
     {
-
     }
 }

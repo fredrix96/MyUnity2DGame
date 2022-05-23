@@ -37,7 +37,7 @@ public class Health : MonoBehaviour
         }
         else
         {
-            height = go.transform.parent.GetComponent<BoxCollider2D>().size.y * go.transform.parent.localScale.y / 2;
+            height = go.transform.parent.GetComponent<BoxCollider2D>().size.y * go.transform.parent.localScale.y;
         }
     }
 

@@ -11,31 +11,27 @@ public class Soldier : Character
 
         go = new GameObject { name = "soldier" + SoldierCounter.counter };
         go.transform.SetParent(inGo.transform);
+        go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
         go.layer = LayerMask.NameToLayer("Soldiers");
 
         cm = go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/StickFigure", "Character");
-
-        go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+        sm.Init(go, gm, "Sprites/StickFigure", "Character");
 
         float randomY = Random.Range(0, gm.GetRes().y - 1);
         Vector2 spawnTile = new Vector2(0, randomY);
         go.transform.position = gm.GetTile(spawnTile).GetPos();
 
-        bc = go.AddComponent<BoxCollider2D>();
-        bc.size = new Vector2(bc.size.x / 2, bc.size.y);
-
-        rb = go.AddComponent<Rigidbody2D>();
-        rb.isKinematic = true;
-        rb.useFullKinematicContacts = true;
+        // This is to make sure that feet of the character wont walk on another sprite
+        pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
+        go.transform.position = sm.GetColliderPivotPoint(go);
 
         health = go.AddComponent<Health>();
         health.Init(go,"Sprites/SoldierHealth", 100);
 
         speed = 2.0f;
-        damage = 20; //30
+        damage = 20;
         direction = 1;
 
         currTile = gm.GetTile(spawnTile);
@@ -62,29 +58,22 @@ public class Soldier : Character
                 }
                 else
                 {
+                    // Notice how we adjust based on the pivot difference
                     go.transform.position = new Vector3(Mathf.MoveTowards(go.transform.position.x, newPos.x, speed * Time.deltaTime),
-                        Mathf.MoveTowards(go.transform.position.y, newPos.y, speed * Time.deltaTime), 0);
+                        Mathf.MoveTowards(go.transform.position.y, newPos.y + pivotHeightDiff, speed * Time.deltaTime), 0);
                 }
             }
             else if (sm.IsAttacking())
             {
                 if (sm.Attack())
                 {
-                    ContactFilter2D filter = new ContactFilter2D();
-                    filter.SetLayerMask(LayerMask.GetMask("Enemies"));
-                    List<Collider2D> results = new List<Collider2D>();
-                    bc.OverlapCollider(filter, results);
+                    List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"));
 
                     foreach (Collider2D col in results)
                     {
                         if (col.gameObject.GetComponent<Health>() != null)
                         {
                             col.gameObject.GetComponent<Health>().Damage(damage);
-
-                            if (col.gameObject.name[0] == 's')
-                            {
-                                Debug.Log("ATTACKING FIERND");
-                            }
 
                             // Turn towards the target
                             if (go.transform.position.x > col.transform.position.x && direction == 1)
@@ -133,8 +122,6 @@ public class Soldier : Character
             if (health.GetHealth() <= 0)
             {
                 isDead = true;
-                bc.isTrigger = true;
-                rb.useFullKinematicContacts = false;
                 currTile.DecreaseCharacters(this);
             }
         }
@@ -150,7 +137,8 @@ public class Soldier : Character
 
     void MarkTile()
     {
-        Tile newTile = gm.GetTileFromWorldPosition(go.transform.position);
+        Vector3 correctPivotToTilePos = new Vector3(go.transform.position.x, go.transform.position.y - pivotHeightDiff, go.transform.position.z);
+        Tile newTile = gm.GetTileFromWorldPosition(correctPivotToTilePos);
 
         if (newTile != currTile)
         {

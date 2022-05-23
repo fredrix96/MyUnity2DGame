@@ -7,14 +7,13 @@ public class Character
     protected GameObject go;
     protected SpriteManager sm;
     protected Graphics gfx;
-    protected BoxCollider2D bc;
-    protected Rigidbody2D rb;
     protected PathFinding pf;
     protected CollisionManager cm;
     protected Tile currTile;
     protected GridManager gm;
     protected Health health;
 
+    protected float pivotHeightDiff;
     protected int direction;
     protected int damage;
     protected float speed;

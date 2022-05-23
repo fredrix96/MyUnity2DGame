@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Vendor : MonoBehaviour
 {
-    GameObject go;
+    GameObject go, textObject;
     GameObject tmpObject;
     Image img;
     CoinManager coinMan;
@@ -13,7 +13,8 @@ public class Vendor : MonoBehaviour
     CameraManager cam;
     GridManager gridMan;
 
-    int type;
+    BuildingInformation.TYPE_OF_BUILDING type;
+
     int counter;
     int cost;
     bool draging;
@@ -24,9 +25,10 @@ public class Vendor : MonoBehaviour
         img = GetComponent<Image>();
     }
 
-    public void Init(GameObject inGo, CoinManager inCoinMan, CameraManager inCam, GridManager inGridMan, BuildingInformation.TYPE_OF_BUILDING inType)
+    public void Init(GameObject inGo, GameObject inTextObject, CoinManager inCoinMan, CameraManager inCam, GridManager inGridMan, BuildingInformation.TYPE_OF_BUILDING inType)
     {
         go = inGo;
+        textObject = inTextObject;
         coinMan = inCoinMan;
         cam = inCam;
         gridMan = inGridMan;
@@ -34,8 +36,8 @@ public class Vendor : MonoBehaviour
         img = go.GetComponent<Image>();
         img.color = Color.white;
         color = new Color();
-        type = (int)inType;
-        cost = BuildingInformation.GetBuildingCost((BuildingInformation.TYPE_OF_BUILDING)type);
+        type = inType;
+        cost = BuildingInformation.GetBuildingCost(type);
     }
 
     void OnMouseEnter()
@@ -51,19 +53,26 @@ public class Vendor : MonoBehaviour
 
     void OnMouseDown()
     {
-        if (coinMan.SpendMoney(cost))
+        if (!BuildingInformation.MaxLimitReached(type))
         {
-            CreateBuildingImage();
+            if (coinMan.SpendMoney(cost))
+            {
+                CreateBuildingImage();
 
-            Vector3 screenPoint = Input.mousePosition;
-            screenPoint.z = cam.GetCamera().nearClipPlane;
-            tmpObject.transform.position = cam.GetCamera().ScreenToWorldPoint(screenPoint);
+                Vector3 screenPoint = Input.mousePosition;
+                screenPoint.z = cam.GetCamera().nearClipPlane;
+                tmpObject.transform.position = cam.GetCamera().ScreenToWorldPoint(screenPoint);
 
-            draging = true;
-            counter++;
+                draging = true;
+                counter++;
 
-            // Hide shop UI
-            go.GetComponentInParent<Canvas>().enabled = false;
+                // Hide shop UI
+                go.GetComponentInParent<Canvas>().enabled = false;
+            }
+        }
+        else
+        {
+            go.GetComponent<PopUpMessage>().SendPopUpMessage("You have reached the max limit!", 1.5f);
         }
     }
 
@@ -99,7 +108,10 @@ public class Vendor : MonoBehaviour
             if (AvoidObstacles(tile))
             {
                 // Use Gameobject.find?
-                GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding((BuildingInformation.TYPE_OF_BUILDING)type, tile, gridMan);
+                GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding(type, tile, gridMan);
+
+                // Update the counter text
+                UpdateText(type);
             }
             else
             {
@@ -125,7 +137,7 @@ public class Vendor : MonoBehaviour
 
         Tile tmpTile = gridMan.GetTile(new Vector2(0, 0));
         RectTransform rect = tmpObject.GetComponent<RectTransform>();
-        Vector2 size = BuildingInformation.GetBuildingSize((BuildingInformation.TYPE_OF_BUILDING)type) * 100;
+        Vector2 size = BuildingInformation.GetBuildingSize(type) * 100;
         tmpObject.transform.localScale = new Vector3(tmpTile.GetSize().x * size.x / rect.sizeDelta.x, tmpTile.GetSize().y * size.y / rect.sizeDelta.y, 1);
     }
 
@@ -139,7 +151,7 @@ public class Vendor : MonoBehaviour
         }
         else
         {
-            Vector2 size = BuildingInformation.GetBuildingSize((BuildingInformation.TYPE_OF_BUILDING)type);
+            Vector2 size = BuildingInformation.GetBuildingSize(type);
             int startX = -Mathf.FloorToInt(size.x / 2f);
             int endX = Mathf.CeilToInt(size.x / 2f);
             int startY = -Mathf.FloorToInt(size.y / 2f);
@@ -201,5 +213,11 @@ public class Vendor : MonoBehaviour
         }
 
         return tile;
+    }
+
+    public void UpdateText(BuildingInformation.TYPE_OF_BUILDING type)
+    {
+        textObject.GetComponent<Text>().text = "Cost: " + BuildingInformation.GetBuildingCost(type) + System.Environment.NewLine +
+            BuildingInformation.GetCounter(type).ToString() + " / " + BuildingInformation.GetMax(type).ToString();
     }
 }

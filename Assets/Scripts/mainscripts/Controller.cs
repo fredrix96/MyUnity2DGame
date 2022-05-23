@@ -104,7 +104,7 @@ public class Controller
             {
                 player.SetDirY(1);
             }
-            else if (Input.GetKey(KeyCode.S) && playerPos.y >= gridMan.GetTile(new Vector2(0, gridMan.GetRes().y - 1)).GetPos().y)
+            else if (Input.GetKey(KeyCode.S) && playerPos.y >= gridMan.GetTile(new Vector2(0, gridMan.GetRes().y - 2)).GetPos().y)
             {
                 player.SetDirY(-1);
             }

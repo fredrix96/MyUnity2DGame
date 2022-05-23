@@ -6,6 +6,8 @@ public class SpriteManager : MonoBehaviour
 {
     SpriteRenderer sr;
     Sprite[] sprites;
+    BoxCollider2D bc;
+    Rigidbody2D rb;
 
     double animationTimer, deadTimer;
 
@@ -15,12 +17,29 @@ public class SpriteManager : MonoBehaviour
     int idle, attack, walk, die;
     bool isIdle, isAttacking, isWalking, isDead;
 
-    public void Init(GameObject go, string spritePath, string sortingLayer)
+    public void Init(GameObject go, GridManager gm, string spritePath, string sortingLayer, bool kinematic = true)
     {
         sprites = Resources.LoadAll<Sprite>(spritePath);
         sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = sprites[idle];
         sr.sortingLayerID = SortingLayer.NameToID(sortingLayer);
+
+        bc = go.AddComponent<BoxCollider2D>();
+        float heightOfTile = gm.GetTile(Vector2.zero).GetSize().y / go.transform.localScale.y;
+        bc.size = new Vector2(bc.size.x / 2, heightOfTile);
+        bc.offset = new Vector2(0, -heightOfTile / 2);
+
+        rb = go.AddComponent<Rigidbody2D>();
+        if (kinematic)
+        {
+            rb.isKinematic = true;
+            rb.useFullKinematicContacts = true;
+        }
+        else
+        {
+            rb.gravityScale = 0;
+            rb.freezeRotation = true;
+        }
 
         ResetAnimations();
 
@@ -32,7 +51,7 @@ public class SpriteManager : MonoBehaviour
         walkDelay = 0.1f;
         idleDelay = 0.15f;
         attackDelay = 0.1f;
-        dieDelay = 0.1f; 
+        dieDelay = 0.1f;
 
         StartWalking();
     }
@@ -108,7 +127,7 @@ public class SpriteManager : MonoBehaviour
             animationTimer = 0;
         }
 
-        return damage; 
+        return damage;
     }
 
     public double Die()
@@ -195,6 +214,9 @@ public class SpriteManager : MonoBehaviour
         isAttacking = false;
         isWalking = false;
         isDead = true;
+
+        bc.isTrigger = true;
+        rb.useFullKinematicContacts = false;
     }
 
     public bool IsAttacking()
@@ -215,5 +237,27 @@ public class SpriteManager : MonoBehaviour
     public bool IsIdle()
     {
         return isIdle;
+    }
+
+    public List<Collider2D> GetListOfOverlapColliders(LayerMask layerMask)
+    {
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.SetLayerMask(layerMask);
+
+        List<Collider2D> results = new List<Collider2D>();
+        bc.OverlapCollider(filter, results);
+
+        return results;
+    }
+
+    public Vector3 GetColliderPivotPoint(GameObject go)
+    {
+        Vector3 pivotOffsetWorldSpace = go.transform.position - bc.bounds.center;
+
+        return new Vector3(
+                    go.transform.position.x,
+                    go.transform.position.y + pivotOffsetWorldSpace.y,
+                    go.transform.position.z
+                    );
     }
 }
