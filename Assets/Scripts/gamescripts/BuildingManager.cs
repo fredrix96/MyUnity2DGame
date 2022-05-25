@@ -9,7 +9,7 @@ public static class BuildingInformation
     private static int houseCounter = 0;
 
     private static int castleMax = 1;
-    private static int houseMax = 99;
+    private static int houseMax = 5;
 
     public enum TYPE_OF_BUILDING
     {

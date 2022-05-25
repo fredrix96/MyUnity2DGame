@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Serialization is the process of taking an object in ram (classes, fields, etc...)
+// and making a disk representation of it which can be recreated at any point in the future.
+// When you apply the SerializeField attribute to a field, it tells the unity engine to save/restore it's state to/from disk.
+// You mostly use serialization for the editor, and especially when building your own editor windows and inspectors.
+
 public static class Tools
 {
     public static bool DebugMode = false;

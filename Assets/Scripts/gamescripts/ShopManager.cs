@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class ShopManager
 {
     GameObject go, canvasObject, shopImage;
+    List<GameObject> imageObjects = new List<GameObject>();
     Canvas canvas;
     CanvasScaler cs;
     Image shop;
@@ -19,6 +20,8 @@ public class ShopManager
     {
         coinMan = inCoinMan;
         buildings = inBuildings;
+
+        imageObjects = new List<GameObject>();
 
         go = new GameObject() { name = "shopObject" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
@@ -112,6 +115,8 @@ public class ShopManager
 
             Vendor vendor = imageObject.AddComponent<Vendor>();
             vendor.Init(imageObject, textObject, coinMan, inCam, inGridMan, type);
+
+            imageObjects.Add(imageObject);
         }
         else
         {

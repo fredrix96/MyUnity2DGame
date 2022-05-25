@@ -42,13 +42,19 @@ public class Vendor : MonoBehaviour
 
     void OnMouseEnter()
     {
-        color = img.color;
-        img.color = new Color(0.3f, 0.3f, 0.8f, 1.0f);
+        if (!BuildingInformation.MaxLimitReached(type))
+        {
+            color = img.color;
+            img.color = new Color(0.3f, 0.3f, 0.3f, 1.0f);
+        }
     }
 
     void OnMouseExit()
     {
-        img.color = color;
+        if (!BuildingInformation.MaxLimitReached(type))
+        {
+            img.color = color;
+        }
     }
 
     void OnMouseDown()
@@ -125,6 +131,16 @@ public class Vendor : MonoBehaviour
 
             // Show shop UI
             go.GetComponentInParent<Canvas>().enabled = true;
+        }
+
+        // Best place to put this function for now. Hurts performance to have this in an update()
+        if (BuildingInformation.MaxLimitReached(type))
+        {
+            img.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+        }
+        else
+        {
+            img.color = color;
         }
     }
 
