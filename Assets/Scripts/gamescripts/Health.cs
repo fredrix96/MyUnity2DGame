@@ -13,7 +13,7 @@ public class Health : MonoBehaviour
 
     int health;
 
-    public void Init(GameObject inGo, string spriteSource, int inHealth)
+    public void Init(GameObject inGo, string spriteSource, int inHealth, bool building = false)
     {
         go = new GameObject();
         go.name = inGo.name + "_healthbar";
@@ -24,21 +24,28 @@ public class Health : MonoBehaviour
 
         sr.sprite = Resources.Load<Sprite>(spriteSource);
         sr.drawMode = SpriteDrawMode.Sliced;
-        sr.size = new Vector2(2.5f, 1f);
+        sr.size = new Vector2(2.5f, 1);
+        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, 0.8f);
 
         go.transform.localScale = sr.size;
         go.GetComponent<RectTransform>().sizeDelta = sr.size;
 
         health = inHealth;
 
-        if (go.transform.parent.GetComponent<BoxCollider2D>() == null)
+        if (!building)
+        {
+            height = sr.sprite.bounds.max.y / 2;
+        }
+        else if (go.transform.parent.GetComponent<BoxCollider2D>() == null)
         {
             Debug.Log("Warning: " + inGo.name + " does not have a box collider! Could not apply the correct height...");
         }
         else
         {
-            height = go.transform.parent.GetComponent<BoxCollider2D>().size.y * go.transform.parent.localScale.y;
+            height = go.transform.parent.GetComponent<BoxCollider2D>().size.y * go.transform.parent.localScale.y * 0.65f;
         }
+
+        go.transform.position = new Vector3(go.transform.parent.position.x, go.transform.parent.position.y + height, go.transform.parent.position.z);
     }
 
     void Update()

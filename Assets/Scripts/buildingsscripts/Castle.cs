@@ -23,7 +23,7 @@ public class Castle : Building
         selector.SetOutlineColor(Color.blue);
         selector.SetWidth(5);
 
-        go.transform.position = inPos.GetPos();
+        go.transform.position = inPos.GetWorldPos();
         gridMan = inGridMan;
 
         MarkTiles(type, inPos);
@@ -31,6 +31,8 @@ public class Castle : Building
         collider = go.AddComponent<BoxCollider2D>();
         rb = go.AddComponent<Rigidbody2D>();
         rb.isKinematic = true;
+
+        CreateHealthBar(type);
 
         BuildingInformation.IncreaseCounter(type);
     }

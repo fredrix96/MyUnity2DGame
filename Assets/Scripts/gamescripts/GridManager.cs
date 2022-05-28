@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GridManager
 {
     Graphics gfx;
     Tile[,] grid;
-    GameObject go;
+    GameObject go, imageObject;
     Vector2 res;
     Vector2 tilePosition;
+
+    Image areaImage;
+    Canvas canvas;
 
     public GridManager(Graphics inGfx, Vector2 inRes)
     {
         go = new GameObject { name = "grid" };
-        go.transform.parent = GameManager.GameManagerObject.transform;
+        go.transform.SetParent(GameManager.GameManagerObject.transform);
         tilePosition = new Vector2(0, 0);
 
         gfx = inGfx;
@@ -22,8 +26,34 @@ public class GridManager
         grid = new Tile[(int)res.x, (int)res.y];
 
         GenerateGrid();
+
+        imageObject = new GameObject { name = "areaImage" };
+        imageObject.transform.SetParent(go.transform);
+
+        canvas = imageObject.AddComponent<Canvas>();
+        canvas.sortingLayerName = "CenterUI";
+
+        Vector2 sizeOfTile = grid[0, 0].GetSize();
+
+        RectTransform rect = imageObject.GetComponent<RectTransform>();
+        rect.transform.position = grid[((int)res.x) / 3, ((int)res.y) / 2].GetWorldPos();
+        float offSet = grid[0, 0].GetWorldPos().y - grid[0, 1].GetWorldPos().y;
+        rect.transform.position = new Vector2(rect.transform.position.x, rect.transform.position.y + offSet / 2);
+        rect.pivot = new Vector2(1, rect.pivot.y);
+        rect.localScale = new Vector3(sizeOfTile.x * res.x / 300, sizeOfTile.y * res.y / 100, 1);
+
+        areaImage = imageObject.AddComponent<Image>();
+        areaImage.sprite = Resources.Load<Sprite>("Sprites/Grid");
+        areaImage.color = new Color(0.4f, 1.0f, 0.0f, 0.2f);
+        
+        imageObject.SetActive(false);
     }
 
+    public void ActivateAreaImage(bool active)
+    {
+        imageObject.SetActive(active);
+    }
+    
     void GenerateGrid()
     {
         // Size of each tile
@@ -42,7 +72,7 @@ public class GridManager
 
                 grid[x, y] = new Tile(go, tilePosition);
                 grid[x, y].SetSize(tileSize);
-                grid[x, y].SetPos(currPosition);
+                grid[x, y].SetWorldPos(currPosition);
 
                 currPosition = new Vector2(currPosition.x + tileSize.x, currPosition.y);
             }
@@ -68,8 +98,8 @@ public class GridManager
         Tile outTile = null;
 
         // Return null if the incoming position is outside of the grid
-        if (pos.x < grid[0, 0].GetPos().x || pos.x > grid[(int)res.x - 1, (int)res.y - 1].GetPos().x
-            || pos.y > grid[0, 0].GetPos().y || pos.y < grid[(int)res.x - 1, (int)res.y - 1].GetPos().y)
+        if (pos.x < grid[0, 0].GetWorldPos().x || pos.x > grid[(int)res.x - 1, (int)res.y - 1].GetWorldPos().x
+            || pos.y > grid[0, 0].GetWorldPos().y || pos.y < grid[(int)res.x - 1, (int)res.y - 1].GetWorldPos().y)
         {
             return outTile;
         }
@@ -124,11 +154,11 @@ public class GridManager
         
             if (y + 1 >= (int)res.y)
             {
-                atThisTile = grid[0, y].GetPos().y - grid[0, y].GetSize().y / 2 <= pos.y;
+                atThisTile = grid[0, y].GetWorldPos().y - grid[0, y].GetSize().y / 2 <= pos.y;
             }
             else
             {
-                atThisTile = grid[0, y].GetPos().y - grid[0, y].GetSize().y / 2 <= pos.y && pos.y > grid[0, y + 1].GetPos().y - grid[0, y + 1].GetSize().y / 2;
+                atThisTile = grid[0, y].GetWorldPos().y - grid[0, y].GetSize().y / 2 <= pos.y && pos.y > grid[0, y + 1].GetWorldPos().y - grid[0, y + 1].GetSize().y / 2;
             }
         
             if (atThisTile)
@@ -144,11 +174,11 @@ public class GridManager
         
             if (x + 1 >= (int)res.x)
             {
-                atThisTile = grid[x, y].GetPos().x - grid[x, y].GetSize().x / 2 <= pos.x;
+                atThisTile = grid[x, y].GetWorldPos().x - grid[x, y].GetSize().x / 2 <= pos.x;
             }
             else
             {
-                atThisTile = grid[x, y].GetPos().x - grid[x, y].GetSize().x / 2 <= pos.x && pos.x < grid[x + 1, y].GetPos().x - grid[x + 1, y].GetSize().x / 2;
+                atThisTile = grid[x, y].GetWorldPos().x - grid[x, y].GetSize().x / 2 <= pos.x && pos.x < grid[x + 1, y].GetWorldPos().x - grid[x + 1, y].GetSize().x / 2;
             }
         
             if (atThisTile)
@@ -168,7 +198,7 @@ public class GridManager
         float step = 0;
 
         // Start at left upper corner
-        if (pos.x < grid[0, 0].GetPos().x && pos.y > grid[0, 0].GetPos().y)
+        if (pos.x < grid[0, 0].GetWorldPos().x && pos.y > grid[0, 0].GetWorldPos().y)
         {
             while (!found)
             {
@@ -183,7 +213,7 @@ public class GridManager
             }
         }
         // Start at right upper corner
-        else if (pos.x > grid[(int)res.x - 1, 0].GetPos().x && pos.y > grid[0, 0].GetPos().y)
+        else if (pos.x > grid[(int)res.x - 1, 0].GetWorldPos().x && pos.y > grid[0, 0].GetWorldPos().y)
         {
             while (!found)
             {
@@ -198,7 +228,7 @@ public class GridManager
             }
         }
         // Start at left lower corner
-        else if (pos.x < grid[0, 0].GetPos().x && pos.y < grid[0, (int)res.y - 1].GetPos().y)
+        else if (pos.x < grid[0, 0].GetWorldPos().x && pos.y < grid[0, (int)res.y - 1].GetWorldPos().y)
         {
             while (!found)
             {
@@ -213,7 +243,7 @@ public class GridManager
             }
         }
         // Start at right lower corner
-        else if (pos.x > grid[(int)res.x - 1, 0].GetPos().x && pos.y < grid[0, (int)res.y - 1].GetPos().y)
+        else if (pos.x > grid[(int)res.x - 1, 0].GetWorldPos().x && pos.y < grid[0, (int)res.y - 1].GetWorldPos().y)
         {
             while (!found)
             {
@@ -228,7 +258,7 @@ public class GridManager
             }
         }
         // Start above grid
-        else if (pos.y > grid[0, 0].GetPos().y)
+        else if (pos.y > grid[0, 0].GetWorldPos().y)
         {
             while (!found)
             {
@@ -243,7 +273,7 @@ public class GridManager
             }
         }
         // Start below grid
-        else if (pos.y < grid[0, (int)res.y - 1].GetPos().y)
+        else if (pos.y < grid[0, (int)res.y - 1].GetWorldPos().y)
         {
             while (!found)
             {
@@ -258,7 +288,7 @@ public class GridManager
             }
         }
         // Start to the left of grid
-        else if (pos.x < grid[0, 0].GetPos().x)
+        else if (pos.x < grid[0, 0].GetWorldPos().x)
         {
             while (!found)
             {
@@ -273,7 +303,7 @@ public class GridManager
             }
         }
         // Start to the right of grid
-        else if (pos.x > grid[(int)res.x - 1, 0].GetPos().x)
+        else if (pos.x > grid[(int)res.x - 1, 0].GetWorldPos().x)
         {
             while (!found)
             {
@@ -305,5 +335,12 @@ public class GridManager
     public Vector2 GetRes()
     {
         return res;
+    }
+
+    /// <summary> returns Vector(MinX, MaxX, MinY, MaxY) </summary>
+    public Vector4 GetPlacementAreaBorders()
+    {
+        Vector4 placementArea = new Vector4(grid[0, 0].GetWorldPos().x, grid[(int)res.x / 3, 0].GetWorldPos().x, grid[0, (int)res.y - 1].GetWorldPos().y, grid[0, 0].GetWorldPos().y);
+        return placementArea;
     }
 }

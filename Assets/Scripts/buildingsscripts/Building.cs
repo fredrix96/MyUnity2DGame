@@ -13,6 +13,8 @@ public class Building
     protected Selector selector;
     protected CoinManager coinMan;
     protected Material outline;
+    protected Health health;
+
     protected BuildingInformation.TYPE_OF_BUILDING type;
 
     public Building()
@@ -45,14 +47,14 @@ public class Building
                     if (x == startX && y == startY)
                     {
                         // Min x and y pos
-                        height.y = currTile.GetPos().y;
-                        width.y = currTile.GetPos().x;
+                        height.y = currTile.GetWorldPos().y;
+                        width.y = currTile.GetWorldPos().x;
                     }
                     else if (x == endX && y == endY)
                     {
                         // Max x and y pos
-                        height.x = currTile.GetPos().y;
-                        width.x = currTile.GetPos().x;
+                        height.x = currTile.GetWorldPos().y;
+                        width.x = currTile.GetWorldPos().x;
                     }
                 }
             }
@@ -79,5 +81,11 @@ public class Building
         }
 
         go.transform.localScale = new Vector3(inPos.GetSize().x * size.x / sr.size.x, inPos.GetSize().y * size.y / sr.size.y, 1);
+    }
+
+    public void CreateHealthBar(BuildingInformation.TYPE_OF_BUILDING type)
+    {
+        health = go.AddComponent<Health>();
+        health.Init(go, "Sprites/SoldierHealth", BuildingInformation.GetBuildingHealth(type), true);
     }
 }

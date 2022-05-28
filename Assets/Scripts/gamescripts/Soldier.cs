@@ -6,6 +6,8 @@ public class Soldier : Character
 {
     public Soldier(Graphics inGfx, GameObject inGo, GridManager inGm)
     {
+        type = TYPE_OF_CHARACTER.Soldier;
+
         gfx = inGfx;
         gm = inGm;
 
@@ -21,11 +23,12 @@ public class Soldier : Character
 
         float randomY = Random.Range(0, gm.GetRes().y - 1);
         Vector2 spawnTile = new Vector2(0, randomY);
-        go.transform.position = gm.GetTile(spawnTile).GetPos();
+        go.transform.position = gm.GetTile(spawnTile).GetWorldPos();
 
         // This is to make sure that feet of the character wont walk on another sprite
         pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
         go.transform.position = sm.GetColliderPivotPoint(go);
+        ph.position = go.transform.position;
 
         health = go.AddComponent<Health>();
         health.Init(go,"Sprites/SoldierHealth", 100);
@@ -36,7 +39,11 @@ public class Soldier : Character
 
         currTile = gm.GetTile(spawnTile);
         currTile.IncreaseCharacters(this);
-        pf = new PathFinding(gm);
+
+        ph.type = type;
+        ph.isIdle = false;
+
+        UpdatePositionHandler();
     }
 
     public override void Update()
@@ -49,19 +56,9 @@ public class Soldier : Character
 
                 MarkTile();
 
-                Vector2 newPos = pf.GetNextTile(currTile, typeof(Enemy), typeof(Soldier), out targetFound, true);
+                SetGameObjectPosition(position);
 
-                // If the soldier has reached half of the field, then stop if there are no enemies nearby
-                if (!targetFound && go.transform.position.x > gfx.GetLevelLimits().y / 2)
-                {
-                    sm.StartIdle();
-                }
-                else
-                {
-                    // Notice how we adjust based on the pivot difference
-                    go.transform.position = new Vector3(Mathf.MoveTowards(go.transform.position.x, newPos.x, speed * Time.deltaTime),
-                        Mathf.MoveTowards(go.transform.position.y, newPos.y + pivotHeightDiff, speed * Time.deltaTime), 0);
-                }
+                UpdatePositionHandler();
             }
             else if (sm.IsAttacking())
             {
@@ -107,7 +104,7 @@ public class Soldier : Character
             else if (sm.IsIdle())
             {
                 // Always search for target
-                pf.GetNextTile(currTile, typeof(Enemy), typeof(Soldier), out targetFound, true);
+                PathFinding.GetNextTile(currTile.GetTilePosition(), typeof(Enemy), typeof(Soldier), out targetFound, true);
 
                 if (targetFound)
                 {
@@ -131,20 +128,6 @@ public class Soldier : Character
             {
                 shouldBeRemoved = true;
             }
-        }
-
-    }
-
-    void MarkTile()
-    {
-        Vector3 correctPivotToTilePos = new Vector3(go.transform.position.x, go.transform.position.y - pivotHeightDiff, go.transform.position.z);
-        Tile newTile = gm.GetTileFromWorldPosition(correctPivotToTilePos);
-
-        if (newTile != currTile)
-        {
-            newTile.IncreaseCharacters(this);
-            currTile.DecreaseCharacters(this);
-            currTile = newTile;
         }
     }
 

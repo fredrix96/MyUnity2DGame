@@ -49,15 +49,12 @@ public class Main : MonoBehaviour
 
     void Update()
     {
+        PathFinding.gm = gridMan;
+
         camMan.Update();
         ctrl.Update();
         charMan.Update();
         coinMan.Update();
         shopMan.Update();
-
-        if (Tools.DebugMode)
-        {
-            Tools.LogFPS();
-        }
     }
 }

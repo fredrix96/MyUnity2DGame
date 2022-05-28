@@ -8,6 +8,8 @@ public class Tile
     GameObject go;
     SpriteRenderer sr;
     Vector2 tilePosition;
+    Vector2 tileWorldPos;
+    Vector2 tileSize;
 
     uint nrOfEnemiesOnTile, nrOfSoldiersOnTile;
 
@@ -18,11 +20,11 @@ public class Tile
     {
         tilePosition = inTilePosition;
 
-        go = new GameObject {  name = "Tile[" + tilePosition.x + ", " + tilePosition.y + "]" };
-        go.transform.parent = grid.transform;
-
         if (Tools.DebugMode)
         {
+            go = new GameObject { name = "Tile[" + tilePosition.x + ", " + tilePosition.y + "]" };
+            go.transform.parent = grid.transform;
+
             sr = go.AddComponent<SpriteRenderer>();
             sr.sprite = Resources.Load<Sprite>("Sprites/Tile");
             sr.color = Color.white;
@@ -190,22 +192,32 @@ public class Tile
 
     public void SetSize(Vector2 newSize)
     {
-        go.transform.localScale = newSize;
+        if (Tools.DebugMode)
+        {
+            go.transform.localScale = newSize;
+        }
+
+        tileSize = newSize;
     }
 
     public Vector2 GetSize()
     {
-        return go.transform.localScale;
+        return tileSize;
     }
 
-    public void SetPos(Vector2 newPos)
+    public void SetWorldPos(Vector2 newPos)
     {
-        go.transform.position = newPos;
+        if (Tools.DebugMode)
+        {
+            go.transform.position = newPos;
+        }
+
+        tileWorldPos = newPos;
     }
 
-    public Vector2 GetPos()
+    public Vector2 GetWorldPos()
     {
-        return go.transform.position;
+        return tileWorldPos;
     }
 
     public void SetValue(float inValue)

@@ -1,26 +1,22 @@
-﻿using System.Collections;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Unity.Mathematics; // more optimized math, good for multithreading
 
-public class PathFinding
+public static class PathFinding
 {
-    GridManager gm;
-
-    public PathFinding(GridManager inGm)
-    {
-        gm = inGm;
-    }
+    public static GridManager gm;
 
     // Find the closest target
-    public Vector2 GetNextTile(Tile startTile, Type target, Type friend, out bool targetFound, bool right)
+    public static float2 GetNextTile(float2 startTilePosition, Type target, Type friend, out bool targetFound, bool right)
     {
+        Tile startTile = gm.GetTile(startTilePosition);
+
         targetFound = false;
 
         if (!startTile.IsCharacterPresent(target))
         {
             // Prioritize the y-axis, then back, then front. Look if the target is on a neighboring tile
-            Vector2 tmpPos = GetPosFromNeighboringTile(startTile.GetTilePosition(), target, friend, right);
+            float2 tmpPos = GetPosFromNeighboringTile(startTile.GetTilePosition(), target, friend, right);
             if (tmpPos.x != -1)
             {
                 targetFound = true;
@@ -34,7 +30,7 @@ public class PathFinding
                 // Do not look at the current tile
                 if (y != startTile.GetTilePosition().y)
                 {
-                    Tile yTile = gm.GetTile(new Vector2(startTile.GetTilePosition().x, y));
+                    Tile yTile = gm.GetTile(new float2(startTile.GetTilePosition().x, y));
                     if (yTile.IsCharacterPresent(target) && !yTile.IsCharacterPresent(friend) && !yTile.IsObjectPresent())
                     {
                         // The closer the target is, the lower value it gets
@@ -69,11 +65,11 @@ public class PathFinding
                         for (int x = (int)startTile.GetTilePosition().x + 1; x < (int)startTile.GetTilePosition().x + shortestDist / 2; x++)
                         {
                             // If the target is closer on the x-axis, move forward
-                            Tile xTile = gm.GetTile(new Vector2(x, startTile.GetTilePosition().y));
+                            Tile xTile = gm.GetTile(new float2(x, startTile.GetTilePosition().y));
                             if (xTile.IsCharacterPresent(target) && !xTile.IsCharacterPresent(friend) && !xTile.IsObjectPresent())
                             {
-                                Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y));
-                                return nextTileXFront.GetPos();
+                                Tile nextTileXFront = gm.GetTile(new float2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y));
+                                return nextTileXFront.GetWorldPos();
                             }
                         }
                     }
@@ -85,11 +81,11 @@ public class PathFinding
                         for (int x = (int)startTile.GetTilePosition().x - 1; x > (int)startTile.GetTilePosition().x - shortestDist / 2; x--)
                         {
                             // If the target is closer on the x-axis, move forward
-                            Tile xTile = gm.GetTile(new Vector2(x, startTile.GetTilePosition().y));
+                            Tile xTile = gm.GetTile(new float2(x, startTile.GetTilePosition().y));
                             if (xTile.IsCharacterPresent(target) && !xTile.IsCharacterPresent(friend) && !xTile.IsObjectPresent())
                             {
-                                Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y));
-                                return nextTileXFront.GetPos();
+                                Tile nextTileXFront = gm.GetTile(new float2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y));
+                                return nextTileXFront.GetWorldPos();
                             }
                         }
                     }
@@ -98,18 +94,18 @@ public class PathFinding
                 // Else move to the closest target at the y-axis
                 if (targets[0].GetTilePosition().y > startTile.GetTilePosition().y)
                 {
-                    Tile nextTileYUp = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
+                    Tile nextTileYUp = gm.GetTile(new float2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
                     if (!nextTileYUp.IsCharacterPresent(friend) && !nextTileYUp.IsObjectPresent())
                     {
-                        return nextTileYUp.GetPos();
+                        return nextTileYUp.GetWorldPos();
                     }
                 }
                 else
                 {
-                    Tile nextTileYDown = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
+                    Tile nextTileYDown = gm.GetTile(new float2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
                     if (!nextTileYDown.IsCharacterPresent(friend) && !nextTileYDown.IsObjectPresent())
                     {
-                        return nextTileYDown.GetPos();
+                        return nextTileYDown.GetWorldPos();
                     }
                 }
             }
@@ -123,10 +119,10 @@ public class PathFinding
 
         // The target is on this tile
         targetFound = true;
-        return startTile.GetPos();
+        return startTile.GetWorldPos();
     }
 
-    Vector2 FindMostEffectivePosition(Tile startTile, bool right)
+    static float2 FindMostEffectivePosition(Tile startTile, bool right)
     {
         bool openPathUp = false;
         bool openPathDown = false;
@@ -136,21 +132,21 @@ public class PathFinding
         if (right)
         {
             // If the next tile is inside the playarea and it does not have an object on it
-            if (startTile.GetTilePosition().x + 1 < gm.GetRes().x && !gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y)).IsObjectPresent())
+            if (startTile.GetTilePosition().x + 1 < gm.GetRes().x && !gm.GetTile(new float2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y)).IsObjectPresent())
             {
-                Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y));
-                return nextTileXFront.GetPos();
+                Tile nextTileXFront = gm.GetTile(new float2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y));
+                return nextTileXFront.GetWorldPos();
             }
             // If the next tile has an object on it. Find the shortest path around it
-            else if (gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y)).IsObjectPresent())
+            else if (gm.GetTile(new float2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y)).IsObjectPresent())
             {
                 while (!openPathUp && !openPathDown)
                 {                 
-                    if (startTile.GetTilePosition().y + steps < gm.GetRes().y && !gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y + steps)).IsObjectPresent())
+                    if (startTile.GetTilePosition().y + steps < gm.GetRes().y && !gm.GetTile(new float2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y + steps)).IsObjectPresent())
                     {
                         openPathUp = true;
                     }
-                    else if (startTile.GetTilePosition().y - steps > 0 && !gm.GetTile(new Vector2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y - steps)).IsObjectPresent())
+                    else if (startTile.GetTilePosition().y - steps > 0 && !gm.GetTile(new float2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y - steps)).IsObjectPresent())
                     {
                         openPathDown = true;
                     }
@@ -162,13 +158,13 @@ public class PathFinding
 
                 if (openPathUp)
                 {
-                    Tile nextTileYUp = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
-                    return nextTileYUp.GetPos();
+                    Tile nextTileYUp = gm.GetTile(new float2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
+                    return nextTileYUp.GetWorldPos();
                 }
                 else
                 {
-                    Tile nextTileYUp = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
-                    return nextTileYUp.GetPos();
+                    Tile nextTileYUp = gm.GetTile(new float2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
+                    return nextTileYUp.GetWorldPos();
                 }
             }
         }
@@ -176,21 +172,21 @@ public class PathFinding
         else
         {
             // If the next tile is inside the playarea and it does not have an object on it
-            if (startTile.GetTilePosition().x - 1 > 0 && !gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y)).IsObjectPresent())
+            if (startTile.GetTilePosition().x - 1 > 0 && !gm.GetTile(new float2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y)).IsObjectPresent())
             {
-                Tile nextTileXFront = gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y));
-                return nextTileXFront.GetPos();
+                Tile nextTileXFront = gm.GetTile(new float2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y));
+                return nextTileXFront.GetWorldPos();
             }
             // If the next tile has an object on it. Find the shortest path around it
-            else if (gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y)).IsObjectPresent())
+            else if (gm.GetTile(new float2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y)).IsObjectPresent())
             {
                 while (!openPathUp && !openPathDown)
                 {
-                    if (startTile.GetTilePosition().y + steps < gm.GetRes().y && !gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y + steps)).IsObjectPresent())
+                    if (startTile.GetTilePosition().y + steps < gm.GetRes().y && !gm.GetTile(new float2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y + steps)).IsObjectPresent())
                     {
                         openPathUp = true;
                     }
-                    else if (startTile.GetTilePosition().y - steps > 0 && !gm.GetTile(new Vector2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y - steps)).IsObjectPresent())
+                    else if (startTile.GetTilePosition().y - steps > 0 && !gm.GetTile(new float2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y - steps)).IsObjectPresent())
                     {
                         openPathDown = true;
                     }
@@ -202,22 +198,22 @@ public class PathFinding
 
                 if (openPathUp)
                 {
-                    Tile nextTileYUp = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
-                    return nextTileYUp.GetPos();
+                    Tile nextTileYUp = gm.GetTile(new float2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
+                    return nextTileYUp.GetWorldPos();
                 }
                 else
                 {
-                    Tile nextTileYDown = gm.GetTile(new Vector2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
-                    return nextTileYDown.GetPos();
+                    Tile nextTileYDown = gm.GetTile(new float2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
+                    return nextTileYDown.GetWorldPos();
                 }
             }
         }
 
         // Do not leave the borders
-        return startTile.GetPos();
+        return startTile.GetWorldPos();
     }
 
-    bool LookForObstaclesBetweenTiles(Tile tile1, Tile tile2)
+    static bool LookForObstaclesBetweenTiles(Tile tile1, Tile tile2)
     {
         bool obstacle = false;
 
@@ -225,7 +221,7 @@ public class PathFinding
         {
             for (int y = (int)tile1.GetTilePosition().y; y < (int)tile2.GetTilePosition().y; y++)
             {
-                Tile tile = gm.GetTile(new Vector2(tile2.GetTilePosition().x, y));
+                Tile tile = gm.GetTile(new float2(tile2.GetTilePosition().x, y));
                 if (tile.IsObjectPresent())
                 {
                     obstacle = true;
@@ -236,7 +232,7 @@ public class PathFinding
         {
             for (int y = (int)tile2.GetTilePosition().y; y < (int)tile1.GetTilePosition().y; y++)
             {
-                Tile tile = gm.GetTile(new Vector2(tile2.GetTilePosition().x, y));
+                Tile tile = gm.GetTile(new float2(tile2.GetTilePosition().x, y));
                 if (tile.IsObjectPresent())
                 {
                     obstacle = true;
@@ -248,25 +244,25 @@ public class PathFinding
         return obstacle;
     }
 
-    Vector2 GetPosFromNeighboringTile(Vector2 inPos, Type target, Type friend, bool right)
+    static float2 GetPosFromNeighboringTile(float2 inPos, Type target, Type friend, bool right)
     {
-        Vector2 outPos = new Vector2(-1, -1);
+        float2 outPos = new float2(-1, -1);
 
         // Avoid tiles that are occupied by others
         if (inPos.y + 1 < gm.GetRes().y)
         {
-            Tile nextTileYUp = gm.GetTile(new Vector2(inPos.x, inPos.y + 1));
+            Tile nextTileYUp = gm.GetTile(new float2(inPos.x, inPos.y + 1));
             if (nextTileYUp.IsCharacterPresent(target) && !nextTileYUp.IsCharacterPresent(friend) && !nextTileYUp.IsObjectPresent())
             {
-                return nextTileYUp.GetPos();
+                return nextTileYUp.GetWorldPos();
             }
         }
         if (inPos.y - 1 > 0)
         {
-            Tile nextTileYDown = gm.GetTile(new Vector2(inPos.x, inPos.y - 1));
+            Tile nextTileYDown = gm.GetTile(new float2(inPos.x, inPos.y - 1));
             if (nextTileYDown.IsCharacterPresent(target) && !nextTileYDown.IsCharacterPresent(friend) && !nextTileYDown.IsObjectPresent())
             {
-                return nextTileYDown.GetPos();
+                return nextTileYDown.GetWorldPos();
             }
         }
 
@@ -275,18 +271,18 @@ public class PathFinding
         {
             if (inPos.x - 1 > 0)
             {
-                Tile nextTileXBack = gm.GetTile(new Vector2(inPos.x - 1, inPos.y));
+                Tile nextTileXBack = gm.GetTile(new float2(inPos.x - 1, inPos.y));
                 if (nextTileXBack.IsCharacterPresent(target) && !nextTileXBack.IsCharacterPresent(friend) && !nextTileXBack.IsObjectPresent())
                 {
-                    return nextTileXBack.GetPos();
+                    return nextTileXBack.GetWorldPos();
                 }
             }
             else if (inPos.x + 1 < gm.GetRes().x)
             {
-                Tile nextTileXFront = gm.GetTile(new Vector2(inPos.x + 1, inPos.y));
+                Tile nextTileXFront = gm.GetTile(new float2(inPos.x + 1, inPos.y));
                 if (nextTileXFront.IsCharacterPresent(target) && !nextTileXFront.IsCharacterPresent(friend) && !nextTileXFront.IsObjectPresent())
                 {
-                    return nextTileXFront.GetPos();
+                    return nextTileXFront.GetWorldPos();
                 }
             }
         }
@@ -295,18 +291,18 @@ public class PathFinding
         {
             if (inPos.x + 1 < gm.GetRes().x)
             {
-                Tile nextTileXFront = gm.GetTile(new Vector2(inPos.x + 1, inPos.y));
+                Tile nextTileXFront = gm.GetTile(new float2(inPos.x + 1, inPos.y));
                 if (nextTileXFront.IsCharacterPresent(target) && !nextTileXFront.IsCharacterPresent(friend) && !nextTileXFront.IsObjectPresent())
                 {
-                    return nextTileXFront.GetPos();
+                    return nextTileXFront.GetWorldPos();
                 }
             }
             if (inPos.x - 1 > 0)
             {
-                Tile nextTileXBack = gm.GetTile(new Vector2(inPos.x - 1, inPos.y));
+                Tile nextTileXBack = gm.GetTile(new float2(inPos.x - 1, inPos.y));
                 if (nextTileXBack.IsCharacterPresent(target) && !nextTileXBack.IsCharacterPresent(friend) && !nextTileXBack.IsObjectPresent())
                 {
-                    return nextTileXBack.GetPos();
+                    return nextTileXBack.GetWorldPos();
                 }
             }
         }
@@ -315,7 +311,7 @@ public class PathFinding
     }
 
     // Find the closest target by using the A* algorithm
-    /*public Vector2 GetNextTile(Tile startTile)
+    /*public static float2 GetNextTile(Tile startTile)
     {
         // Initialize the open list
         List<Tile> openList = new List<Tile>();
@@ -368,7 +364,7 @@ public class PathFinding
                             }
                             else
                             {
-                                Vector2 pos = new Vector2(x, y);
+                                float2 pos = new float2(x, y);
                                 Tile successor = gm.GetTile(pos);
 
                                 // If successor is the goal, stop search

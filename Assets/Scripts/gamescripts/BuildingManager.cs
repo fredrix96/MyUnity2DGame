@@ -21,11 +21,21 @@ public static class BuildingInformation
         400, 50
     };
 
+    static readonly int[] health = new int[]
+    {
+        1000, 50
+    };
+
     // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
     static readonly Vector2[] size = new Vector2[] 
     {
         new Vector2(7,11), new Vector2(3,5),
     };
+
+    public static int GetBuildingHealth(TYPE_OF_BUILDING type)
+    {
+        return health[(int)type];
+    }
 
     public static int GetBuildingCost(TYPE_OF_BUILDING type)
     {
@@ -167,7 +177,7 @@ public class BuildingManager : MonoBehaviour
 
     public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, GridManager inGridMan)
     {
-        audioMan.PlayAudio3D("Construct", 0.4f, inPos.GetPos());
+        audioMan.PlayAudio3D("Construct", 0.4f, inPos.GetWorldPos());
 
         if (type == BuildingInformation.TYPE_OF_BUILDING.Castle)
         {

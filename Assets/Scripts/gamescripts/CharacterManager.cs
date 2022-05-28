@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Jobs;
+using Unity.Collections;
+using Unity.Burst;
 
 public static class EnemyCounter
 {
     public static int counter = 0;
     public static int nrOfEnemies = 0;
-    public static int max = 50;
+    public static int max = 1000;
 }
 
 public static class SoldierCounter
@@ -14,6 +17,19 @@ public static class SoldierCounter
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
     public static int max = 1000;
+}
+
+//[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)
+public struct CharacterUpdatePositionJob : IJobParallelFor
+{
+    public NativeArray<Character.PositionHandler> characterDataArray;
+
+    public void Execute(int index)
+    {
+        var data = characterDataArray[index];
+        data.UpdatePosition();
+        characterDataArray[index] = data;
+    }
 }
 
 public class CharacterManager
@@ -51,8 +67,8 @@ public class CharacterManager
         enemies = new List<Enemy>();
         soldiers = new List<Soldier>();
 
-        enemySpawnDelay = 1.0f;
-        soldierSpawnDelay = 3.0f;
+        enemySpawnDelay = 0.3f;
+        soldierSpawnDelay = 0.6f;
         playerSpawnDelay = 5.0f;
 
         enemySpawnTimer = 0;
@@ -67,6 +83,48 @@ public class CharacterManager
         UpdatePlayer();
     }
 
+    /// <summary> This is done with multithreading OR singlethreading </summary>
+    void UpdateCharacterPosition<T>(List<T> characters, bool multithreading) where T : Character
+    {
+        if (multithreading)
+        {
+            // Main thread -----------------------------------------
+
+            var characterDataArray = new NativeArray<Character.PositionHandler>(characters.Count, Allocator.TempJob);
+
+            for (int i = 0; i < characters.Count; i++)
+            {
+                characterDataArray[i] = characters[i].ph;
+            }
+
+            var job = new CharacterUpdatePositionJob()
+            {
+                characterDataArray = characterDataArray,
+            };
+
+            // Child threads ----------------------------------------
+
+            var jobHandle = job.Schedule(characters.Count, 1);
+            jobHandle.Complete();
+
+            // Main thread ------------------------------------------
+
+            for (int i = 0; i < characters.Count; i++)
+            {
+                characters[i].SetPositionHandler(characterDataArray[i]);
+            }
+
+            characterDataArray.Dispose();
+        }
+        else
+        {
+            for (int i = 0; i < characters.Count; i++)
+            {
+                characters[i].ph.UpdatePosition();
+            }
+        }
+    }
+
     void UpdateEnemies()
     {
         if (EnemyCounter.nrOfEnemies < EnemyCounter.max)
@@ -78,6 +136,8 @@ public class CharacterManager
                 enemySpawnTimer = 0;
             }
         }
+
+        UpdateCharacterPosition(enemies, true);
 
         for (int i = 0; i < enemies.Count; i++)
         {
@@ -104,6 +164,8 @@ public class CharacterManager
             }
         }
 
+        UpdateCharacterPosition(soldiers, true);
+
         for (int i = 0; i < soldiers.Count; i++)
         {
             if (soldiers[i].Remove())
@@ -126,7 +188,7 @@ public class CharacterManager
         {
             player.Destroy();
             playerSpawnTimer += Time.deltaTime;
-            message.SendPopUpMessage("The King is dead!", 2.5f, Color.red);
+            message.SendPopUpMessage("The King is dead!", 2.5f);
         }
         else if (playerSpawnTimer > 0)
         {
@@ -137,7 +199,7 @@ public class CharacterManager
             {
                 player.Respawn();
                 playerSpawnTimer = 0;
-                message.SendPopUpMessage("A new King has arrived!" + System.Environment.NewLine + "All hail the new King!", 2.5f, Color.white);
+                message.SendPopUpMessage("A new King has arrived!" + System.Environment.NewLine + "All hail the new King!", 2.5f);
             }
         }
     }

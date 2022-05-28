@@ -86,13 +86,15 @@ public class Vendor : MonoBehaviour
     {
         if (draging)
         {
+            gridMan.ActivateAreaImage(true);
+
             Tile tile = MousePosToTilePos();
 
             // Follow the mouse
-            tmpObject.transform.position = tile.GetPos();
+            tmpObject.transform.position = tile.GetWorldPos();
 
             // If there is obstacles on the tiles, mark the building red
-            if (!AvoidObstacles(tile))
+            if (!AvoidObstacles(tile) || !CheckIfInsidePlacementArea(tile))
             {
                 // Indicate with red color that the building can not be placed here
                 tmpObject.GetComponent<Image>().color = new Color(0.8f, 0.2f, 0.2f, 0.8f);
@@ -108,20 +110,31 @@ public class Vendor : MonoBehaviour
     {
         if (draging)
         {
+            gridMan.ActivateAreaImage(false);
+
             Tile tile = MousePosToTilePos();
 
-            // If there is no obstacle, create the building
-            if (AvoidObstacles(tile))
+            // If inside the placement area
+            if (CheckIfInsidePlacementArea(tile))
             {
-                // Use Gameobject.find?
-                GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding(type, tile, gridMan);
+                // If there is no obstacle, create the building
+                if (AvoidObstacles(tile))
+                {
+                    // Use Gameobject.find?
+                    GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding(type, tile, gridMan);
 
-                // Update the counter text
-                UpdateText(type);
+                    // Update the counter text
+                    UpdateText(type);
+                }
+                else
+                {
+                    go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building" + System.Environment.NewLine + "at an obstacle!");
+                    coinMan.AddCoins(cost);
+                }
             }
             else
             {
-                go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building at an obstacle!", 1.5f);
+                go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building" + System.Environment.NewLine + "outside the placement area!");
                 coinMan.AddCoins(cost);
             }
 
@@ -155,6 +168,22 @@ public class Vendor : MonoBehaviour
         RectTransform rect = tmpObject.GetComponent<RectTransform>();
         Vector2 size = BuildingInformation.GetBuildingSize(type) * 100;
         tmpObject.transform.localScale = new Vector3(tmpTile.GetSize().x * size.x / rect.sizeDelta.x, tmpTile.GetSize().y * size.y / rect.sizeDelta.y, 1);
+    }
+
+    bool CheckIfInsidePlacementArea(Tile tile)
+    {
+        bool inside = false;
+
+        Vector4 area = gridMan.GetPlacementAreaBorders();
+        Vector2 tilePos = tile.GetWorldPos();
+
+        // Note that the object will be moved to the nearest tile if it is above the play area
+        if (tilePos.x > area.x && tilePos.x < area.y && tilePos.y > area.z && tilePos.y < area.w * 2)
+        {
+            inside = true;
+        }
+
+        return inside;
     }
 
     bool AvoidObstacles(Tile tile)

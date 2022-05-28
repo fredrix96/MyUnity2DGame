@@ -6,9 +6,11 @@ public class Enemy : Character
 {
     CoinManager coinMan;
     int value;
-
+    
     public Enemy(Graphics inGfx, GameObject inGo, GridManager inGm, CoinManager inCoinMan, int inValue = 1)
     {
+        type = TYPE_OF_CHARACTER.Enemy;
+
         gfx = inGfx;
         gm = inGm;
         coinMan = inCoinMan;
@@ -27,11 +29,12 @@ public class Enemy : Character
 
         float randomY = Random.Range(0, gm.GetRes().y - 1);
         Vector2 spawnTile = new Vector2(gm.GetRes().x - 1, randomY);
-        go.transform.position = gm.GetTile(spawnTile).GetPos();
+        go.transform.position = gm.GetTile(spawnTile).GetWorldPos();
 
         // This is to make sure that feet of the character wont walk on another sprite
         pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
         go.transform.position = sm.GetColliderPivotPoint(go);
+        ph.position = go.transform.position;
 
         health = go.AddComponent<Health>();
         health.Init(go, "Sprites/EnemyHealth", 100);
@@ -43,7 +46,10 @@ public class Enemy : Character
         currTile = gm.GetTile(spawnTile);
         currTile.IncreaseCharacters(this);
 
-        pf = new PathFinding(gm);
+        ph.type = type;
+        ph.isIdle = false;
+
+        UpdatePositionHandler();
     }
 
     public override void Update()
@@ -56,16 +62,9 @@ public class Enemy : Character
 
                 MarkTile();
 
-                Vector2 newPos = pf.GetNextTile(currTile, typeof(Soldier), typeof(Enemy), out targetFound, false);
+                SetGameObjectPosition(position);
 
-                if (!targetFound)
-                {
-                    newPos = pf.GetNextTile(currTile, typeof(Player), typeof(Enemy), out targetFound, false);
-                }
-
-                // Notice how we adjust based on the pivot difference
-                go.transform.position = new Vector3(Mathf.MoveTowards(go.transform.position.x, newPos.x, speed * Time.deltaTime),
-                        Mathf.MoveTowards(go.transform.position.y, newPos.y + pivotHeightDiff, speed * Time.deltaTime), 0);
+                UpdatePositionHandler();
             }
             else if (sm.IsAttacking())
             {
@@ -139,19 +138,6 @@ public class Enemy : Character
             {
                 shouldBeRemoved = true;
             }
-        }
-    }
-
-    void MarkTile()
-    {
-        Vector3 correctPivotToTilePos = new Vector3(go.transform.position.x, go.transform.position.y - pivotHeightDiff, go.transform.position.z);
-        Tile newTile = gm.GetTileFromWorldPosition(correctPivotToTilePos);
-
-        if (newTile != currTile)
-        {
-            newTile.IncreaseCharacters(this);
-            currTile.DecreaseCharacters(this);
-            currTile = newTile;
         }
     }
 

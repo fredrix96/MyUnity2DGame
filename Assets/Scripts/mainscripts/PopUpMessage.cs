@@ -9,6 +9,7 @@ public class PopUpMessage : MonoBehaviour
     Canvas canvas;
     CanvasScaler cs;
     Text message;
+    CameraManager cam;
 
     double messageTime;
     float messageLifeTime;
@@ -16,12 +17,14 @@ public class PopUpMessage : MonoBehaviour
     // Start is called before the first frame update
     public void Init(GameObject go, CameraManager inCam)
     {
+        cam = inCam;
+
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
         canvasObject.transform.parent = go.transform;
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = inCam.GetCamera();
+        canvas.worldCamera = cam.GetCamera();
         canvas.sortingLayerName = "Message";
 
         cs = canvasObject.AddComponent<CanvasScaler>();
@@ -58,12 +61,13 @@ public class PopUpMessage : MonoBehaviour
         messageObject.transform.SetParent(canvas.transform);
         messageObject.transform.localScale = new Vector2(0.8f, 0.55f);
 
-        messageObject.AddComponent<Outline>();
+        Outline outline = messageObject.AddComponent<Outline>();
+        outline.effectDistance = new Vector2(3, 3);
 
         message = messageObject.AddComponent<Text>();
         message.text = "";
         message.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        message.fontSize = 50;
+        message.fontSize = 20 * (int)cam.GetCamera().aspect;
         message.color = Color.white;
         message.fontStyle = FontStyle.Bold;
         message.alignment = TextAnchor.MiddleCenter;
@@ -79,11 +83,12 @@ public class PopUpMessage : MonoBehaviour
         messageObject.SetActive(false);
     }
 
-    public void SendPopUpMessage(string text, float lifeTime, Color? color = null)
+    public void SendPopUpMessage(string text, float lifeTime = 2.5f, int fontSize = 30, Color? color = null)
     {
         // Returns left value if it is not null, otherwise it returns the value to the right
         message.color = color ?? Color.white;
 
+        message.fontSize = fontSize * (int)cam.GetCamera().aspect;
         messageLifeTime = lifeTime;
         message.text = text;
         messageObject.SetActive(true);

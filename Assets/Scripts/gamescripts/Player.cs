@@ -178,7 +178,7 @@ public class Player
         go = new GameObject { name = "player" };
         go.transform.parent = GameManager.GameManagerObject.transform;
         go.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
-        go.transform.position = gm.GetTile(spawnTile).GetPos();
+        go.transform.position = gm.GetTile(spawnTile).GetWorldPos();
         go.layer = LayerMask.NameToLayer("Player");
 
         cm = go.AddComponent<CollisionManager>();

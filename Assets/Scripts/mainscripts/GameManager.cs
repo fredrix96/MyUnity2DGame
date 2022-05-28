@@ -10,5 +10,6 @@ public static class GameManager
     {
         GameManagerObject = new GameObject { name = "GameManager" };
         GameManagerObject.transform.position = Vector3.zero;
+        GameManagerObject.AddComponent<PhysicsUpdater>();
     }
 }

@@ -100,20 +100,20 @@ public class Controller
             }
 
             Vector2 playerPos = player.GetPosition();
-            if (Input.GetKey(KeyCode.W) && playerPos.y <= gridMan.GetTile(new Vector2(0,0)).GetPos().y)
+            if (Input.GetKey(KeyCode.W) && playerPos.y <= gridMan.GetTile(new Vector2(0,0)).GetWorldPos().y)
             {
                 player.SetDirY(1);
             }
-            else if (Input.GetKey(KeyCode.S) && playerPos.y >= gridMan.GetTile(new Vector2(0, gridMan.GetRes().y - 2)).GetPos().y)
+            else if (Input.GetKey(KeyCode.S) && playerPos.y >= gridMan.GetTile(new Vector2(0, gridMan.GetRes().y - 2)).GetWorldPos().y)
             {
                 player.SetDirY(-1);
             }
 
-            if (Input.GetKey(KeyCode.A) && playerPos.x >= gridMan.GetTile(new Vector2(0,0)).GetPos().x)
+            if (Input.GetKey(KeyCode.A) && playerPos.x >= gridMan.GetTile(new Vector2(0,0)).GetWorldPos().x)
             {
                 player.SetDirX(-1);
             }
-            else if (Input.GetKey(KeyCode.D) && playerPos.x <= gridMan.GetTile(new Vector2(gridMan.GetRes().x - 1, 0)).GetPos().x)
+            else if (Input.GetKey(KeyCode.D) && playerPos.x <= gridMan.GetTile(new Vector2(gridMan.GetRes().x - 1, 0)).GetWorldPos().x)
             {
                 player.SetDirX(1);
             }
