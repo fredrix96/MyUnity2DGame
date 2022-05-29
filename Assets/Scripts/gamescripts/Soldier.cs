@@ -104,7 +104,7 @@ public class Soldier : Character
             else if (sm.IsIdle())
             {
                 // Always search for target
-                PathFinding.GetNextTile(currTile.GetTilePosition(), typeof(Enemy), typeof(Soldier), out targetFound, true);
+                PathFinding.SearchForTarget(currTile.GetTilePosition(), typeof(Enemy), typeof(Soldier), out targetFound, true);
 
                 if (targetFound)
                 {

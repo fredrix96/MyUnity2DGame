@@ -9,10 +9,14 @@ public class House : Building
     {
         type = BuildingInformation.TYPE_OF_BUILDING.House;
 
+        centerTile = inPos;
         coinMan = inCoinMan;
 
-        go = new GameObject { name = type.ToString() + BuildingInformation.GetCounter(type).ToString() };
+        go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };
         go.transform.SetParent(parent.transform);
+        go.layer = LayerMask.NameToLayer("Buildings");
+
+        go.AddComponent<CollisionManager>();
 
         sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = Resources.Load<Sprite>("Sprites/" + type.ToString());
@@ -26,11 +30,12 @@ public class House : Building
         go.transform.position = inPos.GetWorldPos();
         gridMan = inGridMan;
 
-        MarkTiles(type, inPos);
+        MarkOrUnmarkTiles(type, inPos, true);
 
         collider = go.AddComponent<BoxCollider2D>();
         rb = go.AddComponent<Rigidbody2D>();
         rb.isKinematic = true;
+        rb.useFullKinematicContacts = true;
 
         CreateHealthBar(type);
 
@@ -39,5 +44,6 @@ public class House : Building
 
     public override void Update()
     {
+        CheckIfDestroyed();
     }
 }

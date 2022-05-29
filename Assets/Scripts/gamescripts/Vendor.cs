@@ -122,9 +122,6 @@ public class Vendor : MonoBehaviour
                 {
                     // Use Gameobject.find?
                     GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding(type, tile, gridMan);
-
-                    // Update the counter text
-                    UpdateText(type);
                 }
                 else
                 {
@@ -144,16 +141,6 @@ public class Vendor : MonoBehaviour
 
             // Show shop UI
             go.GetComponentInParent<Canvas>().enabled = true;
-        }
-
-        // Best place to put this function for now. Hurts performance to have this in an update()
-        if (BuildingInformation.MaxLimitReached(type))
-        {
-            img.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
-        }
-        else
-        {
-            img.color = color;
         }
     }
 
@@ -258,11 +245,5 @@ public class Vendor : MonoBehaviour
         }
 
         return tile;
-    }
-
-    public void UpdateText(BuildingInformation.TYPE_OF_BUILDING type)
-    {
-        textObject.GetComponent<Text>().text = "Cost: " + BuildingInformation.GetBuildingCost(type) + System.Environment.NewLine +
-            BuildingInformation.GetCounter(type).ToString() + " / " + BuildingInformation.GetMax(type).ToString();
     }
 }

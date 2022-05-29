@@ -9,7 +9,7 @@ public static class BuildingInformation
     private static int houseCounter = 0;
 
     private static int castleMax = 1;
-    private static int houseMax = 5;
+    private static int houseMax = 15;
 
     public enum TYPE_OF_BUILDING
     {
@@ -23,7 +23,7 @@ public static class BuildingInformation
 
     static readonly int[] health = new int[]
     {
-        1000, 50
+        10000, 1000
     };
 
     // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
@@ -124,6 +124,22 @@ public static class BuildingInformation
                 break;
         }
     }
+
+    public static void DecreaseCounter(TYPE_OF_BUILDING type)
+    {
+        switch (type)
+        {
+            case TYPE_OF_BUILDING.Castle:
+                castleCounter--;
+                break;
+            case TYPE_OF_BUILDING.House:
+                houseCounter--;
+                break;
+            default:
+                Debug.LogWarning("Warning! Could not decrease the " + type.ToString() + "Counter...");
+                break;
+        }
+    }
 }
 
 public class BuildingManager : MonoBehaviour
@@ -169,10 +185,31 @@ public class BuildingManager : MonoBehaviour
 
     void Update()
     {
-        foreach (Building building in buildings)
+        for (int i = 0; i < buildings.Count; i++)
         {
-            building.Update();
+            if (buildings[i].ShouldBeRemoved())
+            {
+                RemoveBuilding(buildings[i]);
+            }
+            else
+            {
+                buildings[i].Update();
+            }
         }
+    }
+
+    public void RemoveBuilding(Building building)
+    {
+        BuildingInformation.TYPE_OF_BUILDING type = building.GetBuildingType();
+
+        audioMan.PlayAudio3D("Destruction", 0.4f, building.GetPosition());
+
+        building.MarkOrUnmarkTiles(type, building.GetCenterTile(), false);
+        building.Destroy();
+
+        buildings.Remove(building);
+
+        BuildingInformation.DecreaseCounter(type);
     }
 
     public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, GridManager inGridMan)

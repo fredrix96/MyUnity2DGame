@@ -16,7 +16,7 @@ public static class SoldierCounter
 {
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
-    public static int max = 1000;
+    public static int max = 0;
 }
 
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)

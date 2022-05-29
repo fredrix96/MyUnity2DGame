@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class ShopManager
 {
     GameObject go, canvasObject, shopImage;
-    List<GameObject> imageObjects = new List<GameObject>();
+    List<GameObject> imageObjects, textObjects;
     Canvas canvas;
     CanvasScaler cs;
     Image shop;
@@ -22,6 +22,7 @@ public class ShopManager
         buildings = inBuildings;
 
         imageObjects = new List<GameObject>();
+        textObjects = new List<GameObject>();
 
         go = new GameObject() { name = "shopObject" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
@@ -63,7 +64,30 @@ public class ShopManager
 
     public void Update()
     {
-        
+        // TODO: Find a more efficient way of doing this
+        foreach (BuildingInformation.TYPE_OF_BUILDING type in System.Enum.GetValues(typeof(BuildingInformation.TYPE_OF_BUILDING)))
+        {
+            GameObject imageObject = GameObject.Find(type.ToString());
+            if (imageObject != null)
+            {
+                Image img = imageObject.GetComponent<Image>();
+
+                if (BuildingInformation.MaxLimitReached(type))
+                {
+                    img.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
+                }
+                else
+                {
+                    img.color = Color.white;
+                }
+
+                GameObject textObject = GameObject.Find(type.ToString() + "_info");
+                if (textObject != null)
+                {
+                    UpdateBuildingTextInformation(textObject.GetComponent<Text>(), type);
+                }
+            }
+        }
     }
 
     public void ChangeActive()
@@ -105,13 +129,13 @@ public class ShopManager
             text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
             text.transform.localScale = new Vector3(1, 1, 1);
             text.color = Color.black;
-            text.text = "Cost: " + BuildingInformation.GetBuildingCost(type) + System.Environment.NewLine + 
-                BuildingInformation.GetCounter(type).ToString() + " / " + BuildingInformation.GetMax(type).ToString();
             text.alignment = TextAnchor.MiddleCenter;
 
             text.rectTransform.anchorMin = Vector2.zero;
             text.rectTransform.anchorMax = Vector2.zero;
             text.rectTransform.anchoredPosition = new Vector3(position.x, position.y - canvasObject.GetComponent<Canvas>().pixelRect.height * 0.07f, position.z);
+
+            textObjects.Add(textObject);
 
             Vendor vendor = imageObject.AddComponent<Vendor>();
             vendor.Init(imageObject, textObject, coinMan, inCam, inGridMan, type);
@@ -122,5 +146,11 @@ public class ShopManager
         {
             Debug.LogWarning("Warning! Could not create image of " + type.ToString() + "! It already exists...");
         }
+    }
+
+    void UpdateBuildingTextInformation(Text text, BuildingInformation.TYPE_OF_BUILDING type)
+    {
+        text.text = "Cost: " + BuildingInformation.GetBuildingCost(type) + System.Environment.NewLine +
+                BuildingInformation.GetCounter(type).ToString() + " / " + BuildingInformation.GetMax(type).ToString();
     }
 }

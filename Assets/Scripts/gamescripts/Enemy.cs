@@ -70,7 +70,8 @@ public class Enemy : Character
             {
                 if (sm.Attack())
                 {
-                    List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player"));
+                    List<Collider2D> results = sm.GetListOfOverlapColliders(
+                        LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player") | LayerMask.GetMask("Buildings"));
 
                     foreach (Collider2D col in results)
                     {

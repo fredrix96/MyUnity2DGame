@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using Unity.Mathematics; // more optimized math, good for multithreading
 
+// TODO: The algorithms can now be more complex because of the implemented multithreading
 public static class PathFinding
 {
     public static GridManager gm;
 
     // Find the closest target
-    public static float2 GetNextTile(float2 startTilePosition, Type target, Type friend, out bool targetFound, bool right)
+    public static float2 SearchForTarget(float2 startTilePosition, Type target, Type friend, out bool targetFound, bool right)
     {
         Tile startTile = gm.GetTile(startTilePosition);
 
@@ -16,7 +17,7 @@ public static class PathFinding
         if (!startTile.IsCharacterPresent(target))
         {
             // Prioritize the y-axis, then back, then front. Look if the target is on a neighboring tile
-            float2 tmpPos = GetPosFromNeighboringTile(startTile.GetTilePosition(), target, friend, right);
+            float2 tmpPos = SearchTargetOnNeighboringTile(startTile.GetTilePosition(), target, friend, right);
             if (tmpPos.x != -1)
             {
                 targetFound = true;
@@ -119,6 +120,121 @@ public static class PathFinding
 
         // The target is on this tile
         targetFound = true;
+        return startTile.GetWorldPos();
+    }
+
+    public static float2 SearchForBuidling(float2 startTilePosition, Type friend, out bool buildingFound, bool right)
+    {
+        Tile startTile = gm.GetTile(startTilePosition);
+
+        buildingFound = false;
+
+        if (!startTile.IsObjectPresent())
+        {
+            // Prioritize the y-axis, then back, then front. Look if the target is on a neighboring tile
+            float2 tmpPos = SearchBuildingOnNeighboringTile(startTile.GetTilePosition(), friend, right);
+            if (tmpPos.x != -1)
+            {
+                buildingFound = true;
+                return tmpPos;
+            }
+
+            // Else, look for the target along the y-axis 
+            List<Tile> targets = new List<Tile>();
+            for (int y = 0; y < gm.GetRes().y; y++)
+            {
+                // Do not look at the current tile
+                if (y != startTile.GetTilePosition().y)
+                {
+                    Tile yTile = gm.GetTile(new float2(startTile.GetTilePosition().x, y));
+                    if (yTile.IsObjectPresent() && !yTile.IsCharacterPresent(friend))
+                    {
+                        // The closer the target is, the lower value it gets
+                        float dist = Tools.CalculateDistance(startTile.GetTilePosition().y, yTile.GetTilePosition().y);
+                        yTile.SetValue(dist);
+                        targets.Add(yTile);
+                    }
+                }
+            }
+
+            // If targets were found, find the one with the shortest distance
+            if (targets.Count > 0)
+            {
+                buildingFound = true;
+
+                targets.Sort(Tools.SortByValue);
+
+                // Find out if there is an obstacle between the character and its target
+                if (LookForObstaclesBetweenTiles(targets[0], startTile))
+                {
+                    // Look for a tile with the most effective path
+                    return FindMostEffectivePosition(startTile, right);
+                }
+
+                float shortestDist = targets[0].GetValue();
+
+                // Find out if the target is closer on the x-axis if that distance is inside the grid
+                if (right)
+                {
+                    if (startTile.GetTilePosition().x + shortestDist / 2 < gm.GetRes().x)
+                    {
+                        for (int x = (int)startTile.GetTilePosition().x + 1; x < (int)startTile.GetTilePosition().x + shortestDist / 2; x++)
+                        {
+                            // If the target is closer on the x-axis, move forward
+                            Tile xTile = gm.GetTile(new float2(x, startTile.GetTilePosition().y));
+                            if (xTile.IsObjectPresent() && !xTile.IsCharacterPresent(friend))
+                            {
+                                Tile nextTileXFront = gm.GetTile(new float2(startTile.GetTilePosition().x + 1, startTile.GetTilePosition().y));
+                                return nextTileXFront.GetWorldPos();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (startTile.GetTilePosition().x - shortestDist / 2 > 0)
+                    {
+                        for (int x = (int)startTile.GetTilePosition().x - 1; x > (int)startTile.GetTilePosition().x - shortestDist / 2; x--)
+                        {
+                            // If the target is closer on the x-axis, move forward
+                            Tile xTile = gm.GetTile(new float2(x, startTile.GetTilePosition().y));
+                            if (xTile.IsObjectPresent() && !xTile.IsCharacterPresent(friend))
+                            {
+                                Tile nextTileXFront = gm.GetTile(new float2(startTile.GetTilePosition().x - 1, startTile.GetTilePosition().y));
+                                return nextTileXFront.GetWorldPos();
+                            }
+                        }
+                    }
+                }
+
+                // Else move to the closest target at the y-axis
+                if (targets[0].GetTilePosition().y > startTile.GetTilePosition().y)
+                {
+                    Tile nextTileYUp = gm.GetTile(new float2(startTile.GetTilePosition().x, startTile.GetTilePosition().y + 1));
+                    if (nextTileYUp.IsObjectPresent() && !nextTileYUp.IsCharacterPresent(friend))
+                    {
+                        return nextTileYUp.GetWorldPos();
+                    }
+                }
+                else
+                {
+                    Tile nextTileYDown = gm.GetTile(new float2(startTile.GetTilePosition().x, startTile.GetTilePosition().y - 1));
+                    if (nextTileYDown.IsObjectPresent() && !nextTileYDown.IsCharacterPresent(friend))
+                    {
+                        return nextTileYDown.GetWorldPos();
+                    }
+                }
+            }
+            // Else if no target was found, move to the next tile
+            else
+            {
+                // Look for a tile with the most effective path
+                return FindMostEffectivePosition(startTile, right);
+            }
+        }
+
+        // The target is on this tile
+        buildingFound = true;
         return startTile.GetWorldPos();
     }
 
@@ -244,7 +360,7 @@ public static class PathFinding
         return obstacle;
     }
 
-    static float2 GetPosFromNeighboringTile(float2 inPos, Type target, Type friend, bool right)
+    static float2 SearchTargetOnNeighboringTile(float2 inPos, Type target, Type friend, bool right)
     {
         float2 outPos = new float2(-1, -1);
 
@@ -301,6 +417,72 @@ public static class PathFinding
             {
                 Tile nextTileXBack = gm.GetTile(new float2(inPos.x - 1, inPos.y));
                 if (nextTileXBack.IsCharacterPresent(target) && !nextTileXBack.IsCharacterPresent(friend) && !nextTileXBack.IsObjectPresent())
+                {
+                    return nextTileXBack.GetWorldPos();
+                }
+            }
+        }
+
+        return outPos;
+    }
+
+    static float2 SearchBuildingOnNeighboringTile(float2 inPos, Type friend, bool right)
+    {
+        float2 outPos = new float2(-1, -1);
+
+        // Avoid tiles that are occupied by others
+        if (inPos.y + 1 < gm.GetRes().y)
+        {
+            Tile nextTileYUp = gm.GetTile(new float2(inPos.x, inPos.y + 1));
+            if (nextTileYUp.IsObjectPresent() && !nextTileYUp.IsCharacterPresent(friend))
+            {
+                return nextTileYUp.GetWorldPos();
+            }
+        }
+        if (inPos.y - 1 > 0)
+        {
+            Tile nextTileYDown = gm.GetTile(new float2(inPos.x, inPos.y - 1));
+            if (nextTileYDown.IsObjectPresent() && !nextTileYDown.IsCharacterPresent(friend))
+            {
+                return nextTileYDown.GetWorldPos();
+            }
+        }
+
+        // Is the main direction to the right?
+        if (right)
+        {
+            if (inPos.x - 1 > 0)
+            {
+                Tile nextTileXBack = gm.GetTile(new float2(inPos.x - 1, inPos.y));
+                if (nextTileXBack.IsObjectPresent() && !nextTileXBack.IsCharacterPresent(friend))
+                {
+                    return nextTileXBack.GetWorldPos();
+                }
+            }
+            else if (inPos.x + 1 < gm.GetRes().x)
+            {
+                Tile nextTileXFront = gm.GetTile(new float2(inPos.x + 1, inPos.y));
+                if (nextTileXFront.IsObjectPresent() && !nextTileXFront.IsCharacterPresent(friend))
+                {
+                    return nextTileXFront.GetWorldPos();
+                }
+            }
+        }
+        // Is the main direction to the left?
+        else
+        {
+            if (inPos.x + 1 < gm.GetRes().x)
+            {
+                Tile nextTileXFront = gm.GetTile(new float2(inPos.x + 1, inPos.y));
+                if (nextTileXFront.IsObjectPresent())
+                {
+                    return nextTileXFront.GetWorldPos();
+                }
+            }
+            if (inPos.x - 1 > 0)
+            {
+                Tile nextTileXBack = gm.GetTile(new float2(inPos.x - 1, inPos.y));
+                if (nextTileXBack.IsObjectPresent())
                 {
                     return nextTileXBack.GetWorldPos();
                 }

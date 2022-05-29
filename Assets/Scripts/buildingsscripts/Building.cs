@@ -14,8 +14,11 @@ public class Building
     protected CoinManager coinMan;
     protected Material outline;
     protected Health health;
+    protected Tile centerTile;
 
     protected BuildingInformation.TYPE_OF_BUILDING type;
+
+    protected bool shouldBeRemoved;
 
     public Building()
     {
@@ -23,7 +26,7 @@ public class Building
 
     public virtual void Update() { }
 
-    protected void MarkTiles(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos)
+    public void MarkOrUnmarkTiles(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, bool mark)
     {
         // Vector2(max, min)
         Vector2 height = Vector2.zero;
@@ -42,20 +45,20 @@ public class Building
                 Tile currTile = gridMan.GetTile(new Vector2(inPos.GetTilePosition().x + x, inPos.GetTilePosition().y + y));
                 if (currTile != null)
                 {
-                    currTile.ObjectOnTile(true);
+                    currTile.ObjectOnTile(mark);
 
-                    if (x == startX && y == startY)
-                    {
-                        // Min x and y pos
-                        height.y = currTile.GetWorldPos().y;
-                        width.y = currTile.GetWorldPos().x;
-                    }
-                    else if (x == endX && y == endY)
-                    {
-                        // Max x and y pos
-                        height.x = currTile.GetWorldPos().y;
-                        width.x = currTile.GetWorldPos().x;
-                    }
+                    //if (x == startX && y == startY)
+                    //{
+                    //    // Min x and y pos
+                    //    height.y = currTile.GetWorldPos().y;
+                    //    width.y = currTile.GetWorldPos().x;
+                    //}
+                    //else if (x == endX && y == endY)
+                    //{
+                    //    // Max x and y pos
+                    //    height.x = currTile.GetWorldPos().y;
+                    //    width.x = currTile.GetWorldPos().x;
+                    //}
                 }
             }
         }
@@ -74,7 +77,16 @@ public class Building
                     Tile currTile = gridMan.GetTile(new Vector2(inPos.GetTilePosition().x + x, inPos.GetTilePosition().y + y));
                     if (currTile != null)
                     {
-                        currTile.SetPermissionToBuild(false);
+                        if (mark)
+                        {
+                            // Claim tile
+                            currTile.SetPermissionToBuild(false);
+                        }
+                        else
+                        {
+                            // Unclaim tile
+                            currTile.SetPermissionToBuild(true);
+                        }
                     }
                 }
             }
@@ -87,5 +99,38 @@ public class Building
     {
         health = go.AddComponent<Health>();
         health.Init(go, "Sprites/SoldierHealth", BuildingInformation.GetBuildingHealth(type), true);
+    }
+
+    public Vector3 GetPosition()
+    {
+        return go.transform.position;
+    }
+
+    public BuildingInformation.TYPE_OF_BUILDING GetBuildingType()
+    {
+        return type;
+    }
+
+    public Tile GetCenterTile()
+    {
+        return centerTile;
+    }
+
+    public void CheckIfDestroyed()
+    {
+        if (health.GetHealth() <= 0)
+        {
+            shouldBeRemoved = true;
+        }
+    }
+
+    public bool ShouldBeRemoved()
+    {
+        return shouldBeRemoved;
+    }
+
+    public void Destroy()
+    {
+        Object.Destroy(go);
     }
 }

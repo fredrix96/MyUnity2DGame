@@ -131,11 +131,16 @@ public class Character
 
                 if (type is TYPE_OF_CHARACTER.Enemy)
                 {
-                    newPos = PathFinding.GetNextTile(tilePosition, typeof(Soldier), typeof(Enemy), out targetFound, false);
+                    newPos = PathFinding.SearchForTarget(tilePosition, typeof(Soldier), typeof(Enemy), out targetFound, false);
 
                     if (!targetFound)
                     {
-                        newPos = PathFinding.GetNextTile(tilePosition, typeof(Player), typeof(Enemy), out targetFound, false);
+                        newPos = PathFinding.SearchForTarget(tilePosition, typeof(Player), typeof(Enemy), out targetFound, false);
+                    }
+
+                    if (!targetFound)
+                    {
+                        newPos = PathFinding.SearchForBuidling(tilePosition, typeof(Enemy), out targetFound, false);
                     }
 
                     // Notice how we adjust based on the pivot difference
@@ -144,7 +149,7 @@ public class Character
                 }
                 else if (type is TYPE_OF_CHARACTER.Soldier)
                 {
-                    newPos = PathFinding.GetNextTile(tilePosition, typeof(Enemy), typeof(Soldier), out targetFound, true);
+                    newPos = PathFinding.SearchForTarget(tilePosition, typeof(Enemy), typeof(Soldier), out targetFound, true);
 
                     // If the soldier has reached half of the field, then stop if there are no enemies nearby
                     if (!targetFound && position.x > levelLimits.y / 2)

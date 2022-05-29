@@ -9,10 +9,14 @@ public class Castle : Building
     {
         type = BuildingInformation.TYPE_OF_BUILDING.Castle;
 
+        centerTile = inPos;
         coinMan = inCoinMan;
 
-        go = new GameObject { name = type.ToString() + BuildingInformation.GetCounter(type) };
+        go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type) };
         go.transform.SetParent(parent.transform);
+        go.layer = LayerMask.NameToLayer("Buildings");
+
+        go.AddComponent<CollisionManager>();
 
         sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = Resources.Load<Sprite>("Sprites/" + type.ToString());
@@ -26,19 +30,22 @@ public class Castle : Building
         go.transform.position = inPos.GetWorldPos();
         gridMan = inGridMan;
 
-        MarkTiles(type, inPos);
+        MarkOrUnmarkTiles(type, inPos, true);
 
         collider = go.AddComponent<BoxCollider2D>();
         rb = go.AddComponent<Rigidbody2D>();
         rb.isKinematic = true;
+        rb.useFullKinematicContacts = true;
 
         CreateHealthBar(type);
+
+        shouldBeRemoved = false;
 
         BuildingInformation.IncreaseCounter(type);
     }
 
     public override void Update()
     {
-
+        CheckIfDestroyed();
     }
 }
