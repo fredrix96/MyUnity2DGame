@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics; // more optimized math, good for multithreading
+using UnityEngine;
 
 // TODO: The algorithms can now be more complex because of the implemented multithreading
 public static class PathFinding
@@ -490,6 +492,161 @@ public static class PathFinding
         }
 
         return outPos;
+    }
+
+    // Pseudo code: https://www.researchgate.net/figure/A-search-algorithm-Pseudocode-of-the-A-search-algorithm-operating-with-open-and-closed_fig8_232085273
+    public static float2 SearchForTargetAStar(float2 startTilePosition, Type target, Type friend, out bool targetFound, bool right)
+    {
+        Tile startTile = gm.GetTile(startTilePosition);
+
+        targetFound = false;
+
+        float g = Mathf.Infinity;
+        float h = Mathf.Infinity;
+        float f = g + h;
+        float3 values = new float3(g, h, f); // x = g, y = h, z = f
+
+        List<Tuple<Tile, float3>> openList = new List<Tuple<Tile, float3>>();
+        Tuple<Tile, float3> start = new Tuple<Tile, float3>(startTile, values);
+        openList.Add(start);
+
+        List<Tuple<Tile, float3>> closedList = new List<Tuple<Tile, float3>>();
+
+        Tuple<Tile, float3> currentTuple = new Tuple<Tile, float3>(startTile, values);
+
+        int maxItr = 10;
+        int counter = 0;
+
+        while (openList.Count > 0 && counter < maxItr)
+        {
+            openList = openList.OrderByDescending(t => t.Item2.z).ToList();
+
+            currentTuple = openList[openList.Count - 1];
+
+            // To lower the function calls
+            Tile currentTile = currentTuple.Item1;
+            Vector2 currentTilePos = currentTile.GetTilePosition();
+        
+            if (currentTile.IsCharacterPresent(target))
+            {
+                targetFound = true;
+                break;
+            }
+            else
+            {
+                openList.Remove(currentTuple);
+                closedList.Add(currentTuple);
+        
+                int startX = (int)currentTilePos.x - 1;
+                int endX = (int)currentTilePos.x + 1;
+                int startY = (int)currentTilePos.y - 1;
+                int endY = (int)currentTilePos.y + 1;
+        
+                // Check neighbors
+                for (int x = startX; x < endX + 1; x++)
+                {
+                    for (int y = startY; y < endY + 1; y++)
+                    {
+                        // Skip if the same pos as current tile
+                        if (x == (int)currentTilePos.x && y == (int)currentTilePos.y)
+                        {
+                            continue;
+                        }
+
+                        // THINK! 
+                        float3 empty = float3.zero;
+                        Tuple<Tile, float3> child = new Tuple<Tile, float3>(gm.GetTile(new float2(x, y)), float3.zero);
+
+                        // If neighbor is inside the area
+                        if (child.Item1 != null)
+                        {
+                            if (closedList.Contains(child))
+                            {
+                                continue;
+                            }
+
+                            float cost = child.Item2.x + Tools.CalculateVectorDistance(currentTile.GetWorldPos(), currentTile.GetWorldPos());
+
+                            if (openList.Contains(child) && cost < child.Item2.x)
+                            {
+                                openList.Remove(child);
+                            }
+        
+                            else if (closedList.Contains(child) && cost < child.Item2.x)
+                            {
+                                closedList.Remove(child);
+                            }
+        
+                            else if (!openList.Contains(child) && !closedList.Contains(child))
+                            {
+                                float3 newValues = new float3(cost, child.Item2.y, child.Item2.z);
+                                float distx = gm.GetTileDistance().x;
+        
+                                if (child.Item1.IsObjectPresent())
+                                {
+                                    newValues.y = 4 * distx;
+                                }
+                                else if (child.Item1.IsCharacterPresent(friend))
+                                {
+                                    newValues.y = 3 * distx;
+                                }
+                                //else if (child.Item1.GetTilePosition().x <= startTile.GetTilePosition().x && right)
+                                //{
+                                //    newValues.y = 25;
+                                //}
+                                //else if (child.Item1.GetTilePosition().x >= startTile.GetTilePosition().x && !right)
+                                //{
+                                //    newValues.y = 25;
+                                //}
+                                else if (child.Item1.GetTilePosition().x >= startTile.GetTilePosition().x && child.Item1.GetTilePosition().y == startTile.GetTilePosition().y && right)
+                                {
+                                    newValues.y = 1 * distx;
+                                }
+                                else if (child.Item1.GetTilePosition().x <= startTile.GetTilePosition().x && child.Item1.GetTilePosition().y == startTile.GetTilePosition().y && !right)
+                                {
+                                    newValues.y = 1 * distx;
+                                }
+                                else if (child.Item1.IsCharacterPresent(target))
+                                {
+                                    newValues.y = 0;
+                                }
+                                else
+                                {
+                                    newValues.y = 2 * distx;
+                                }
+        
+                                newValues.z = newValues.x + newValues.y;
+        
+                                Tuple<Tile, float3> modifiedChild = new Tuple<Tile, float3>(gm.GetTile(new float2(x, y)), newValues);
+        
+                                openList.Add(modifiedChild);
+                            }
+                        }
+                    }
+                }
+            }
+        
+            counter++;
+        }
+
+        //if (counter == searchDist && right)
+        //{
+        //    return gm.GetTile(new float2(startTilePosition.x + 1, startTilePosition.y)).GetWorldPos();
+        //}
+        //else if (counter == searchDist && !right)
+        //{
+        //    return gm.GetTile(new float2(startTilePosition.x - 1, startTilePosition.y)).GetWorldPos();
+        //}
+
+        if (targetFound)
+        {
+            return currentTuple.Item1.GetWorldPos();
+        }
+
+        closedList = closedList.OrderByDescending(t => t.Item2.z).ToList();
+        return closedList[closedList.Count - 1].Item1.GetWorldPos();
+
+        //return currentTuple.Item1.GetWorldPos();
     }
 
     // Find the closest target by using the A* algorithm

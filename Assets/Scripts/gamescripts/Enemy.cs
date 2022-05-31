@@ -60,11 +60,11 @@ public class Enemy : Character
             {
                 sm.Walk();
 
-                MarkTile();
-
-                SetGameObjectPosition(position);
-
                 UpdatePositionHandler();
+
+                WalkToNewPosition();
+
+                MarkTile();
             }
             else if (sm.IsAttacking())
             {

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 // Serialization is the process of taking an object in ram (classes, fields, etc...)
 // and making a disk representation of it which can be recreated at any point in the future.
@@ -45,6 +46,19 @@ public static class Tools
         //{
         //    return sr.material.shader.GetPropertyName(pos);
         //}
+    }
+
+    public static List<List<T>> PartitionList<T>(this List<T> values, int chunkSize)
+    {
+        return values.Select((x, i) => new { Index = i, Value = x })
+            .GroupBy(x => x.Index / chunkSize)
+            .Select(x => x.Select(v => v.Value).ToList())
+            .ToList();
+    }
+
+    public static float CalculateVectorDistance(Vector2 v1, Vector2 v2)
+    {
+        return Mathf.Sqrt(Mathf.Pow(v2.x + Mathf.Abs(v1.x), 2) + Mathf.Pow(v2.y + Mathf.Abs(v1.y), 2));
     }
 
     public static float CalculateDistance(float x1, float x2)

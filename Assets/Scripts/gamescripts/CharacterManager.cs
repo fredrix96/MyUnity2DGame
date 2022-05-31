@@ -16,7 +16,7 @@ public static class SoldierCounter
 {
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
-    public static int max = 0;
+    public static int max = 1000;
 }
 
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)
@@ -67,8 +67,8 @@ public class CharacterManager
         enemies = new List<Enemy>();
         soldiers = new List<Soldier>();
 
-        enemySpawnDelay = 0.3f;
-        soldierSpawnDelay = 0.6f;
+        enemySpawnDelay = 2.3f;
+        soldierSpawnDelay = 2.6f;
         playerSpawnDelay = 5.0f;
 
         enemySpawnTimer = 0;
@@ -83,44 +83,85 @@ public class CharacterManager
         UpdatePlayer();
     }
 
-    /// <summary> This is done with multithreading OR singlethreading </summary>
-    void UpdateCharacterPosition<T>(List<T> characters, bool multithreading) where T : Character
+    List<T> GetListToUpdate<T>(List<T> characters, float targetFrame)
     {
-        if (multithreading)
+        float chunkSize;
+
+        if (characters.Count < targetFrame)
         {
-            // Main thread -----------------------------------------
-
-            var characterDataArray = new NativeArray<Character.PositionHandler>(characters.Count, Allocator.TempJob);
-
-            for (int i = 0; i < characters.Count; i++)
-            {
-                characterDataArray[i] = characters[i].ph;
-            }
-
-            var job = new CharacterUpdatePositionJob()
-            {
-                characterDataArray = characterDataArray,
-            };
-
-            // Child threads ----------------------------------------
-
-            var jobHandle = job.Schedule(characters.Count, 1);
-            jobHandle.Complete();
-
-            // Main thread ------------------------------------------
-
-            for (int i = 0; i < characters.Count; i++)
-            {
-                characters[i].SetPositionHandler(characterDataArray[i]);
-            }
-
-            characterDataArray.Dispose();
+            chunkSize = characters.Count;
         }
         else
         {
-            for (int i = 0; i < characters.Count; i++)
+            chunkSize = (float)characters.Count / targetFrame;
+        }
+
+        List<List<T>> chunks = Tools.PartitionList(characters, (int)Mathf.Ceil(chunkSize));
+        List<T> listToUpdate = new List<T>();
+
+        if (Time.frameCount % targetFrame == 0)
+        {
+            listToUpdate = chunks[0];
+        }
+        else
+        {
+            for (int i = 1; i < targetFrame; i++)
             {
-                characters[i].ph.UpdatePosition();
+                if (Time.frameCount % targetFrame == i && chunks.Count >= i + 1)
+                {
+                    listToUpdate = chunks[i];
+                }
+            }
+        }
+
+        return listToUpdate;
+    }
+
+    /// <summary> This is done with multithreading OR singlethreading. The new position is based on a search algorithm </summary>
+    void UpdateCharacterPosition<T>(List<T> characters, bool multithreading) where T : Character
+    {
+        // Only search for a new path every n:th frame.
+        // This is done because it allows us to have a "clever" AI while also having good FPS
+        if (characters.Count > 0)
+        {
+            List<T> listToUpdate = GetListToUpdate(characters, 20);
+
+            if (multithreading)
+            {
+                // Main thread -----------------------------------------
+
+                var characterDataArray = new NativeArray<Character.PositionHandler>(listToUpdate.Count, Allocator.TempJob);
+
+                for (int i = 0; i < listToUpdate.Count; i++)
+                {
+                    characterDataArray[i] = listToUpdate[i].ph;
+                }
+
+                var job = new CharacterUpdatePositionJob()
+                {
+                    characterDataArray = characterDataArray,
+                };
+
+                // Child threads ----------------------------------------
+
+                var jobHandle = job.Schedule(listToUpdate.Count, 1);
+                jobHandle.Complete();
+
+                // Main thread ------------------------------------------
+
+                for (int i = 0; i < listToUpdate.Count; i++)
+                {
+                    listToUpdate[i].SetPositionHandler(characterDataArray[i]);
+                }
+
+                characterDataArray.Dispose();
+            }
+            else
+            {
+                for (int i = 0; i < listToUpdate.Count; i++)
+                {
+                    listToUpdate[i].ph.UpdatePosition();
+                }
             }
         }
     }

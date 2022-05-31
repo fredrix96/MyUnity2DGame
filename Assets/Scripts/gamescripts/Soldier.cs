@@ -54,11 +54,11 @@ public class Soldier : Character
             {
                 sm.Walk();
 
-                MarkTile();
-
-                SetGameObjectPosition(position);
-
                 UpdatePositionHandler();
+
+                WalkToNewPosition();
+
+                MarkTile();
             }
             else if (sm.IsAttacking())
             {
@@ -103,8 +103,7 @@ public class Soldier : Character
             }
             else if (sm.IsIdle())
             {
-                // Always search for target
-                PathFinding.SearchForTarget(currTile.GetTilePosition(), typeof(Enemy), typeof(Soldier), out targetFound, true);
+                UpdatePositionHandler();
 
                 if (targetFound)
                 {

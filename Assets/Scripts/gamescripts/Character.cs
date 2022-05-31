@@ -20,8 +20,6 @@ public class Character
     protected GridManager gm;
     protected Health health;
 
-    protected Vector3 position;
-
     protected float pivotHeightDiff;
     protected int direction;
     protected int damage;
@@ -53,26 +51,20 @@ public class Character
 
     public void MarkTile()
     {
-        Vector3 correctPivotToTilePos = new Vector3(position.x, position.y - pivotHeightDiff, position.z);
+        Vector3 correctPivotToTilePos = new Vector3(go.transform.position.x, go.transform.position.y - pivotHeightDiff, go.transform.position.z);
         Tile newTile = gm.GetTileFromWorldPosition(correctPivotToTilePos);
 
         if (newTile != currTile)
         {
-            newTile.IncreaseCharacters(this);
             currTile.DecreaseCharacters(this);
 
-            currTile = newTile;
+            if (newTile != null)
+            {
+                newTile.IncreaseCharacters(this);
+
+                currTile = newTile;
+            }
         }
-    }
-
-    public void SetGameObjectPosition(Vector3 newPos)
-    {
-        go.transform.position = newPos;
-    }
-
-    public void SetPosition(Vector3 newPos)
-    {
-        position = newPos;
     }
 
     public bool IsWalking()
@@ -90,18 +82,23 @@ public class Character
         // In
         ph.tilePosition = currTile.GetTilePosition();
         ph.speed = speed;
-        ph.deltaTime = Time.deltaTime;
-        ph.pivotHeightDiff = pivotHeightDiff;
-        ph.isWalking = IsWalking();
+        ph.isDead = IsDead();
+        ph.isAttacking = sm.IsAttacking();
         ph.levelLimits = gfx.GetLevelLimits();
 
         // Out
         targetFound = ph.targetFound;
-        position = ph.position;
         if (ph.isIdle)
         {
             sm.StartIdle();
         }
+    }
+
+    protected void WalkToNewPosition()
+    {
+        // Notice how we adjust based on the pivot difference
+        go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, ph.position.x, speed * Time.deltaTime),
+            Mathf.MoveTowards(go.transform.position.y, ph.position.y + pivotHeightDiff, speed * Time.deltaTime), 0);
     }
 
     public void SetPositionHandler(PositionHandler inPh)
@@ -116,40 +113,41 @@ public class Character
         public float2 tilePosition;
         public float4 levelLimits;
         public bool targetFound;
-        public bool isWalking;
+        public bool isDead;
+        public bool isAttacking;
         public bool isIdle;
-        public float pivotHeightDiff;
         public float speed;
-        public float deltaTime;
 
         public void UpdatePosition()
         {
-            if (isWalking)
+            // Only search for targets if the character is alive
+            if (!isDead && !isAttacking)
             {
                 isIdle = false;
                 float2 newPos;
 
                 if (type is TYPE_OF_CHARACTER.Enemy)
                 {
-                    newPos = PathFinding.SearchForTarget(tilePosition, typeof(Soldier), typeof(Enemy), out targetFound, false);
+                    //newPos = PathFinding.SearchForTarget(tilePosition, typeof(Soldier), typeof(Enemy), out targetFound, false);
+                    newPos = PathFinding.SearchForTargetAStar(tilePosition, typeof(Soldier), typeof(Enemy), out targetFound, false);
 
-                    if (!targetFound)
-                    {
-                        newPos = PathFinding.SearchForTarget(tilePosition, typeof(Player), typeof(Enemy), out targetFound, false);
-                    }
+                    //if (!targetFound)
+                    //{
+                    //    newPos = PathFinding.SearchForTarget(tilePosition, typeof(Player), typeof(Enemy), out targetFound, false);
+                    //}
+                    //
+                    //if (!targetFound)
+                    //{
+                    //    newPos = PathFinding.SearchForBuidling(tilePosition, typeof(Enemy), out targetFound, false);
+                    //}
 
-                    if (!targetFound)
-                    {
-                        newPos = PathFinding.SearchForBuidling(tilePosition, typeof(Enemy), out targetFound, false);
-                    }
 
-                    // Notice how we adjust based on the pivot difference
-                    position = new float3(Mathf.MoveTowards(position.x, newPos.x, speed * deltaTime),
-                        Mathf.MoveTowards(position.y, newPos.y + pivotHeightDiff, speed * deltaTime), 0);
+                    position = new float3(newPos, position.z);
                 }
                 else if (type is TYPE_OF_CHARACTER.Soldier)
                 {
-                    newPos = PathFinding.SearchForTarget(tilePosition, typeof(Enemy), typeof(Soldier), out targetFound, true);
+                    //newPos = PathFinding.SearchForTarget(tilePosition, typeof(Enemy), typeof(Soldier), out targetFound, true);
+                    newPos = PathFinding.SearchForTargetAStar(tilePosition, typeof(Enemy), typeof(Soldier), out targetFound, true);
 
                     // If the soldier has reached half of the field, then stop if there are no enemies nearby
                     if (!targetFound && position.x > levelLimits.y / 2)
@@ -158,9 +156,7 @@ public class Character
                     }
                     else
                     {
-                        // Notice how we adjust based on the pivot difference
-                        position = new float3(Mathf.MoveTowards(position.x, newPos.x, speed * deltaTime),
-                            Mathf.MoveTowards(position.y, newPos.y + pivotHeightDiff, speed * deltaTime), 0);
+                        position = new float3(newPos, position.z);
                     }
                 }
             }

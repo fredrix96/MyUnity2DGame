@@ -11,10 +11,14 @@ public class Tile
     Vector2 tileWorldPos;
     Vector2 tileSize;
 
+    Tile parent;
+
     uint nrOfEnemiesOnTile, nrOfSoldiersOnTile;
 
     bool enemyOnTile, soldierOnTile, playerOnTile, objectOnTile, buildPermission;
     float value;
+
+    public float f, g, h, currCost;
 
     public Tile(GameObject grid, Vector2 inTilePosition)
     {
@@ -38,7 +42,10 @@ public class Tile
         nrOfEnemiesOnTile = 0;
         nrOfSoldiersOnTile = 0;
 
-        value = 0;
+        value = 999999;
+        f = g = h = 0;
+
+        parent = null;
     }
 
     public uint GetNrOfCharactersOnTile(Character type)
@@ -222,12 +229,12 @@ public class Tile
 
     public void SetValue(float inValue)
     {
-        value = inValue;
+        f = inValue;
     }
 
     public float GetValue()
     {
-        return value;
+        return f;
     }
 
     public Vector2 GetTilePosition()
@@ -238,6 +245,16 @@ public class Tile
     public string GetName()
     {
         return go.name;
+    }
+
+    public void SetParent(Tile tile)
+    {
+        parent = tile;
+    }
+
+    public Tile GetParent()
+    {
+        return parent;
     }
 
     public void Destroy()

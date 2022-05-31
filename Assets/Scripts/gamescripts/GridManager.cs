@@ -81,9 +81,9 @@ public class GridManager
         }
     }
 
+    /// <summary> Return null if the incoming tile position is outside of the grid </summary>
     public Tile GetTile(Vector2 tilePosition)
     {
-        // Return null if the incoming tile position is outside of the grid
         if (tilePosition.x < 0 || tilePosition.x > res.x - 1
             || tilePosition.y < 0 || tilePosition.y > res.y - 1)
         {
@@ -335,6 +335,14 @@ public class GridManager
     public Vector2 GetRes()
     {
         return res;
+    }
+
+    /// <summary> The distance in x and y between two tiles </summary>
+    public Vector2 GetTileDistance()
+    {
+        float x = Mathf.Abs(grid[1, 0].GetWorldPos().x - grid[0, 0].GetWorldPos().x);
+        float y = Mathf.Abs(grid[0, 1].GetWorldPos().y - grid[0, 0].GetWorldPos().y);
+        return new Vector2(x, y);
     }
 
     /// <summary> returns Vector(MinX, MaxX, MinY, MaxY) </summary>
