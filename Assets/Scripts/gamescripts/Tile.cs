@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using Unity.Entities;
 
 public class Tile
 {
@@ -12,6 +13,8 @@ public class Tile
     Vector2 tileSize;
 
     Tile parent;
+
+    string tileName;
 
     uint nrOfEnemiesOnTile, nrOfSoldiersOnTile;
 
@@ -24,9 +27,11 @@ public class Tile
     {
         tilePosition = inTilePosition;
 
+        tileName = "Tile[" + tilePosition.x + ", " + tilePosition.y + "]";
+
         if (Tools.DebugMode)
         {
-            go = new GameObject { name = "Tile[" + tilePosition.x + ", " + tilePosition.y + "]" };
+            go = new GameObject { name = tileName };
             go.transform.parent = grid.transform;
 
             sr = go.AddComponent<SpriteRenderer>();
@@ -166,22 +171,22 @@ public class Tile
         return buildPermission;
     }
 
-    public bool IsCharacterPresent(Type type)
+    public bool IsCharacterPresent(Character.TYPE_OF_CHARACTER type)
     {
-        if (type == typeof(Enemy))
+        if (type == Character.TYPE_OF_CHARACTER.Enemy)
         {
             return enemyOnTile;
         }
-        else if (type == typeof(Soldier))
+        else if (type == Character.TYPE_OF_CHARACTER.Soldier)
         {
             return soldierOnTile;
         }
-        else if (type == typeof(Player))
+        else if (type == Character.TYPE_OF_CHARACTER.Player)
         {
             return playerOnTile;
         }
 
-        Debug.LogWarning("Could not find type " + type.Name + ". Can not tell if " + go.name + " is occupied!");
+        Debug.LogWarning("Could not find type " + type.ToString() + ". Can not tell if " + go.name + " is occupied!");
         return true;
     }
 
@@ -189,7 +194,10 @@ public class Tile
     {
         bool placeable = true;
 
-        if (!BuildPermission() || IsObjectPresent() || IsCharacterPresent(typeof(Player)) || IsCharacterPresent(typeof(Enemy)) || IsCharacterPresent(typeof(Soldier)))
+        if (!BuildPermission() || IsObjectPresent() ||
+            IsCharacterPresent(Character.TYPE_OF_CHARACTER.Player) ||
+            IsCharacterPresent(Character.TYPE_OF_CHARACTER.Enemy) ||
+            IsCharacterPresent(Character.TYPE_OF_CHARACTER.Soldier))
         {
             placeable = false;
         }
@@ -244,7 +252,7 @@ public class Tile
 
     public string GetName()
     {
-        return go.name;
+        return tileName;
     }
 
     public void SetParent(Tile tile)

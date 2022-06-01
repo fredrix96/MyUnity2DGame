@@ -105,7 +105,7 @@ public class Soldier : Character
             {
                 UpdatePositionHandler();
 
-                if (targetFound)
+                if (ph.targetFound)
                 {
                     sm.StartWalking();
                 }

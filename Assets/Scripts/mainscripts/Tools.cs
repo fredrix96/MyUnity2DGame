@@ -58,23 +58,12 @@ public static class Tools
 
     public static float CalculateVectorDistance(Vector2 v1, Vector2 v2)
     {
-        return Mathf.Sqrt(Mathf.Pow(v2.x + Mathf.Abs(v1.x), 2) + Mathf.Pow(v2.y + Mathf.Abs(v1.y), 2));
+        return Mathf.Sqrt(Mathf.Pow(Mathf.Abs(v2.x - v1.x), 2) + Mathf.Pow(Mathf.Abs(v2.y - v1.y), 2));
     }
 
     public static float CalculateDistance(float x1, float x2)
     {
-        float dist;
-
-        if (x1 < 0)
-        {
-            dist = Mathf.Sqrt(Mathf.Pow(x2 + Mathf.Abs(x1), 2));
-        }
-        else
-        {
-            dist = Mathf.Sqrt(Mathf.Pow(x2 - x1, 2));
-        }
-
-        return dist;
+        return Mathf.Sqrt(Mathf.Pow(Mathf.Abs(x2 - x1), 2));
     }
 
     public static int SortByValue(Tile t1, Tile t2)

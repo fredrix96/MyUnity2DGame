@@ -67,8 +67,8 @@ public class CharacterManager
         enemies = new List<Enemy>();
         soldiers = new List<Soldier>();
 
-        enemySpawnDelay = 2.3f;
-        soldierSpawnDelay = 2.6f;
+        enemySpawnDelay = 1.3f;
+        soldierSpawnDelay = 3.6f;
         playerSpawnDelay = 5.0f;
 
         enemySpawnTimer = 0;
@@ -124,7 +124,7 @@ public class CharacterManager
         // This is done because it allows us to have a "clever" AI while also having good FPS
         if (characters.Count > 0)
         {
-            List<T> listToUpdate = GetListToUpdate(characters, 20);
+            List<T> listToUpdate = GetListToUpdate(characters, 60);
 
             if (multithreading)
             {

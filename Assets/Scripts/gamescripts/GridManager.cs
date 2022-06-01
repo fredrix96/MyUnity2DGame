@@ -53,7 +53,7 @@ public class GridManager
     {
         imageObject.SetActive(active);
     }
-    
+
     void GenerateGrid()
     {
         // Size of each tile

@@ -7,7 +7,7 @@ public class Character
 {
     public enum TYPE_OF_CHARACTER
     {
-        Enemy, Soldier
+        Enemy, Soldier, Player
     }
     public TYPE_OF_CHARACTER type;
     public PositionHandler ph;
@@ -24,13 +24,11 @@ public class Character
     protected int direction;
     protected int damage;
     protected float speed;
-    protected bool targetFound;
     protected bool isDead;
     protected bool shouldBeRemoved;
 
     public Character()
     {
-        targetFound = false;
         isDead = false;
         shouldBeRemoved = false;
     }
@@ -87,7 +85,6 @@ public class Character
         ph.levelLimits = gfx.GetLevelLimits();
 
         // Out
-        targetFound = ph.targetFound;
         if (ph.isIdle)
         {
             sm.StartIdle();
@@ -96,7 +93,7 @@ public class Character
 
     protected void WalkToNewPosition()
     {
-        // Notice how we adjust based on the pivot difference
+        // Notice how we adjust the height based on the pivot difference
         go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, ph.position.x, speed * Time.deltaTime),
             Mathf.MoveTowards(go.transform.position.y, ph.position.y + pivotHeightDiff, speed * Time.deltaTime), 0);
     }
@@ -126,28 +123,15 @@ public class Character
                 isIdle = false;
                 float2 newPos;
 
-                if (type is TYPE_OF_CHARACTER.Enemy)
+                if (type == TYPE_OF_CHARACTER.Enemy)
                 {
-                    //newPos = PathFinding.SearchForTarget(tilePosition, typeof(Soldier), typeof(Enemy), out targetFound, false);
-                    newPos = PathFinding.SearchForTargetAStar(tilePosition, typeof(Soldier), typeof(Enemy), out targetFound, false);
-
-                    //if (!targetFound)
-                    //{
-                    //    newPos = PathFinding.SearchForTarget(tilePosition, typeof(Player), typeof(Enemy), out targetFound, false);
-                    //}
-                    //
-                    //if (!targetFound)
-                    //{
-                    //    newPos = PathFinding.SearchForBuidling(tilePosition, typeof(Enemy), out targetFound, false);
-                    //}
-
+                    newPos = PathFinding.SearchForTargetAStar(tilePosition, TYPE_OF_CHARACTER.Soldier, TYPE_OF_CHARACTER.Enemy, out targetFound, false);
 
                     position = new float3(newPos, position.z);
                 }
-                else if (type is TYPE_OF_CHARACTER.Soldier)
+                else if (type == TYPE_OF_CHARACTER.Soldier)
                 {
-                    //newPos = PathFinding.SearchForTarget(tilePosition, typeof(Enemy), typeof(Soldier), out targetFound, true);
-                    newPos = PathFinding.SearchForTargetAStar(tilePosition, typeof(Enemy), typeof(Soldier), out targetFound, true);
+                    newPos = PathFinding.SearchForTargetAStar(tilePosition, TYPE_OF_CHARACTER.Enemy, TYPE_OF_CHARACTER.Soldier, out targetFound, true);
 
                     // If the soldier has reached half of the field, then stop if there are no enemies nearby
                     if (!targetFound && position.x > levelLimits.y / 2)
