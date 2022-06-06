@@ -9,22 +9,19 @@ public class PopUpMessage : MonoBehaviour
     Canvas canvas;
     CanvasScaler cs;
     Text message;
-    CameraManager cam;
 
     double messageTime;
     float messageLifeTime;
 
     // Start is called before the first frame update
-    public void Init(GameObject go, CameraManager inCam)
+    public void Init(GameObject go)
     {
-        cam = inCam;
-
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
         canvasObject.transform.parent = go.transform;
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = cam.GetCamera();
+        canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "Message";
 
         cs = canvasObject.AddComponent<CanvasScaler>();
@@ -67,7 +64,7 @@ public class PopUpMessage : MonoBehaviour
         message = messageObject.AddComponent<Text>();
         message.text = "";
         message.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        message.fontSize = 20 * (int)cam.GetCamera().aspect;
+        message.fontSize = 20 * (int)CameraManager.GetCamera().aspect;
         message.color = Color.white;
         message.fontStyle = FontStyle.Bold;
         message.alignment = TextAnchor.MiddleCenter;
@@ -88,7 +85,7 @@ public class PopUpMessage : MonoBehaviour
         // Returns left value if it is not null, otherwise it returns the value to the right
         message.color = color ?? Color.white;
 
-        message.fontSize = fontSize * (int)cam.GetCamera().aspect;
+        message.fontSize = fontSize * (int)CameraManager.GetCamera().aspect;
         messageLifeTime = lifeTime;
         message.text = text;
         messageObject.SetActive(true);

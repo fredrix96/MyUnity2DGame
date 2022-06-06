@@ -19,7 +19,7 @@ public class Coin
     bool shouldBeRemoved;
 
     // If the coin is used as UI
-    public Coin(GameObject inGo, CameraManager inCam)
+    public Coin(GameObject inGo)
     {
         go = new GameObject() { name = "coin_UI" };
         go.transform.SetParent(inGo.transform);
@@ -30,7 +30,7 @@ public class Coin
 
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = inCam.GetCamera();
+        canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "UI";
 
         cs = canvasObject.AddComponent<CanvasScaler>();

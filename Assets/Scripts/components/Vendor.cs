@@ -10,28 +10,22 @@ public class Vendor : MonoBehaviour
     Image img;
     CoinManager coinMan;
     Color color;
-    CameraManager cam;
-    GridManager gridMan;
 
     BuildingInformation.TYPE_OF_BUILDING type;
 
-    int counter;
     int cost;
     bool draging;
 
     void Start()
     {
-        counter = 0;
         img = GetComponent<Image>();
     }
 
-    public void Init(GameObject inGo, GameObject inTextObject, CoinManager inCoinMan, CameraManager inCam, GridManager inGridMan, BuildingInformation.TYPE_OF_BUILDING inType)
+    public void Init(GameObject inGo, GameObject inTextObject, CoinManager inCoinMan, BuildingInformation.TYPE_OF_BUILDING inType)
     {
         go = inGo;
         textObject = inTextObject;
         coinMan = inCoinMan;
-        cam = inCam;
-        gridMan = inGridMan;
 
         img = go.GetComponent<Image>();
         img.color = Color.white;
@@ -66,11 +60,10 @@ public class Vendor : MonoBehaviour
                 CreateBuildingImage();
 
                 Vector3 screenPoint = Input.mousePosition;
-                screenPoint.z = cam.GetCamera().nearClipPlane;
-                tmpObject.transform.position = cam.GetCamera().ScreenToWorldPoint(screenPoint);
+                screenPoint.z = CameraManager.GetCamera().nearClipPlane;
+                tmpObject.transform.position = CameraManager.GetCamera().ScreenToWorldPoint(screenPoint);
 
                 draging = true;
-                counter++;
 
                 // Hide shop UI
                 go.GetComponentInParent<Canvas>().enabled = false;
@@ -86,7 +79,7 @@ public class Vendor : MonoBehaviour
     {
         if (draging)
         {
-            gridMan.ActivateAreaImage(true);
+            GridManager.ActivateAreaImage(true);
 
             Tile tile = MousePosToTilePos();
 
@@ -110,7 +103,7 @@ public class Vendor : MonoBehaviour
     {
         if (draging)
         {
-            gridMan.ActivateAreaImage(false);
+            GridManager.ActivateAreaImage(false);
 
             Tile tile = MousePosToTilePos();
 
@@ -121,7 +114,7 @@ public class Vendor : MonoBehaviour
                 if (AvoidObstacles(tile))
                 {
                     // Use Gameobject.find?
-                    GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding(type, tile, gridMan);
+                    GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding(type, tile);
                 }
                 else
                 {
@@ -151,7 +144,7 @@ public class Vendor : MonoBehaviour
         tmpObject.GetComponent<Image>().color = color;
         tmpObject.GetComponent<BoxCollider2D>().enabled = false; // this wont push the player character around
 
-        Tile tmpTile = gridMan.GetTile(new Vector2(0, 0));
+        Tile tmpTile = GridManager.GetTile(new Vector2(0, 0));
         RectTransform rect = tmpObject.GetComponent<RectTransform>();
         Vector2 size = BuildingInformation.GetBuildingSize(type) * 100;
         tmpObject.transform.localScale = new Vector3(tmpTile.GetSize().x * size.x / rect.sizeDelta.x, tmpTile.GetSize().y * size.y / rect.sizeDelta.y, 1);
@@ -161,7 +154,7 @@ public class Vendor : MonoBehaviour
     {
         bool inside = false;
 
-        Vector4 area = gridMan.GetPlacementAreaBorders();
+        Vector4 area = GridManager.GetPlacementAreaBorders();
         Vector2 tilePos = tile.GetWorldPos();
 
         // Note that the object will be moved to the nearest tile if it is above the play area
@@ -189,16 +182,16 @@ public class Vendor : MonoBehaviour
             int startY = -Mathf.FloorToInt(size.y / 2f);
             int endY = Mathf.CeilToInt(size.y / 2f);
 
-            Tile bottomRightTile = gridMan.GetTile(new Vector2(tile.GetTilePosition().x + endX - 1, tile.GetTilePosition().y + endY - 1));
-            Tile bottomLeftTile = gridMan.GetTile(new Vector2(tile.GetTilePosition().x + startX, tile.GetTilePosition().y + endY - 1));
-            Tile tileBelowBuilding = gridMan.GetTile(new Vector2(tile.GetTilePosition().x + startX, tile.GetTilePosition().y + endY));
+            Tile bottomRightTile = GridManager.GetTile(new Vector2(tile.GetTilePosition().x + endX - 1, tile.GetTilePosition().y + endY - 1));
+            Tile bottomLeftTile = GridManager.GetTile(new Vector2(tile.GetTilePosition().x + startX, tile.GetTilePosition().y + endY - 1));
+            Tile tileBelowBuilding = GridManager.GetTile(new Vector2(tile.GetTilePosition().x + startX, tile.GetTilePosition().y + endY));
 
             // The "door" to the building can not be placed at the very bottom of the grid, however, it is allowed to be placed at the very top
             for (int x = startX; x < endX; x++)
             {
                 for (int y = startY; y < endY; y++)
                 {
-                    Tile currTile = gridMan.GetTile(new Vector2(tile.GetTilePosition().x + x, tile.GetTilePosition().y + y));
+                    Tile currTile = GridManager.GetTile(new Vector2(tile.GetTilePosition().x + x, tile.GetTilePosition().y + y));
 
                     if (currTile != null)
                     {
@@ -233,15 +226,15 @@ public class Vendor : MonoBehaviour
         Vector3 screenPoint = Input.mousePosition;
 
         // Distance of the plane from the camera
-        screenPoint.z = cam.GetCamera().nearClipPlane;
+        screenPoint.z = CameraManager.GetCamera().nearClipPlane;
 
-        Vector3 worldPoint = cam.GetCamera().ScreenToWorldPoint(screenPoint);
-        Tile tile = gridMan.GetTileFromWorldPosition(worldPoint);
+        Vector3 worldPoint = CameraManager.GetCamera().ScreenToWorldPoint(screenPoint);
+        Tile tile = GridManager.GetTileFromWorldPosition(worldPoint);
 
         // If the mouse pointer is not on a tile, find the closest tile
         if (tile == null)
         {
-            tile = gridMan.FindClosestTile(worldPoint);
+            tile = GridManager.FindClosestTile(worldPoint);
         }
 
         return tile;

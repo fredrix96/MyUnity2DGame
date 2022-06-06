@@ -14,10 +14,8 @@ public class Character
 
     protected GameObject go;
     protected SpriteManager sm;
-    protected Graphics gfx;
     protected CollisionManager cm;
     protected Tile currTile;
-    protected GridManager gm;
     protected Health health;
 
     protected float pivotHeightDiff;
@@ -47,18 +45,20 @@ public class Character
         return go.name;
     }
 
-    public void MarkTile()
+    public void MarkTile(TYPE_OF_CHARACTER type)
     {
         Vector3 correctPivotToTilePos = new Vector3(go.transform.position.x, go.transform.position.y - pivotHeightDiff, go.transform.position.z);
-        Tile newTile = gm.GetTileFromWorldPosition(correctPivotToTilePos);
+        Tile newTile = GridManager.GetTileFromWorldPosition(correctPivotToTilePos);
 
         if (newTile != currTile)
         {
             currTile.DecreaseCharacters(this);
+            GridManager.GetCharacterTiles(type).Remove(currTile);
 
             if (newTile != null)
             {
                 newTile.IncreaseCharacters(this);
+                GridManager.GetCharacterTiles(type).Add(newTile);
 
                 currTile = newTile;
             }
@@ -82,7 +82,6 @@ public class Character
         ph.speed = speed;
         ph.isDead = IsDead();
         ph.isAttacking = sm.IsAttacking();
-        ph.levelLimits = gfx.GetLevelLimits();
 
         // Out
         if (ph.isIdle)
@@ -108,7 +107,6 @@ public class Character
         public TYPE_OF_CHARACTER type;
         public float3 position;
         public float2 tilePosition;
-        public float4 levelLimits;
         public bool targetFound;
         public bool isDead;
         public bool isAttacking;
@@ -134,7 +132,7 @@ public class Character
                     newPos = PathFinding.SearchForTargetAStar(tilePosition, TYPE_OF_CHARACTER.Enemy, TYPE_OF_CHARACTER.Soldier, out targetFound, true);
 
                     // If the soldier has reached half of the field, then stop if there are no enemies nearby
-                    if (!targetFound && position.x > levelLimits.y / 2)
+                    if (!targetFound && position.x > Graphics.GetLevelLimits().y / 2)
                     {
                         isIdle = true;
                     }

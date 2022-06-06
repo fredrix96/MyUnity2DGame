@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class Building
 {
     protected GameObject go;
-    protected GridManager gridMan;
     protected SpriteRenderer sr;
     protected BoxCollider2D collider;
     protected Rigidbody2D rb;
@@ -28,10 +27,6 @@ public class Building
 
     public void MarkOrUnmarkTiles(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, bool mark)
     {
-        // Vector2(max, min)
-        Vector2 height = Vector2.zero;
-        Vector2 width = Vector2.zero;
-
         Vector2 size = BuildingInformation.GetBuildingSize(type);
         int startX = -Mathf.FloorToInt(size.x / 2f);
         int endX = Mathf.CeilToInt(size.x / 2f);
@@ -42,23 +37,13 @@ public class Building
         {
             for (int y = startY; y < endY; y++)
             {
-                Tile currTile = gridMan.GetTile(new Vector2(inPos.GetTilePosition().x + x, inPos.GetTilePosition().y + y));
+                Tile currTile = GridManager.GetTile(new Vector2(inPos.GetTilePosition().x + x, inPos.GetTilePosition().y + y));
                 if (currTile != null)
                 {
                     currTile.ObjectOnTile(mark);
 
-                    //if (x == startX && y == startY)
-                    //{
-                    //    // Min x and y pos
-                    //    height.y = currTile.GetWorldPos().y;
-                    //    width.y = currTile.GetWorldPos().x;
-                    //}
-                    //else if (x == endX && y == endY)
-                    //{
-                    //    // Max x and y pos
-                    //    height.x = currTile.GetWorldPos().y;
-                    //    width.x = currTile.GetWorldPos().x;
-                    //}
+                    if (mark) GridManager.GetObjectTiles().Add(currTile);
+                    else GridManager.GetObjectTiles().Remove(currTile);
                 }
             }
         }
@@ -74,7 +59,7 @@ public class Building
             {
                 if (x == startX || x == endX - 1 || y == startY || y == endY - 1)
                 {
-                    Tile currTile = gridMan.GetTile(new Vector2(inPos.GetTilePosition().x + x, inPos.GetTilePosition().y + y));
+                    Tile currTile = GridManager.GetTile(new Vector2(inPos.GetTilePosition().x + x, inPos.GetTilePosition().y + y));
                     if (currTile != null)
                     {
                         if (mark)

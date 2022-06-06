@@ -17,7 +17,7 @@ public class SpriteManager : MonoBehaviour
     int idle, attack, walk, die;
     bool isIdle, isAttacking, isWalking, isDead;
 
-    public void Init(GameObject go, GridManager gm, string spritePath, string sortingLayer, bool kinematic = true)
+    public void Init(GameObject go, string spritePath, string sortingLayer, bool kinematic = true)
     {
         sprites = Resources.LoadAll<Sprite>(spritePath);
         sr = go.AddComponent<SpriteRenderer>();
@@ -25,7 +25,7 @@ public class SpriteManager : MonoBehaviour
         sr.sortingLayerID = SortingLayer.NameToID(sortingLayer);
 
         bc = go.AddComponent<BoxCollider2D>();
-        float heightOfTile = gm.GetTile(Vector2.zero).GetSize().y / go.transform.localScale.y;
+        float heightOfTile = GridManager.GetTile(Vector2.zero).GetSize().y / go.transform.localScale.y;
         bc.size = new Vector2(bc.size.x / 2, heightOfTile);
         bc.offset = new Vector2(0, -heightOfTile / 2);
 

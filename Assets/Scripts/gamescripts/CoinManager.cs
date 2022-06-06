@@ -22,7 +22,7 @@ public class CoinManager
 
     int nrOfCoins;
 
-    public CoinManager(CameraManager inCam, AudioManager inAm, int startAmount)
+    public CoinManager(AudioManager inAm, int startAmount)
     {
         am = inAm;
 
@@ -30,9 +30,9 @@ public class CoinManager
         go.transform.SetParent(GameManager.GameManagerObject.transform);
 
         message = go.AddComponent<PopUpMessage>();
-        message.Init(go, inCam);
+        message.Init(go);
 
-        coin = new Coin(go, inCam);
+        coin = new Coin(go);
 
         coinList = new List<Coin>();
 
@@ -43,13 +43,13 @@ public class CoinManager
         canvasObject.transform.parent = go.transform;
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = inCam.GetCamera();
+        canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "UI";
 
         cs = canvasObject.AddComponent<CanvasScaler>();
         cs.referenceResolution = new Vector2(1920, 1080);
 
-        CreateValueUI(inCam);
+        CreateValueUI();
     }
 
     public void Update()
@@ -101,7 +101,7 @@ public class CoinManager
         return false;
     }
 
-    void CreateValueUI(CameraManager inCam)
+    void CreateValueUI()
     {
         // Value object
         valueObject = new GameObject { name = "value" };

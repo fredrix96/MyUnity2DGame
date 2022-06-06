@@ -14,7 +14,7 @@ public class PlayerHealth : MonoBehaviour
     int health;
     int maxHealth;
 
-    public void Init(GameObject inGo, int inHealth, CameraManager inCam)
+    public void Init(GameObject inGo, int inHealth)
     {
         // Head object
         go = new GameObject { name = inGo.name + "_healthbar" };
@@ -25,7 +25,7 @@ public class PlayerHealth : MonoBehaviour
         canvasObject.transform.parent = go.transform;
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = inCam.GetCamera();
+        canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "UI";
 
         cs = canvasObject.AddComponent<CanvasScaler>();

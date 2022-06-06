@@ -7,12 +7,10 @@ public class Enemy : Character
     CoinManager coinMan;
     int value;
     
-    public Enemy(Graphics inGfx, GameObject inGo, GridManager inGm, CoinManager inCoinMan, int inValue = 1)
+    public Enemy(GameObject inGo, CoinManager inCoinMan, int inValue = 1)
     {
         type = TYPE_OF_CHARACTER.Enemy;
 
-        gfx = inGfx;
-        gm = inGm;
         coinMan = inCoinMan;
         value = inValue;
 
@@ -24,12 +22,12 @@ public class Enemy : Character
         cm = go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, gm, "Sprites/StickFigureMonster", "Character");
+        sm.Init(go, "Sprites/StickFigureMonster", "Character");
         sm.FlipX();
 
-        float randomY = Random.Range(0, gm.GetRes().y - 1);
-        Vector2 spawnTile = new Vector2(gm.GetRes().x - 1, randomY);
-        go.transform.position = gm.GetTile(spawnTile).GetWorldPos();
+        float randomY = Random.Range(0, GridManager.GetRes().y - 1);
+        Vector2 spawnTile = new Vector2(GridManager.GetRes().x - 1, randomY);
+        go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
 
         // This is to make sure that feet of the character wont walk on another sprite
         pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
@@ -43,7 +41,7 @@ public class Enemy : Character
         damage = 10;
         direction = -1;
 
-        currTile = gm.GetTile(spawnTile);
+        currTile = GridManager.GetTile(spawnTile);
         currTile.IncreaseCharacters(this);
 
         ph.type = type;
@@ -64,7 +62,7 @@ public class Enemy : Character
 
                 WalkToNewPosition();
 
-                MarkTile();
+                MarkTile(type);
             }
             else if (sm.IsAttacking())
             {
@@ -129,6 +127,7 @@ public class Enemy : Character
             {
                 isDead = true;
                 currTile.DecreaseCharacters(this);
+                GridManager.GetCharacterTiles(type).Remove(currTile);
                 coinMan.CreateCoin(go.transform.position, new Vector2(0.2f, 0.2f), Vector3.up, 1, 1.5f, true);
                 coinMan.AddCoins(value);
             }

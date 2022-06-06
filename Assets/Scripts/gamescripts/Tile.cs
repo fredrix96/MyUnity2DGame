@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using Unity.Entities;
 
 public class Tile
 {
@@ -19,9 +18,6 @@ public class Tile
     uint nrOfEnemiesOnTile, nrOfSoldiersOnTile;
 
     bool enemyOnTile, soldierOnTile, playerOnTile, objectOnTile, buildPermission;
-    float value;
-
-    public float f, g, h, currCost;
 
     public Tile(GameObject grid, Vector2 inTilePosition)
     {
@@ -46,9 +42,6 @@ public class Tile
         buildPermission = true;
         nrOfEnemiesOnTile = 0;
         nrOfSoldiersOnTile = 0;
-
-        value = 999999;
-        f = g = h = 0;
 
         parent = null;
     }
@@ -233,16 +226,6 @@ public class Tile
     public Vector2 GetWorldPos()
     {
         return tileWorldPos;
-    }
-
-    public void SetValue(float inValue)
-    {
-        f = inValue;
-    }
-
-    public float GetValue()
-    {
-        return f;
     }
 
     public Vector2 GetTilePosition()

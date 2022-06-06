@@ -7,10 +7,8 @@ public class Player
     GameObject go;
     SpriteManager sm;
     PlayerHealth health;
-    GridManager gm;
     Tile currTile;
     CollisionManager cm;
-    CameraManager cam;
 
     bool isDead;
     bool shouldBeRemoved;
@@ -21,11 +19,8 @@ public class Player
     float regenerationDelay;
     Vector2 dirVector;
 
-    public Player(GridManager inGm, CameraManager inCam)
+    public Player()
     {
-        gm = inGm;
-        cam = inCam;
-
         maxHealth = 300;
         regenerationDelay = 0.3f;
         playerSpeed = 5;
@@ -70,6 +65,7 @@ public class Player
             {
                 isDead = true;
                 currTile.PlayerOnTile(false);
+                GridManager.SetPlayerTile(null);
             }
         }
         else
@@ -136,10 +132,11 @@ public class Player
 
     void MarkTile()
     {
-        Tile newTile = gm.GetTileFromWorldPosition(go.transform.position);
+        Tile newTile = GridManager.GetTileFromWorldPosition(go.transform.position);
 
         if (newTile != currTile && newTile != null)
         {
+            GridManager.SetPlayerTile(newTile);
             newTile.PlayerOnTile(true);
             currTile.PlayerOnTile(false);
             currTile = newTile;
@@ -178,22 +175,22 @@ public class Player
         go = new GameObject { name = "player" };
         go.transform.parent = GameManager.GameManagerObject.transform;
         go.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
-        go.transform.position = gm.GetTile(spawnTile).GetWorldPos();
+        go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
         go.layer = LayerMask.NameToLayer("Player");
 
         cm = go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, gm, "Sprites/StickFigureKing", "Player", false);
+        sm.Init(go, "Sprites/StickFigureKing", "Player", false);
 
         health = go.AddComponent<PlayerHealth>();
-        health.Init(go, maxHealth, cam);
+        health.Init(go, maxHealth);
 
         dirVector = Vector2.zero;
         isDead = false;
         shouldBeRemoved = false;
 
-        currTile = gm.GetTile(spawnTile);
+        currTile = GridManager.GetTile(spawnTile);
         currTile.PlayerOnTile(true);
     }
 

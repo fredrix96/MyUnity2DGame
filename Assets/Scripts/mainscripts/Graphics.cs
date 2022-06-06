@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Graphics
+public static class Graphics
 {
-    GameObject level, background;
+    static GameObject level, background;
 
-    Vector4 worldLimits, levelLimits;
+    static Vector4 worldLimits, levelLimits;
 
     // Start is called before the first frame update
-    public Graphics()
+    public static void Init()
     {
         float res = Mathf.CeilToInt(Screen.width / 267F);
 
@@ -46,12 +46,12 @@ public class Graphics
         worldLimits = new Vector4(-transformLvl.rect.width / 2, transformLvl.rect.width / 2, -transformLvl.rect.height / 2, transformLvl.rect.height / 2 + transformBg.rect.height);
     }
 
-    public Vector4 GetLevelLimits()
+    static public Vector4 GetLevelLimits()
     {
         return levelLimits;
     }
 
-    public Vector4 GetWorldLimits()
+    static public Vector4 GetWorldLimits()
     {
         return worldLimits;
     }

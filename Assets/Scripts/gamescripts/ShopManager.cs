@@ -16,7 +16,7 @@ public class ShopManager
 
     bool active;
 
-    public ShopManager(CameraManager inCam, CoinManager inCoinMan, BuildingManager inBuildings, GridManager inGridMan)
+    public ShopManager(CoinManager inCoinMan, BuildingManager inBuildings)
     {
         coinMan = inCoinMan;
         buildings = inBuildings;
@@ -33,7 +33,7 @@ public class ShopManager
 
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = inCam.GetCamera();
+        canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "UI";
 
         cs = canvasObject.AddComponent<CanvasScaler>();
@@ -54,8 +54,8 @@ public class ShopManager
         shop.rectTransform.pivot = new Vector2(0, 0.5f);
         shop.rectTransform.anchoredPosition = new Vector3(0, canvas.pixelRect.height / 2, 0);
 
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Castle, new Vector3(canvas.pixelRect.width * 0.03f, canvas.pixelRect.height * 0.8f, 0), inCam, inGridMan);
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.House, new Vector3(canvas.pixelRect.width * 0.08f, canvas.pixelRect.height * 0.8f, 0), inCam, inGridMan);
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Castle, new Vector3(canvas.pixelRect.width * 0.03f, canvas.pixelRect.height * 0.8f, 0));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.House, new Vector3(canvas.pixelRect.width * 0.08f, canvas.pixelRect.height * 0.8f, 0));
 
         // Disable at start
         active = false;
@@ -104,7 +104,7 @@ public class ShopManager
         go.SetActive(active);
     }
 
-    void CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING type, Vector3 position, CameraManager inCam, GridManager inGridMan)
+    void CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING type, Vector3 position)
     {
         if (GameObject.Find(type.ToString()) == null)
         {
@@ -112,7 +112,7 @@ public class ShopManager
             imageObject.transform.SetParent(canvasObject.transform);
             imageObject.AddComponent<BoxCollider2D>();
             message = imageObject.AddComponent<PopUpMessage>();
-            message.Init(go, inCam);
+            message.Init(go);
 
             Image image = imageObject.AddComponent<Image>();
             image.sprite = buildings.GetSprite(type);
@@ -138,7 +138,7 @@ public class ShopManager
             textObjects.Add(textObject);
 
             Vendor vendor = imageObject.AddComponent<Vendor>();
-            vendor.Init(imageObject, textObject, coinMan, inCam, inGridMan, type);
+            vendor.Init(imageObject, textObject, coinMan, type);
 
             imageObjects.Add(imageObject);
         }

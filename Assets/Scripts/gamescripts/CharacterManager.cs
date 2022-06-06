@@ -9,14 +9,14 @@ public static class EnemyCounter
 {
     public static int counter = 0;
     public static int nrOfEnemies = 0;
-    public static int max = 1000;
+    public static int max = 3;
 }
 
 public static class SoldierCounter
 {
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
-    public static int max = 1000;
+    public static int max = 3;
 }
 
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)
@@ -34,8 +34,6 @@ public struct CharacterUpdatePositionJob : IJobParallelFor
 
 public class CharacterManager
 {
-    Graphics gfx;
-    GridManager gm;
     List<Enemy> enemies;
     List<Soldier> soldiers;
     Player player;
@@ -47,17 +45,15 @@ public class CharacterManager
     float enemySpawnDelay, soldierSpawnDelay, playerSpawnDelay;
     double enemySpawnTimer, soldierSpawnTimer, playerSpawnTimer;
 
-    public CharacterManager(Graphics inGfx, GridManager inGm, CameraManager inCam, Player inPlayer, CoinManager inCoinMan)
+    public CharacterManager(Player inPlayer, CoinManager inCoinMan)
     {
-        gfx = inGfx;
-        gm = inGm;
         player = inPlayer;
         coinMan = inCoinMan;
 
         chracterObjects = new GameObject { name = "characters" };
         chracterObjects.transform.SetParent(GameManager.GameManagerObject.transform);
         message = chracterObjects.AddComponent<PopUpMessage>();
-        message.Init(chracterObjects, inCam);
+        message.Init(chracterObjects);
 
         enemyObjects = new GameObject { name = "enemies" };
         enemyObjects.transform.SetParent(chracterObjects.transform);
@@ -67,8 +63,8 @@ public class CharacterManager
         enemies = new List<Enemy>();
         soldiers = new List<Soldier>();
 
-        enemySpawnDelay = 1.3f;
-        soldierSpawnDelay = 3.6f;
+        enemySpawnDelay = 2.3f;
+        soldierSpawnDelay = 2.6f;
         playerSpawnDelay = 5.0f;
 
         enemySpawnTimer = 0;
@@ -247,7 +243,7 @@ public class CharacterManager
 
     void SpawnEnemy()
     {
-        enemies.Add(new Enemy(gfx, enemyObjects, gm, coinMan));
+        enemies.Add(new Enemy(enemyObjects, coinMan));
         EnemyCounter.counter++;
         EnemyCounter.nrOfEnemies++;
     }
@@ -261,7 +257,7 @@ public class CharacterManager
 
     void SpawnSoldier()
     {
-        soldiers.Add(new Soldier(gfx, soldierObjects, gm));
+        soldiers.Add(new Soldier(soldierObjects));
         SoldierCounter.counter++;
         SoldierCounter.nrOfSoldiers++;
     }

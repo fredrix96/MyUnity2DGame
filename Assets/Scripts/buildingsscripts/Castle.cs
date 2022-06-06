@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Castle : Building
 {
-    public Castle(GameObject parent, Tile inPos, GridManager inGridMan, CoinManager inCoinMan)
+    public Castle(GameObject parent, Tile inPos, CoinManager inCoinMan)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.Castle;
 
@@ -28,7 +28,6 @@ public class Castle : Building
         selector.SetWidth(5);
 
         go.transform.position = inPos.GetWorldPos();
-        gridMan = inGridMan;
 
         MarkOrUnmarkTiles(type, inPos, true);
 

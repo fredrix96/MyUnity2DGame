@@ -4,19 +4,13 @@ using UnityEngine;
 
 public class Controller
 {
-    Graphics gfx;
-    CameraManager cm;
     Player player;
     ShopManager shopMan;
-    GridManager gridMan;
 
-    public Controller(Graphics inGfx, CameraManager inCm, Player inPlayer, ShopManager inShopMan, GridManager inGridMan)
+    public Controller(Player inPlayer, ShopManager inShopMan)
     {
-        gfx = inGfx;
-        cm = inCm;
         player = inPlayer;
         shopMan = inShopMan;
-        gridMan = inGridMan;
     }
 
     public void Update()
@@ -27,62 +21,62 @@ public class Controller
 
     void UpdateMouse()
     {
-        if (Input.mousePosition.x < cm.GetCamBorderInScreenPoint(0.05f, 0.05f).x && Input.GetMouseButton(1))
+        if (Input.mousePosition.x < CameraManager.GetCamBorderInScreenPoint(0.05f, 0.05f).x && Input.GetMouseButton(1))
         {
-            if (gfx.GetWorldLimits().x < cm.GetPosX() - cm.GetWorldSpaceWidth() / 2)
+            if (Graphics.GetWorldLimits().x < CameraManager.GetPosX() - CameraManager.GetWorldSpaceWidth() / 2)
             {
-                cm.SetDirX(-1);
+                CameraManager.SetDirX(-1);
             }
         }
-        else if (Input.mousePosition.x > cm.GetCamBorderInScreenPoint(0.05f, 0.05f).y && Input.GetMouseButton(1))
+        else if (Input.mousePosition.x > CameraManager.GetCamBorderInScreenPoint(0.05f, 0.05f).y && Input.GetMouseButton(1))
         {
-            if (gfx.GetWorldLimits().y > cm.GetPosX() + cm.GetWorldSpaceWidth() / 2)
+            if (Graphics.GetWorldLimits().y > CameraManager.GetPosX() + CameraManager.GetWorldSpaceWidth() / 2)
             {
-                cm.SetDirX(1);
+                CameraManager.SetDirX(1);
             }
         }
 
-        if (Input.mousePosition.y > cm.GetCamBorderInScreenPoint(0.05f, 0.05f).w && Input.GetMouseButton(1))
+        if (Input.mousePosition.y > CameraManager.GetCamBorderInScreenPoint(0.05f, 0.05f).w && Input.GetMouseButton(1))
         {
-            if (gfx.GetWorldLimits().w > cm.GetPosY() + cm.GetWorldSpaceHeight() / 2)
+            if (Graphics.GetWorldLimits().w > CameraManager.GetPosY() + CameraManager.GetWorldSpaceHeight() / 2)
             {
-                cm.SetDirY(1);
+                CameraManager.SetDirY(1);
             }
         }
-        else if (Input.mousePosition.y < cm.GetCamBorderInScreenPoint(0.05f, 0.05f).z && Input.GetMouseButton(1))
+        else if (Input.mousePosition.y < CameraManager.GetCamBorderInScreenPoint(0.05f, 0.05f).z && Input.GetMouseButton(1))
         {
-            if (gfx.GetWorldLimits().z < cm.GetPosY() - cm.GetWorldSpaceHeight() / 2)
+            if (Graphics.GetWorldLimits().z < CameraManager.GetPosY() - CameraManager.GetWorldSpaceHeight() / 2)
             {
-                cm.SetDirY(-1);
+                CameraManager.SetDirY(-1);
             }
         }
 
         // Scroll to "zoom"
         if (Input.mouseScrollDelta.y > 0)
         {
-            cm.ZoomIn();
+            CameraManager.ZoomIn();
         }
         else if (Input.mouseScrollDelta.y < 0)
         {
-            cm.ZoomOut();
+            CameraManager.ZoomOut();
 
             // Make sure the camera stays inside the game area
-            if (gfx.GetWorldLimits().x > cm.GetPosX() - cm.GetWorldSpaceWidth() / 2)
+            if (Graphics.GetWorldLimits().x > CameraManager.GetPosX() - CameraManager.GetWorldSpaceWidth() / 2)
             {
-                cm.SetPosX(gfx.GetWorldLimits().x + cm.GetWorldSpaceWidth() / 2);
+                CameraManager.SetPosX(Graphics.GetWorldLimits().x + CameraManager.GetWorldSpaceWidth() / 2);
             }
-            else if (gfx.GetLevelLimits().y < cm.GetPosX() + cm.GetWorldSpaceWidth() / 2)
+            else if (Graphics.GetLevelLimits().y < CameraManager.GetPosX() + CameraManager.GetWorldSpaceWidth() / 2)
             {
-                cm.SetPosX(gfx.GetWorldLimits().y - cm.GetWorldSpaceWidth() / 2);
+                CameraManager.SetPosX(Graphics.GetWorldLimits().y - CameraManager.GetWorldSpaceWidth() / 2);
             }
 
-            if (gfx.GetWorldLimits().w < cm.GetPosY() + cm.GetWorldSpaceHeight() / 2)
+            if (Graphics.GetWorldLimits().w < CameraManager.GetPosY() + CameraManager.GetWorldSpaceHeight() / 2)
             {
-                cm.SetPosY(gfx.GetWorldLimits().w - cm.GetWorldSpaceHeight() / 2);
+                CameraManager.SetPosY(Graphics.GetWorldLimits().w - CameraManager.GetWorldSpaceHeight() / 2);
             }
-            else if (gfx.GetWorldLimits().z > cm.GetPosY() - cm.GetWorldSpaceHeight() / 2)
+            else if (Graphics.GetWorldLimits().z > CameraManager.GetPosY() - CameraManager.GetWorldSpaceHeight() / 2)
             {
-                cm.SetPosY(gfx.GetWorldLimits().z + cm.GetWorldSpaceHeight() / 2);
+                CameraManager.SetPosY(Graphics.GetWorldLimits().z + CameraManager.GetWorldSpaceHeight() / 2);
             }
         }
     }
@@ -100,20 +94,20 @@ public class Controller
             }
 
             Vector2 playerPos = player.GetPosition();
-            if (Input.GetKey(KeyCode.W) && playerPos.y <= gridMan.GetTile(new Vector2(0,0)).GetWorldPos().y)
+            if (Input.GetKey(KeyCode.W) && playerPos.y <= GridManager.GetTile(new Vector2(0,0)).GetWorldPos().y)
             {
                 player.SetDirY(1);
             }
-            else if (Input.GetKey(KeyCode.S) && playerPos.y >= gridMan.GetTile(new Vector2(0, gridMan.GetRes().y - 2)).GetWorldPos().y)
+            else if (Input.GetKey(KeyCode.S) && playerPos.y >= GridManager.GetTile(new Vector2(0, GridManager.GetRes().y - 2)).GetWorldPos().y)
             {
                 player.SetDirY(-1);
             }
 
-            if (Input.GetKey(KeyCode.A) && playerPos.x >= gridMan.GetTile(new Vector2(0,0)).GetWorldPos().x)
+            if (Input.GetKey(KeyCode.A) && playerPos.x >= GridManager.GetTile(new Vector2(0,0)).GetWorldPos().x)
             {
                 player.SetDirX(-1);
             }
-            else if (Input.GetKey(KeyCode.D) && playerPos.x <= gridMan.GetTile(new Vector2(gridMan.GetRes().x - 1, 0)).GetWorldPos().x)
+            else if (Input.GetKey(KeyCode.D) && playerPos.x <= GridManager.GetTile(new Vector2(GridManager.GetRes().x - 1, 0)).GetWorldPos().x)
             {
                 player.SetDirX(1);
             }

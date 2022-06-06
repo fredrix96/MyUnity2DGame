@@ -2,28 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Burst;
 
-public class GridManager
+public static class GridManager
 {
-    Graphics gfx;
-    Tile[,] grid;
-    GameObject go, imageObject;
-    Vector2 res;
-    Vector2 tilePosition;
+    static Vector2 res;
 
-    Image areaImage;
-    Canvas canvas;
+    static Tile[,] grid;
+    static List<Tile> tilesWithEnemies, tilesWithSoldiers, tilesWithObjects;
+    static Tile tileWithPlayer;
+    static GameObject go, imageObject;
+    static Vector2 tilePosition;
 
-    public GridManager(Graphics inGfx, Vector2 inRes)
+    static Image areaImage;
+    static Canvas canvas;
+
+    public static void Init(Vector2 inRes)
     {
+        res = inRes;
+
         go = new GameObject { name = "grid" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
         tilePosition = new Vector2(0, 0);
 
-        gfx = inGfx;
-        res = inRes;
-
         grid = new Tile[(int)res.x, (int)res.y];
+        tilesWithEnemies = new List<Tile>();
+        tilesWithSoldiers = new List<Tile>();
+        tilesWithObjects = new List<Tile>();
 
         GenerateGrid();
 
@@ -45,24 +50,24 @@ public class GridManager
         areaImage = imageObject.AddComponent<Image>();
         areaImage.sprite = Resources.Load<Sprite>("Sprites/Grid");
         areaImage.color = new Color(0.4f, 1.0f, 0.0f, 0.2f);
-        
+
         imageObject.SetActive(false);
     }
 
-    public void ActivateAreaImage(bool active)
+    public static void ActivateAreaImage(bool active)
     {
         imageObject.SetActive(active);
     }
 
-    void GenerateGrid()
+    static void GenerateGrid()
     {
         // Size of each tile
-        float length = Tools.CalculateDistance(gfx.GetLevelLimits().y, gfx.GetLevelLimits().x);
-        float height = Tools.CalculateDistance(gfx.GetLevelLimits().w, gfx.GetLevelLimits().z);
+        float length = Tools.CalculateDistance(Graphics.GetLevelLimits().y, Graphics.GetLevelLimits().x);
+        float height = Tools.CalculateDistance(Graphics.GetLevelLimits().w, Graphics.GetLevelLimits().z);
         Vector2 tileSize = new Vector2(length / res.x, height / res.y);
 
         // Start position
-        Vector2 currPosition = new Vector2(gfx.GetLevelLimits().x + tileSize.x / 2, gfx.GetLevelLimits().w - tileSize.y / 2);
+        Vector2 currPosition = new Vector2(Graphics.GetLevelLimits().x + tileSize.x / 2, Graphics.GetLevelLimits().w - tileSize.y / 2);
 
         for (int y = 0; y < (int)res.y; y++)
         {
@@ -77,12 +82,12 @@ public class GridManager
                 currPosition = new Vector2(currPosition.x + tileSize.x, currPosition.y);
             }
 
-            currPosition = new Vector2(gfx.GetLevelLimits().x + tileSize.x / 2, currPosition.y - tileSize.y);
+            currPosition = new Vector2(Graphics.GetLevelLimits().x + tileSize.x / 2, currPosition.y - tileSize.y);
         }
     }
 
     /// <summary> Return null if the incoming tile position is outside of the grid </summary>
-    public Tile GetTile(Vector2 tilePosition)
+    public static Tile GetTile(Vector2 tilePosition)
     {
         if (tilePosition.x < 0 || tilePosition.x > res.x - 1
             || tilePosition.y < 0 || tilePosition.y > res.y - 1)
@@ -93,7 +98,7 @@ public class GridManager
         return grid[(int)tilePosition.x, (int)tilePosition.y];
     }
 
-    public Tile GetTileFromWorldPosition(Vector2 pos)
+    public static Tile GetTileFromWorldPosition(Vector2 pos)
     {
         Tile outTile = null;
 
@@ -104,54 +109,12 @@ public class GridManager
             return outTile;
         }
 
-        // Go through every tile to find where the position is. Worst-case time: O(n^2)
-        {
-            //for (int y = 0; y < (int)res.y; y++)
-            //{
-            //    for (int x = 0; x < (int)res.x; x++)
-            //    {
-            //        bool atThisTile = false;
-            //
-            //        if (x + 1 >= (int)res.x)
-            //        {
-            //            atThisTile = grid[x, y].GetPos().x - grid[x, y].GetSize().x / 2 <= pos.x;
-            //        }
-            //        else
-            //        {
-            //            atThisTile = grid[x, y].GetPos().x - grid[x, y].GetSize().x / 2 <= pos.x && pos.x < grid[x + 1, y].GetPos().x - grid[x + 1, y].GetSize().x / 2;
-            //        }
-            //
-            //        if (atThisTile)
-            //        {
-            //            atThisTile = false;
-            //
-            //            if (y + 1 >= (int)res.y)
-            //            {
-            //                atThisTile = grid[x, y].GetPos().y - grid[x, y].GetSize().y / 2 <= pos.y;
-            //            }
-            //            else
-            //            {
-            //                atThisTile = grid[x, y].GetPos().y - grid[x, y].GetSize().y / 2 <= pos.y && pos.y > grid[x, y + 1].GetPos().y - grid[x, y + 1].GetSize().y / 2;
-            //            }
-            //
-            //            if (atThisTile)
-            //            {
-            //                outTile = grid[x, y];
-            //
-            //                goto endloop;
-            //            }
-            //        }
-            //    }
-            //}
-            //endloop:
-        }
-
-        // First find where the position is on the y axis. Worst-case time: O(n+n)
+        // First find where the position is on the y axis
         int y = 0;
         for (; y < (int)res.y; y++)
         {
             bool atThisTile = false;
-        
+
             if (y + 1 >= (int)res.y)
             {
                 atThisTile = grid[0, y].GetWorldPos().y - grid[0, y].GetSize().y / 2 <= pos.y;
@@ -160,18 +123,18 @@ public class GridManager
             {
                 atThisTile = grid[0, y].GetWorldPos().y - grid[0, y].GetSize().y / 2 <= pos.y && pos.y > grid[0, y + 1].GetWorldPos().y - grid[0, y + 1].GetSize().y / 2;
             }
-        
+
             if (atThisTile)
             {
                 break;
             }
         }
-        
+
         // Then find where the position is on the x axis with the help of the y position
         for (int x = 0; x < (int)res.x; x++)
         {
             bool atThisTile;
-        
+
             if (x + 1 >= (int)res.x)
             {
                 atThisTile = grid[x, y].GetWorldPos().x - grid[x, y].GetSize().x / 2 <= pos.x;
@@ -180,7 +143,7 @@ public class GridManager
             {
                 atThisTile = grid[x, y].GetWorldPos().x - grid[x, y].GetSize().x / 2 <= pos.x && pos.x < grid[x + 1, y].GetWorldPos().x - grid[x + 1, y].GetSize().x / 2;
             }
-        
+
             if (atThisTile)
             {
                 outTile = grid[x, y];
@@ -191,7 +154,32 @@ public class GridManager
         return outTile;
     }
 
-    public Tile FindClosestTile(Vector2 pos)
+    public static List<Tile> GetObjectTiles()
+    {
+        return tilesWithObjects;
+    }
+
+    public static List<Tile> GetCharacterTiles(Character.TYPE_OF_CHARACTER type)
+    {
+        if (type == Character.TYPE_OF_CHARACTER.Enemy) return tilesWithEnemies;
+        else if (type == Character.TYPE_OF_CHARACTER.Soldier) return tilesWithSoldiers;
+
+        Debug.LogWarning("No type of " + type + " could be found! Could not return tiles...");
+
+        return null;
+    }
+
+    public static Tile GetPlayerTile()
+    {
+        return tileWithPlayer;
+    }
+
+    public static void SetPlayerTile(Tile tile)
+    {
+        tileWithPlayer = tile;
+    }
+
+    public static Tile FindClosestTile(Vector2 pos)
     {
         bool found = false;
         Tile tile = null;
@@ -327,18 +315,18 @@ public class GridManager
         return tile;
     }
 
-    public Tile[,] GetGrid()
+    public static Tile[,] GetGrid()
     {
         return grid;
     }
 
-    public Vector2 GetRes()
+    public static Vector2 GetRes()
     {
         return res;
     }
 
     /// <summary> The distance in x and y between two tiles </summary>
-    public Vector2 GetTileDistance()
+    public static Vector2 GetTileDistance()
     {
         float x = Mathf.Abs(grid[1, 0].GetWorldPos().x - grid[0, 0].GetWorldPos().x);
         float y = Mathf.Abs(grid[0, 1].GetWorldPos().y - grid[0, 0].GetWorldPos().y);
@@ -346,7 +334,7 @@ public class GridManager
     }
 
     /// <summary> returns Vector(MinX, MaxX, MinY, MaxY) </summary>
-    public Vector4 GetPlacementAreaBorders()
+    public static Vector4 GetPlacementAreaBorders()
     {
         Vector4 placementArea = new Vector4(grid[0, 0].GetWorldPos().x, grid[(int)res.x / 3, 0].GetWorldPos().x, grid[0, (int)res.y - 1].GetWorldPos().y, grid[0, 0].GetWorldPos().y);
         return placementArea;

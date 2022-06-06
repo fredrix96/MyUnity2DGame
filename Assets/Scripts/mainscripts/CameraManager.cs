@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CameraManager
+public static class CameraManager
 {
-    Camera mainCam;
+    static Camera mainCam;
 
-    List<GameObject> cameras;
+    static List<GameObject> cameras;
 
-    float camOrtoSize;
+    static float camOrtoSize;
 
-    int cameraSpeed;
-    int zoomSpeed;
+    static int cameraSpeed;
+    static int zoomSpeed;
 
-    Vector2 dirVector;
+    static Vector2 dirVector;
 
-    public CameraManager()
+    static CameraManager()
     {
         camOrtoSize = 5.0f;
         zoomSpeed = 100;
@@ -30,7 +30,7 @@ public class CameraManager
         dirVector = Vector2.zero;
     }
 
-    public void Update()
+    public static void Update()
     {
         if (dirVector.x != 0 || dirVector.y != 0)
         {
@@ -41,7 +41,7 @@ public class CameraManager
         SetDirY();
     }
 
-    public void CreateCamera(GameObject inGo, bool orthographic = false, CameraClearFlags flag = CameraClearFlags.Skybox)
+    public static void CreateCamera(GameObject inGo, bool orthographic = false, CameraClearFlags flag = CameraClearFlags.Skybox)
     {
         GameObject UICamObject = new GameObject { name = inGo.name + "_camera" };
         UICamObject.transform.parent = inGo.transform;
@@ -55,7 +55,7 @@ public class CameraManager
     }
 
     // Returns the main camera if no game object is chosen
-    public Camera GetCamera(GameObject inGo = null)
+    public static Camera GetCamera(GameObject inGo = null)
     {
         if (inGo == null)
         {
@@ -76,7 +76,7 @@ public class CameraManager
     }
 
     // Offset must be above 0 or below 1. The function returns a vector4 with (Xmin, Xmax, Ymin, Ymax)
-    public Vector4 GetCamBorderInScreenPoint(float offsetX = 0, float offsetY = 0, GameObject inGo = null)
+    public static Vector4 GetCamBorderInScreenPoint(float offsetX = 0, float offsetY = 0, GameObject inGo = null)
     {
         Vector4 camBorder = Vector4.zero;
 
@@ -104,7 +104,7 @@ public class CameraManager
     }
 
     // Offset must be above 0 or below 1. The function returns a vector4 with (Xmin, Xmax, Ymin, Ymax)
-    public Vector4 GetCamBorderInWorldPoint(float offsetX = 0, float offsetY = 0, GameObject inGo = null)
+    public static Vector4 GetCamBorderInWorldPoint(float offsetX = 0, float offsetY = 0, GameObject inGo = null)
     {
         Vector4 camBorder = Vector4.zero;
 
@@ -131,58 +131,58 @@ public class CameraManager
         return camBorder;
     }
 
-    void Move()
+    static void Move()
     {
         mainCam.transform.position = new Vector3(mainCam.transform.position.x + cameraSpeed * Time.deltaTime * dirVector.x,
             mainCam.transform.position.y + cameraSpeed * Time.deltaTime * dirVector.y, mainCam.transform.position.z);
     }
 
-    public void SetDirX(int x = 0)
+    public static void SetDirX(int x = 0)
     {
         dirVector = new Vector2(x, dirVector.y);
     }
 
-    public void SetDirY(int y = 0)
+    public static void SetDirY(int y = 0)
     {
         dirVector = new Vector2(dirVector.x, y);
     }
 
-    public void SetPosX(float newXPos)
+    public static void SetPosX(float newXPos)
     {
         mainCam.transform.position = new Vector3(newXPos, mainCam.transform.position.y, mainCam.transform.position.z);
     }
 
-    public void SetPosY(float newYPos)
+    public static void SetPosY(float newYPos)
     {
         mainCam.transform.position = new Vector3(mainCam.transform.position.x, newYPos, mainCam.transform.position.z);
     }
 
-    public void ZoomIn()
+    public static void ZoomIn()
     {
         mainCam.orthographicSize = Mathf.MoveTowards(mainCam.orthographicSize, camOrtoSize / 4, zoomSpeed * Time.deltaTime);
     }
 
-    public void ZoomOut()
+    public static void ZoomOut()
     {
         mainCam.orthographicSize = Mathf.MoveTowards(mainCam.orthographicSize, camOrtoSize, zoomSpeed * Time.deltaTime);
     }
 
-    public float GetPosX()
+    public static float GetPosX()
     {
         return mainCam.transform.position.x;
     }
 
-    public float GetPosY()
+    public static float GetPosY()
     {
         return mainCam.transform.position.y;
     }
 
-    public float GetWorldSpaceWidth()
+    public static float GetWorldSpaceWidth()
     {
         return mainCam.ViewportToWorldPoint(new Vector2(1, 0)).x - mainCam.ViewportToWorldPoint(new Vector2(0, 0)).x;
     }
 
-    public float GetWorldSpaceHeight()
+    public static float GetWorldSpaceHeight()
     {
         return mainCam.ViewportToWorldPoint(new Vector2(0, 1)).y - mainCam.ViewportToWorldPoint(new Vector2(0, 0)).y;
     }

@@ -4,12 +4,9 @@ using UnityEngine;
 
 public class Soldier : Character
 {
-    public Soldier(Graphics inGfx, GameObject inGo, GridManager inGm)
+    public Soldier(GameObject inGo)
     {
         type = TYPE_OF_CHARACTER.Soldier;
-
-        gfx = inGfx;
-        gm = inGm;
 
         go = new GameObject { name = "soldier" + SoldierCounter.counter };
         go.transform.SetParent(inGo.transform);
@@ -19,11 +16,11 @@ public class Soldier : Character
         cm = go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, gm, "Sprites/StickFigure", "Character");
+        sm.Init(go, "Sprites/StickFigure", "Character");
 
-        float randomY = Random.Range(0, gm.GetRes().y - 1);
+        float randomY = Random.Range(0, GridManager.GetRes().y - 1);
         Vector2 spawnTile = new Vector2(0, randomY);
-        go.transform.position = gm.GetTile(spawnTile).GetWorldPos();
+        go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
 
         // This is to make sure that feet of the character wont walk on another sprite
         pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
@@ -37,7 +34,7 @@ public class Soldier : Character
         damage = 20;
         direction = 1;
 
-        currTile = gm.GetTile(spawnTile);
+        currTile = GridManager.GetTile(spawnTile);
         currTile.IncreaseCharacters(this);
 
         ph.type = type;
@@ -58,7 +55,7 @@ public class Soldier : Character
 
                 WalkToNewPosition();
 
-                MarkTile();
+                MarkTile(type);
             }
             else if (sm.IsAttacking())
             {
@@ -119,6 +116,7 @@ public class Soldier : Character
             {
                 isDead = true;
                 currTile.DecreaseCharacters(this);
+                GridManager.GetCharacterTiles(type).Remove(currTile);
             }
         }
         else

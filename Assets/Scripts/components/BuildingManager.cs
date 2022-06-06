@@ -156,7 +156,7 @@ public class BuildingManager : MonoBehaviour
     {
     }
 
-    public void Init(CameraManager inCam, AudioManager inAudioMan, CoinManager inCoinMan)
+    public void Init(AudioManager inAudioMan, CoinManager inCoinMan)
     {
         audioMan = inAudioMan;
         coinMan = inCoinMan;
@@ -176,7 +176,7 @@ public class BuildingManager : MonoBehaviour
 
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = inCam.GetCamera();
+        canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "Buildings";
 
         cs = canvasObject.AddComponent<CanvasScaler>();
@@ -212,18 +212,18 @@ public class BuildingManager : MonoBehaviour
         BuildingInformation.DecreaseCounter(type);
     }
 
-    public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, GridManager inGridMan)
+    public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos)
     {
         audioMan.PlayAudio3D("Construct", 0.4f, inPos.GetWorldPos());
 
         if (type == BuildingInformation.TYPE_OF_BUILDING.Castle)
         {
-            Castle castle = new Castle(go, inPos, inGridMan, coinMan);
+            Castle castle = new Castle(go, inPos, coinMan);
             buildings.Add(castle);
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.House)
         {
-            House house = new House(go, inPos, inGridMan, coinMan);
+            House house = new House(go, inPos, coinMan);
             buildings.Add(house);
         }
     }
