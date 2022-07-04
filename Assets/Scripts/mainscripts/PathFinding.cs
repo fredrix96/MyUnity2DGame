@@ -761,4 +761,247 @@ public static class PathFinding
         // Do not leave the borders
         return startTile.GetWorldPos();
     }
+
+    public static float2 SearchForTarget(float2 startTilePosition, Character.TYPE_OF_CHARACTER target, Character.TYPE_OF_CHARACTER friend, out bool targetFound, bool right)
+    {
+        Tile startTile = GridManager.GetTile(startTilePosition);
+
+        targetFound = false;
+
+        if (startTile.IsCharacterPresent(target) && friend == Character.TYPE_OF_CHARACTER.Soldier)
+        {
+            targetFound = true;
+            return startTilePosition;
+        }
+        else if (friend == Character.TYPE_OF_CHARACTER.Enemy)
+        {
+            if (startTile.IsCharacterPresent(target) || startTile.IsObjectPresent() || startTile.IsCharacterPresent(Character.TYPE_OF_CHARACTER.Player))
+            {
+                targetFound = true;
+                return startTilePosition;
+            }
+        }
+
+        Vector2 currentTilePos = startTilePosition;
+
+        int gridLength = 10;
+        int startX = (int)currentTilePos.x - gridLength;
+        int endX = (int)currentTilePos.x + gridLength;
+
+        // Check neighbors
+        Tile currentTile = startTile;
+        List<float2> targetPositions = new List<float2>();
+        for (int x = startX; x <= endX; x++)
+        {
+            for (int y = 0; y < GridManager.GetRes().y; y++)
+            {
+                currentTile = GridManager.GetTile(new Vector2(x, y));
+
+                // If the tile is inside the grid
+                if (currentTile != null)
+                {
+                    if (currentTile.IsCharacterPresent(target) && friend == Character.TYPE_OF_CHARACTER.Soldier)
+                    {
+                        targetPositions.Add(currentTile.GetWorldPos());
+                    }
+                    else if (friend == Character.TYPE_OF_CHARACTER.Enemy)
+                    {
+                        if (currentTile.IsCharacterPresent(target) || currentTile.IsObjectPresent() || currentTile.IsCharacterPresent(Character.TYPE_OF_CHARACTER.Player))
+                        {
+                            targetPositions.Add(currentTile.GetWorldPos());
+                        }
+                    }
+                }
+            }
+        }
+
+        float2 nextPos = startTile.GetWorldPos();
+        List<Tuple<float2, float>> distList = new List<Tuple<float2, float>>();
+        if (targetPositions.Count > 0)
+        {
+            targetFound = true;
+
+            foreach (float2 position in targetPositions)
+            {
+                Tuple<float2, float> tmp = new Tuple<float2, float>(position, Tools.CalculateVectorDistance(startTilePosition, position));
+                distList.Add(tmp);
+            }
+
+            distList = distList.OrderByDescending(t => t.Item2).ToList();
+            nextPos = distList[0].Item1;
+        }
+        else
+        {
+            //nextPos = GetClosestTargetPosition(startTile, target, friend);
+            nextPos = SearchFreeTile(startTilePosition, friend);
+        }
+
+        // Extra precaution to not walk through objects
+        if (friend == Character.TYPE_OF_CHARACTER.Soldier)
+        {
+            Tile nextTileFrontX = GridManager.GetTile(new float2(startTilePosition.x + 1, startTilePosition.y));
+            if (nextTileFrontX != null)
+            {
+                if (nextTileFrontX.IsObjectPresent())
+                {
+                    return FindMostEffectivePosition(startTile, right);
+                }
+            }
+
+            Tile nextTileBackX = GridManager.GetTile(new float2(startTilePosition.x - 1, startTilePosition.y));
+            if (nextTileBackX != null)
+            {
+                if (nextTileBackX.IsObjectPresent())
+                {
+                    return FindMostEffectivePosition(startTile, right);
+                }
+            }
+
+            Tile nextTileUpY = GridManager.GetTile(new float2(startTilePosition.x, startTilePosition.y - 1));
+            if (nextTileUpY != null)
+            {
+                if (nextTileUpY.IsObjectPresent())
+                {
+                    return FindMostEffectivePosition(startTile, right);
+                }
+            }
+
+            Tile nextTileDownY = GridManager.GetTile(new float2(startTilePosition.x, startTilePosition.y + 1));
+            if (nextTileDownY != null)
+            {
+                if (nextTileDownY.IsObjectPresent())
+                {
+                    return FindMostEffectivePosition(startTile, right);
+                }
+            }
+        }
+
+        return nextPos;
+    }
+
+    static float2 SearchFreeTile(float2 inPos, Character.TYPE_OF_CHARACTER friend)
+    {
+        float2 outPos = inPos;
+
+        // Avoid tiles that are occupied by others
+        if (friend == Character.TYPE_OF_CHARACTER.Soldier)
+        {
+            Tile nextTileXFront = GridManager.GetTile(new float2(inPos.x + 1, inPos.y));
+            if (nextTileXFront != null)
+            {
+                if (!nextTileXFront.IsCharacterPresent(friend) && !nextTileXFront.IsObjectPresent())
+                {
+                    return nextTileXFront.GetWorldPos();
+                }
+            }
+
+            Tile nextTileXBack = GridManager.GetTile(new float2(inPos.x - 1, inPos.y));
+            if (nextTileXBack != null)
+            {
+                if (!nextTileXBack.IsCharacterPresent(friend) && !nextTileXBack.IsObjectPresent())
+                {
+                    return nextTileXBack.GetWorldPos();
+                }
+            }
+        }
+        else
+        {
+            Tile nextTileXFront = GridManager.GetTile(new float2(inPos.x - 1, inPos.y));
+            if (nextTileXFront != null)
+            {
+                if (!nextTileXFront.IsCharacterPresent(friend) && !nextTileXFront.IsObjectPresent())
+                {
+                    return nextTileXFront.GetWorldPos();
+                }
+            }
+            Tile nextTileXBack = GridManager.GetTile(new float2(inPos.x + 1, inPos.y));
+            if (nextTileXBack != null)
+            {
+                if (!nextTileXBack.IsCharacterPresent(friend) && !nextTileXBack.IsObjectPresent())
+                {
+                    return nextTileXBack.GetWorldPos();
+                }
+            }
+        }
+
+        if (inPos.y + 1 < GridManager.GetRes().y)
+        {
+            Tile nextTileYUp = GridManager.GetTile(new float2(inPos.x, inPos.y + 1));
+            if (nextTileYUp != null)
+            {
+                if (!nextTileYUp.IsCharacterPresent(friend) && !nextTileYUp.IsObjectPresent())
+                {
+                    return nextTileYUp.GetWorldPos();
+                }
+            }
+        }
+        if (inPos.y - 1 > 0)
+        {
+            Tile nextTileYDown = GridManager.GetTile(new float2(inPos.x, inPos.y - 1));
+            if (nextTileYDown != null)
+            {
+                if (!nextTileYDown.IsCharacterPresent(friend) && !nextTileYDown.IsObjectPresent())
+                {
+                    return nextTileYDown.GetWorldPos();
+                }
+            }
+        }
+
+        return outPos;
+    }
+
+    static float2 GetClosestTargetPosition(Tile startTile, Character.TYPE_OF_CHARACTER target, Character.TYPE_OF_CHARACTER friend)
+    {
+        float shortestDistance = 99999;
+        Tile closestTarget = startTile;
+        Tile currentTile = startTile;
+        float2 startTilePosition = startTile.GetTilePosition();
+
+        List<Tile> tilesWithCharacters = GridManager.GetCharacterTiles(target);
+        float dist = 0;
+        for (int i = 0; i < tilesWithCharacters.Count; i++)
+        {
+            currentTile = tilesWithCharacters[i];
+            dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
+            if (dist < shortestDistance)
+            {
+                shortestDistance = dist;
+                closestTarget = currentTile;
+            }
+        }
+
+        if (friend == Character.TYPE_OF_CHARACTER.Enemy)
+        {
+            List<Tile> tilesWithObjects = GridManager.GetObjectTiles();
+            for (int i = 0; i < tilesWithObjects.Count; i++)
+            {
+                currentTile = tilesWithObjects[i];
+                dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
+                if (dist < shortestDistance)
+                {
+                    shortestDistance = dist;
+                    closestTarget = currentTile;
+                }
+            }
+
+            currentTile = GridManager.GetPlayerTile();
+            if (currentTile != null)
+            {
+                dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
+                if (dist < shortestDistance)
+                {
+                    shortestDistance = dist;
+                    closestTarget = currentTile;
+                }
+            }
+        }
+
+        // No targets available, don't move
+        if (shortestDistance == 99999)
+        {
+            return startTile.GetWorldPos();
+        }
+
+        return closestTarget.GetWorldPos();
+    }
 }

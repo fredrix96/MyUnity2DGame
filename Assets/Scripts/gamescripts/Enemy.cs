@@ -33,6 +33,7 @@ public class Enemy : Character
         pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
         go.transform.position = sm.GetColliderPivotPoint(go);
         ph.position = go.transform.position;
+        lastXPos = ph.position.x;
 
         health = go.AddComponent<Health>();
         health.Init(go, "Sprites/EnemyHealth", 100);
@@ -63,63 +64,15 @@ public class Enemy : Character
                 WalkToNewPosition();
 
                 MarkTile(type);
+
+                CheckDirection(type);
             }
             else if (sm.IsAttacking())
             {
+                // Damage every time the attack animation has completed
                 if (sm.Attack())
                 {
-                    List<Collider2D> results = sm.GetListOfOverlapColliders(
-                        LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player") | LayerMask.GetMask("Buildings"));
-
-                    foreach (Collider2D col in results)
-                    {
-                        if (col.gameObject.GetComponent<Health>() != null)
-                        {
-                            col.gameObject.GetComponent<Health>().Damage(damage);
-
-                            // Turn towards the target
-                            if (go.transform.position.x < col.transform.position.x && direction == -1)
-                            {
-                                direction = 1;
-                                sm.FlipX();
-                            }
-                            else if (go.transform.position.x > col.transform.position.x && direction == 1)
-                            {
-                                direction = -1;
-                                sm.FlipX();
-                            }
-                        }
-                        else if (col.gameObject.GetComponent<PlayerHealth>() != null)
-                        {
-                            col.gameObject.GetComponent<PlayerHealth>().Damage(damage);
-
-                            // Turn towards the target
-                            if (go.transform.position.x < col.transform.position.x && direction == -1)
-                            {
-                                direction = 1;
-                                sm.FlipX();
-                            }
-                            else if (go.transform.position.x > col.transform.position.x && direction == 1)
-                            {
-                                direction = -1;
-                                sm.FlipX();
-                            }
-                        }
-                    }
-
-                    // Are there any soldiers left around the character?
-                    if (results.Count == 0)
-                    {
-                        // Else, resume walking
-                        sm.StartWalking();
-
-                        // Turn if necessary
-                        if (direction == 1)
-                        {
-                            direction = -1;
-                            sm.FlipX();
-                        }
-                    }
+                    Damage();
                 }
             }
 
@@ -137,6 +90,62 @@ public class Enemy : Character
             if (sm.Die() > 3)
             {
                 shouldBeRemoved = true;
+            }
+        }
+    }
+
+    void Damage()
+    {
+        List<Collider2D> results = sm.GetListOfOverlapColliders(
+                        LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player") | LayerMask.GetMask("Buildings"));
+
+        foreach (Collider2D col in results)
+        {
+            if (col.gameObject.GetComponent<Health>() != null)
+            {
+                col.gameObject.GetComponent<Health>().Damage(damage);
+
+                // Turn towards the target
+                if (go.transform.position.x < col.transform.position.x && direction == -1)
+                {
+                    direction = 1;
+                    sm.FlipX();
+                }
+                else if (go.transform.position.x > col.transform.position.x && direction == 1)
+                {
+                    direction = -1;
+                    sm.FlipX();
+                }
+            }
+            else if (col.gameObject.GetComponent<PlayerHealth>() != null)
+            {
+                col.gameObject.GetComponent<PlayerHealth>().Damage(damage);
+
+                // Turn towards the target
+                if (go.transform.position.x < col.transform.position.x && direction == -1)
+                {
+                    direction = 1;
+                    sm.FlipX();
+                }
+                else if (go.transform.position.x > col.transform.position.x && direction == 1)
+                {
+                    direction = -1;
+                    sm.FlipX();
+                }
+            }
+        }
+
+        // Are there any soldiers left around the character?
+        if (results.Count == 0)
+        {
+            // Else, resume walking
+            sm.StartWalking();
+
+            // Turn if necessary
+            if (direction == 1)
+            {
+                direction = -1;
+                sm.FlipX();
             }
         }
     }

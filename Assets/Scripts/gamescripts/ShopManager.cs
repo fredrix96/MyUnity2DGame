@@ -5,16 +5,17 @@ using UnityEngine.UI;
 
 public class ShopManager
 {
-    GameObject go, canvasObject, shopImage;
+    GameObject go, canvasObject, shopImageObject, titleObject;
     List<GameObject> imageObjects, textObjects;
     Canvas canvas;
     CanvasScaler cs;
-    Image shop;
+    SpriteRenderer shop;
     CoinManager coinMan;
     BuildingManager buildings;
     PopUpMessage message;
+    Text title;
 
-    bool active;
+    public static bool active;
 
     public ShopManager(CoinManager inCoinMan, BuildingManager inBuildings)
     {
@@ -35,27 +36,52 @@ public class ShopManager
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "UI";
+        canvas.sortingOrder = 1;
 
         cs = canvasObject.AddComponent<CanvasScaler>();
         cs.referenceResolution = new Vector2(1920, 1080);
 
         // Image object
-        shopImage = new GameObject { name = "shop" };
-        shopImage.transform.SetParent(canvasObject.transform);
-        shopImage.transform.localScale = new Vector2(3.0f, 7.0f);
+        shopImageObject = new GameObject { name = "shop" };
+        shopImageObject.transform.SetParent(canvasObject.transform);
 
         // Shop background
-        shop = shopImage.AddComponent<Image>();
-        Vector3 color = new Vector3(205, 133, 63);
-        shop.color = new Color(color.x / 255f, color.y / 255f, color.z / 255f);
+        shop = shopImageObject.AddComponent<SpriteRenderer>();
+        shop.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
+        shop.drawMode = SpriteDrawMode.Sliced;
+        shop.size = new Vector2(4f, 8f);
+        shop.sortingLayerName = "UI";
 
-        shop.rectTransform.anchorMin = Vector2.zero;
-        shop.rectTransform.anchorMax = Vector2.zero;
-        shop.rectTransform.pivot = new Vector2(0, 0.5f);
-        shop.rectTransform.anchoredPosition = new Vector3(0, canvas.pixelRect.height / 2, 0);
+        RectTransform rect = shopImageObject.AddComponent<RectTransform>();
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.zero;
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = new Vector2(canvas.pixelRect.width * 0.1f, canvas.pixelRect.height / 2);
+        rect.sizeDelta = shop.size;
 
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Castle, new Vector3(canvas.pixelRect.width * 0.03f, canvas.pixelRect.height * 0.8f, 0));
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.House, new Vector3(canvas.pixelRect.width * 0.08f, canvas.pixelRect.height * 0.8f, 0));
+        // Shop title
+        titleObject = new GameObject { name = "shopTitle" };
+        titleObject.transform.SetParent(canvasObject.transform);
+        titleObject.transform.localScale = new Vector3(2, 2, 0);
+
+        RectTransform rectTitle = titleObject.AddComponent<RectTransform>();
+        rectTitle.anchorMin = Vector2.zero;
+        rectTitle.anchorMax = Vector2.zero;
+        rectTitle.pivot = new Vector2(0.5f, 0.5f);
+        rectTitle.anchoredPosition = new Vector2(canvas.pixelRect.width * 0.1f, canvas.pixelRect.height * 0.7f);
+        rectTitle.sizeDelta = new Vector2(0.05f * canvas.pixelRect.width, 0.13f * canvas.pixelRect.height);
+
+        title = titleObject.AddComponent<Text>();
+        title.text = "Shop";
+        title.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        title.fontSize = (int)(4 * Graphics.resolution);
+        title.color = Color.white;
+        title.fontStyle = FontStyle.Bold;
+        title.alignment = TextAnchor.UpperCenter;
+
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Castle, new Vector3(canvas.pixelRect.width * 0.05f, canvas.pixelRect.height * 0.7f, 0));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.House, new Vector3(canvas.pixelRect.width * 0.1f, canvas.pixelRect.height * 0.7f, 0));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack, new Vector3(canvas.pixelRect.width * 0.15f, canvas.pixelRect.height * 0.7f, 0));
 
         // Disable at start
         active = false;

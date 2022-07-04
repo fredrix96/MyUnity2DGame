@@ -9,14 +9,14 @@ public static class EnemyCounter
 {
     public static int counter = 0;
     public static int nrOfEnemies = 0;
-    public static int max = 3;
+    public static int max = 1000;
 }
 
 public static class SoldierCounter
 {
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
-    public static int max = 3;
+    public static int max = 1000;
 }
 
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)
@@ -63,8 +63,8 @@ public class CharacterManager
         enemies = new List<Enemy>();
         soldiers = new List<Soldier>();
 
-        enemySpawnDelay = 2.3f;
-        soldierSpawnDelay = 2.6f;
+        enemySpawnDelay = 0.3f;
+        soldierSpawnDelay = 0.6f;
         playerSpawnDelay = 5.0f;
 
         enemySpawnTimer = 0;
@@ -120,7 +120,7 @@ public class CharacterManager
         // This is done because it allows us to have a "clever" AI while also having good FPS
         if (characters.Count > 0)
         {
-            List<T> listToUpdate = GetListToUpdate(characters, 60);
+            List<T> listToUpdate = GetListToUpdate(characters, 10);
 
             if (multithreading)
             {

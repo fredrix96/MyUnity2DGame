@@ -8,7 +8,6 @@ public class Player
     SpriteManager sm;
     PlayerHealth health;
     Tile currTile;
-    CollisionManager cm;
 
     bool isDead;
     bool shouldBeRemoved;
@@ -40,15 +39,7 @@ public class Player
             {
                 if (sm.Attack())
                 {
-                    List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"));
-
-                    foreach (Collider2D col in results)
-                    {
-                        if (col.gameObject.GetComponent<Health>() != null)
-                        {
-                            col.gameObject.GetComponent<Health>().Damage(damage);
-                        }
-                    }
+                    Damage();
                 }
             }
             // Is the player walking?
@@ -73,6 +64,19 @@ public class Player
             if (sm.Die() > 3)
             {
                 shouldBeRemoved = true;
+            }
+        }
+    }
+
+    void Damage()
+    {
+        List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"));
+
+        foreach (Collider2D col in results)
+        {
+            if (col.gameObject.GetComponent<Health>() != null)
+            {
+                col.gameObject.GetComponent<Health>().Damage(damage);
             }
         }
     }
@@ -178,7 +182,7 @@ public class Player
         go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
         go.layer = LayerMask.NameToLayer("Player");
 
-        cm = go.AddComponent<CollisionManager>();
+        go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
         sm.Init(go, "Sprites/StickFigureKing", "Player", false);

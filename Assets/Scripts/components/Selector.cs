@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Selector : MonoBehaviour
 {
+    GameObject toolBarObject;
     SpriteRenderer sr;
 
     bool mouseOnObject;
@@ -22,13 +23,15 @@ public class Selector : MonoBehaviour
         {
             objectPressed = false;
             Tools.OutlineMaterialSettings.Enable(ref sr, false);
+            toolBarObject.SetActive(false);
         }
     }
 
-    public void Init(SpriteRenderer inSr)
+    public void Init(GameObject inGo, SpriteRenderer inSr)
     {
         sr = inSr;
         sr.material = Resources.Load<Material>("Materials/Outline");
+        toolBarObject = inGo;
     }
 
     public void SetOutlineColor(Color color)
@@ -59,8 +62,12 @@ public class Selector : MonoBehaviour
 
     void OnMouseDown()
     {
-        objectPressed = true;
-        Tools.OutlineMaterialSettings.Enable(ref sr, true);
+        if (!ShopManager.active)
+        {
+            objectPressed = true;
+            Tools.OutlineMaterialSettings.Enable(ref sr, true);
+            toolBarObject.SetActive(true);
+        }
     }
 
     void OnMouseDrag()

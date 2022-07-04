@@ -7,29 +7,31 @@ public static class BuildingInformation
 {
     private static int castleCounter = 0;
     private static int houseCounter = 0;
+    private static int barrackCounter = 0;
 
     private static int castleMax = 1;
     private static int houseMax = 15;
+    private static int barrackMax = 15;
 
     public enum TYPE_OF_BUILDING
     {
-        Castle, House
+        Castle, House, Barrack
     }
 
     static readonly int[] cost = new int[]
     {
-        400, 50
+        400, 50, 200
     };
 
     static readonly int[] health = new int[]
     {
-        10000, 1000
+        5000, 500, 1500
     };
 
     // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
     static readonly Vector2[] size = new Vector2[] 
     {
-        new Vector2(7,11), new Vector2(3,5),
+        new Vector2(7,11), new Vector2(3,5), new Vector2(9,13)
     };
 
     public static int GetBuildingHealth(TYPE_OF_BUILDING type)
@@ -65,6 +67,13 @@ public static class BuildingInformation
                 limitReached = true;
             }
         }
+        else if (type is TYPE_OF_BUILDING.Barrack)
+        {
+            if (barrackCounter == houseMax)
+            {
+                limitReached = true;
+            }
+        }
 
         return limitReached;
     }
@@ -80,6 +89,9 @@ public static class BuildingInformation
                 break;
             case TYPE_OF_BUILDING.House:
                 counter = houseCounter;
+                break;
+            case TYPE_OF_BUILDING.Barrack:
+                counter = barrackCounter;
                 break;
             default:
                 Debug.LogWarning("Warning! Could not return the " + type.ToString() + "Counter...");
@@ -101,6 +113,9 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.House:
                 max = houseMax;
                 break;
+            case TYPE_OF_BUILDING.Barrack:
+                max = barrackMax;
+                break;
             default:
                 Debug.LogWarning("Warning! Could not return the " + type.ToString() + "Max...");
                 break;
@@ -119,6 +134,9 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.House:
                 houseCounter++;
                 break;
+            case TYPE_OF_BUILDING.Barrack:
+                barrackCounter++;
+                break;
             default:
                 Debug.LogWarning("Warning! Could not increase the " + type.ToString() + "Counter...");
                 break;
@@ -134,6 +152,9 @@ public static class BuildingInformation
                 break;
             case TYPE_OF_BUILDING.House:
                 houseCounter--;
+                break;
+            case TYPE_OF_BUILDING.Barrack:
+                barrackCounter--;
                 break;
             default:
                 Debug.LogWarning("Warning! Could not decrease the " + type.ToString() + "Counter...");
@@ -169,6 +190,7 @@ public class BuildingManager : MonoBehaviour
 
         sprites.Add(Resources.Load<Sprite>("Sprites/Castle"));
         sprites.Add(Resources.Load<Sprite>("Sprites/House"));
+        sprites.Add(Resources.Load<Sprite>("Sprites/Barrack"));
 
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
@@ -225,6 +247,11 @@ public class BuildingManager : MonoBehaviour
         {
             House house = new House(go, inPos, coinMan);
             buildings.Add(house);
+        }
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack)
+        {
+            Barrack barrack = new Barrack(go, inPos, coinMan);
+            buildings.Add(barrack);
         }
     }
 

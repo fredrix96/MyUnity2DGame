@@ -67,6 +67,7 @@ public class Vendor : MonoBehaviour
 
                 // Hide shop UI
                 go.GetComponentInParent<Canvas>().enabled = false;
+                go.transform.parent.GetComponentInChildren<SpriteRenderer>().enabled = false;
             }
         }
         else
@@ -134,6 +135,7 @@ public class Vendor : MonoBehaviour
 
             // Show shop UI
             go.GetComponentInParent<Canvas>().enabled = true;
+            go.transform.parent.GetComponentInChildren<SpriteRenderer>().enabled = true;
         }
     }
 

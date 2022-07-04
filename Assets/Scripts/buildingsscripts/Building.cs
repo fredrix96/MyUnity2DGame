@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Building
 {
-    protected GameObject go;
+    protected GameObject go, toolBarObject;
     protected SpriteRenderer sr;
     protected BoxCollider2D collider;
     protected Rigidbody2D rb;
@@ -14,6 +14,9 @@ public class Building
     protected Material outline;
     protected Health health;
     protected Tile centerTile;
+
+    protected Canvas canvasToolBar;
+    protected SpriteRenderer srToolBar;
 
     protected BuildingInformation.TYPE_OF_BUILDING type;
 

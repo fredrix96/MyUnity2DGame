@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class House : Building
+public class Barrack : Building
 {
-    public House(GameObject parent, Tile inPos, CoinManager inCoinMan)
+    public Barrack(GameObject parent, Tile inPos, CoinManager inCoinMan)
     {
-        type = BuildingInformation.TYPE_OF_BUILDING.House;
+        type = BuildingInformation.TYPE_OF_BUILDING.Barrack;
 
         centerTile = inPos;
         coinMan = inCoinMan;

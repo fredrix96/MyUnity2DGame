@@ -8,19 +8,21 @@ public static class Graphics
 
     static Vector4 worldLimits, levelLimits;
 
+    public static float resolution;
+
     // Start is called before the first frame update
     public static void Init()
     {
-        float res = Mathf.CeilToInt(Screen.width / 267F);
+        resolution = Mathf.CeilToInt(Screen.width / 267F);
 
         int tMyRes = Mathf.CeilToInt(Screen.width / 440F);
-        if (tMyRes > res)
+        if (tMyRes > resolution)
         {
-            res = tMyRes;
+            resolution = tMyRes;
         }
 
-        float halfScreenWidth = Screen.width / 2 / res;
-        float halfScreenHeight = Screen.height / 2 / res;
+        float halfScreenWidth = Screen.width / 2 / resolution;
+        float halfScreenHeight = Screen.height / 2 / resolution;
 
         level = new GameObject();
         level.name = "level";

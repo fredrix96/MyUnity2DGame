@@ -18,6 +18,7 @@ public class Character
     protected Tile currTile;
     protected Health health;
 
+    protected float lastXPos;
     protected float pivotHeightDiff;
     protected int direction;
     protected int damage;
@@ -97,6 +98,38 @@ public class Character
             Mathf.MoveTowards(go.transform.position.y, ph.position.y + pivotHeightDiff, speed * Time.deltaTime), 0);
     }
 
+    protected void CheckDirection(TYPE_OF_CHARACTER type)
+    {
+        if (type == TYPE_OF_CHARACTER.Enemy)
+        {
+            if (go.transform.position.x < lastXPos && direction == 1)
+            {
+                direction = -1;
+                sm.FlipX();
+            }
+            else if (go.transform.position.x > lastXPos && direction == -1)
+            {
+                direction = 1;
+                sm.FlipX();
+            }
+        }
+        else if (type == TYPE_OF_CHARACTER.Soldier)
+        {
+            if (go.transform.position.x > lastXPos && direction == -1)
+            {
+                direction = 1;
+                sm.FlipX();
+            }
+            else if (go.transform.position.x < lastXPos && direction == 1)
+            {
+                direction = -1;
+                sm.FlipX();
+            }
+        }
+
+        lastXPos = go.transform.position.x;
+    }
+
     public void SetPositionHandler(PositionHandler inPh)
     {
         ph = inPh;
@@ -123,13 +156,13 @@ public class Character
 
                 if (type == TYPE_OF_CHARACTER.Enemy)
                 {
-                    newPos = PathFinding.SearchForTargetAStar(tilePosition, TYPE_OF_CHARACTER.Soldier, TYPE_OF_CHARACTER.Enemy, out targetFound, false);
+                    newPos = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Soldier, TYPE_OF_CHARACTER.Enemy, out targetFound, false);
 
                     position = new float3(newPos, position.z);
                 }
                 else if (type == TYPE_OF_CHARACTER.Soldier)
                 {
-                    newPos = PathFinding.SearchForTargetAStar(tilePosition, TYPE_OF_CHARACTER.Enemy, TYPE_OF_CHARACTER.Soldier, out targetFound, true);
+                    newPos = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Enemy, TYPE_OF_CHARACTER.Soldier, out targetFound, true);
 
                     // If the soldier has reached half of the field, then stop if there are no enemies nearby
                     if (!targetFound && position.x > Graphics.GetLevelLimits().y / 2)
