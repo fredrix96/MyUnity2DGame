@@ -5,9 +5,21 @@ using UnityEngine.UI;
 
 public class House : Building
 {
+    int nrOfHumans;
+    int maxHumans;
+
+    double time;
+    float timeDelay;
+
     public House(GameObject parent, Tile inPos, CoinManager inCoinMan)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.House;
+
+        nrOfHumans = 0;
+        maxHumans = 5;
+
+        time = 0;
+        timeDelay = 5f;
 
         centerTile = inPos;
         coinMan = inCoinMan;
@@ -35,7 +47,7 @@ public class House : Building
         CreateToolBar();
 
         selector = go.AddComponent<Selector>();
-        selector.Init(toolBarObject, sr);
+        selector.Init(toolBarObject, sr, textObject, null);
         selector.SetOutlineColor(Color.blue);
         selector.SetWidth(5);
 
@@ -44,24 +56,43 @@ public class House : Building
 
     public override void Update()
     {
+        time += Time.deltaTime;
+
         CheckIfDestroyed();
+
+        LookIfIgnored();
+
+        // Add humans
+        if (time >= timeDelay)
+        {
+            if (nrOfHumans < maxHumans)
+            {
+                nrOfHumans++;
+                HumansCounter.nrOfHumans++;
+                text.text = nrOfHumans + " / " + maxHumans + " Humans";
+            }
+
+            time = 0;
+        }
     }
 
     void CreateToolBar()
     {
-        toolBarObject = new GameObject();
-        toolBarObject.name = go.name + "_toolBar";
+        // Toolbar
+        toolBarObject = new GameObject { name = go.name + "_toolBar" };
         toolBarObject.transform.SetParent(go.transform);
 
+        // Canvas
         canvasToolBar = toolBarObject.AddComponent<Canvas>();
-        srToolBar = toolBarObject.AddComponent<SpriteRenderer>();
+        canvasToolBar.transform.localScale = new Vector3(0.05f * CameraManager.GetCamera().aspect, 0.05f, 1f);
 
+        // Sprite
+        srToolBar = toolBarObject.AddComponent<SpriteRenderer>();
+        srToolBar.sortingLayerName = "UI";
+        srToolBar.sortingOrder = 0;
         srToolBar.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
         srToolBar.drawMode = SpriteDrawMode.Sliced;
-        srToolBar.size = new Vector2(2.5f, 2f);
-
-        toolBarObject.transform.localScale = srToolBar.size;
-        toolBarObject.GetComponent<RectTransform>().sizeDelta = srToolBar.size;
+        srToolBar.size = new Vector2(100f, 100f);
 
         float height = 0;
         if (go.transform.GetComponent<BoxCollider2D>() == null)
@@ -70,11 +101,30 @@ public class House : Building
         }
         else
         {
-            height = toolBarObject.transform.parent.GetComponent<BoxCollider2D>().size.y * toolBarObject.transform.parent.localScale.y * 0.8f;
+            height = srToolBar.sprite.bounds.max.y * 0.2f;
         }
 
         toolBarObject.transform.position = new Vector3(toolBarObject.transform.parent.position.x, toolBarObject.transform.parent.position.y + height, toolBarObject.transform.parent.position.z);
-
         toolBarObject.SetActive(false);
+
+        // Text
+        textObject = new GameObject{ name = go.name + "_textObject" };
+        textObject.transform.SetParent(go.transform);
+        textObject.transform.position = toolBarObject.transform.position;
+
+        canvasText = textObject.AddComponent<Canvas>();
+        canvasText.transform.localScale = new Vector3(0.05f * CameraManager.GetCamera().aspect, 0.05f, 1f);
+        canvasText.sortingLayerName = "UI";
+        canvasText.sortingOrder = 1;
+
+        text = textObject.AddComponent<Text>();
+        text.text = nrOfHumans + " / " + maxHumans + " Humans";
+        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.fontSize = (int)(1.5f * Graphics.resolution);
+        text.color = Color.white;
+        text.fontStyle = FontStyle.Bold;
+        text.alignment = TextAnchor.MiddleCenter;
+
+        textObject.SetActive(false);
     }
 }

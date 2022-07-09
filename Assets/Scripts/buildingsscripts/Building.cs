@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Building
 {
-    protected GameObject go, toolBarObject;
+    protected GameObject go, toolBarObject, textObject, buttonObject;
     protected SpriteRenderer sr;
     protected BoxCollider2D collider;
     protected Rigidbody2D rb;
@@ -15,8 +15,10 @@ public class Building
     protected Health health;
     protected Tile centerTile;
 
-    protected Canvas canvasToolBar;
+    protected Canvas canvasToolBar, canvasText, canvasButton;
+    protected Text text;
     protected SpriteRenderer srToolBar;
+    protected Button button;
 
     protected BuildingInformation.TYPE_OF_BUILDING type;
 
@@ -115,6 +117,19 @@ public class Building
     public bool ShouldBeRemoved()
     {
         return shouldBeRemoved;
+    }
+
+    protected void LookIfIgnored()
+    {
+        // Ignore mourse clicks whenever the shop is active
+        if (ShopManager.active == true)
+        {
+            go.layer = LayerMask.NameToLayer("Ignore Raycast");
+        }
+        else
+        {
+            go.layer = LayerMask.NameToLayer("Buildings");
+        }
     }
 
     public void Destroy()

@@ -11,7 +11,7 @@ public static class BuildingInformation
 
     private static int castleMax = 1;
     private static int houseMax = 15;
-    private static int barrackMax = 15;
+    private static int barrackMax = 4;
 
     public enum TYPE_OF_BUILDING
     {

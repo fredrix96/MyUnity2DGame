@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Selector : MonoBehaviour
 {
-    GameObject toolBarObject;
+    GameObject toolBarObject, textObject, btnObject;
     SpriteRenderer sr;
 
     bool mouseOnObject;
@@ -18,20 +18,25 @@ public class Selector : MonoBehaviour
 
     void Update()
     {
-        // Deselect the object if the user clicks somewhere else
-        if (Input.GetMouseButtonDown(0) && !mouseOnObject)
+        // Deselect the object if the user clicks somewhere else or if the shop is active
+        if (Input.GetMouseButtonDown(1) || ShopManager.active == true)
         {
             objectPressed = false;
             Tools.OutlineMaterialSettings.Enable(ref sr, false);
             toolBarObject.SetActive(false);
+
+            if (textObject != null) textObject.SetActive(false);
+            if (btnObject != null) btnObject.SetActive(false);
         }
     }
 
-    public void Init(GameObject inGo, SpriteRenderer inSr)
+    public void Init(GameObject inGo, SpriteRenderer inSr, GameObject inTextGo = null, GameObject inBtnGo = null)
     {
         sr = inSr;
         sr.material = Resources.Load<Material>("Materials/Outline");
         toolBarObject = inGo;
+        textObject = inTextGo;
+        btnObject = inBtnGo;
     }
 
     public void SetOutlineColor(Color color)
@@ -67,6 +72,9 @@ public class Selector : MonoBehaviour
             objectPressed = true;
             Tools.OutlineMaterialSettings.Enable(ref sr, true);
             toolBarObject.SetActive(true);
+
+            if (textObject != null) textObject.SetActive(true);
+            if (btnObject != null) btnObject.SetActive(true);
         }
     }
 

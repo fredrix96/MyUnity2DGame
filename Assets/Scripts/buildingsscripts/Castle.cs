@@ -35,7 +35,7 @@ public class Castle : Building
         CreateToolBar();
 
         selector = go.AddComponent<Selector>();
-        selector.Init(toolBarObject, sr);
+        selector.Init(toolBarObject, sr, textObject);
         selector.SetOutlineColor(Color.blue);
         selector.SetWidth(5);
 
@@ -47,6 +47,8 @@ public class Castle : Building
     public override void Update()
     {
         CheckIfDestroyed();
+
+        LookIfIgnored();
     }
 
     void CreateToolBar()
@@ -57,13 +59,11 @@ public class Castle : Building
 
         canvasToolBar = toolBarObject.AddComponent<Canvas>();
         srToolBar = toolBarObject.AddComponent<SpriteRenderer>();
+        srToolBar.sortingLayerName = "UI";
 
         srToolBar.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
         srToolBar.drawMode = SpriteDrawMode.Sliced;
         srToolBar.size = new Vector2(2.5f, 2f);
-
-        toolBarObject.transform.localScale = srToolBar.size;
-        toolBarObject.GetComponent<RectTransform>().sizeDelta = srToolBar.size;
 
         float height = 0;
         if (go.transform.GetComponent<BoxCollider2D>() == null)
@@ -72,11 +72,29 @@ public class Castle : Building
         }
         else
         {
-            height = toolBarObject.transform.parent.GetComponent<BoxCollider2D>().size.y * toolBarObject.transform.parent.localScale.y * 0.8f;
+            height = srToolBar.sprite.bounds.max.y * 0.4f;
         }
 
         toolBarObject.transform.position = new Vector3(toolBarObject.transform.parent.position.x, toolBarObject.transform.parent.position.y + height, toolBarObject.transform.parent.position.z);
 
         toolBarObject.SetActive(false);
+
+        // Text
+        textObject = new GameObject { name = "textObject" };
+        textObject.transform.SetParent(go.transform);
+        textObject.transform.position = go.transform.position;
+
+        canvasText = textObject.AddComponent<Canvas>();
+        canvasText.transform.localScale = new Vector3(0.05f * CameraManager.GetCamera().aspect, 0.05f, 1f);
+        canvasText.sortingLayerName = "UI";
+        canvasText.sortingOrder = 1;
+
+        text = textObject.AddComponent<Text>();
+        //text.text = nrOfHumans + " / " + maxHumans + " Humans";
+        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        //text.fontSize = (int)(0.0001f * Graphics.resolution);
+        text.color = Color.white;
+        text.fontStyle = FontStyle.Bold;
+        text.alignment = TextAnchor.UpperCenter;
     }
 }

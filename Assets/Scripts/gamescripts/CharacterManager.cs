@@ -5,6 +5,12 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
 
+public static class HumansCounter
+{
+    public static int counter = 0;
+    public static int nrOfHumans = 0;
+}
+
 public static class EnemyCounter
 {
     public static int counter = 0;
@@ -16,7 +22,7 @@ public static class SoldierCounter
 {
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
-    public static int max = 1000;
+    public static int max = 2;
 }
 
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)

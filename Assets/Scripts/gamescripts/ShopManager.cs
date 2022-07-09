@@ -102,7 +102,7 @@ public class ShopManager
                 {
                     img.color = new Color(0.3f, 0.3f, 0.3f, 0.5f);
                 }
-                else
+                else if (img.color == new Color(0.3f, 0.3f, 0.3f, 0.5f))
                 {
                     img.color = Color.white;
                 }
@@ -164,7 +164,7 @@ public class ShopManager
             textObjects.Add(textObject);
 
             Vendor vendor = imageObject.AddComponent<Vendor>();
-            vendor.Init(imageObject, textObject, coinMan, type);
+            vendor.Init(imageObject, coinMan, type);
 
             imageObjects.Add(imageObject);
         }

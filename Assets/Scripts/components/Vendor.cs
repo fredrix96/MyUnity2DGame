@@ -5,11 +5,10 @@ using UnityEngine.UI;
 
 public class Vendor : MonoBehaviour
 {
-    GameObject go, textObject;
+    GameObject go;
     GameObject tmpObject;
     Image img;
     CoinManager coinMan;
-    Color color;
 
     BuildingInformation.TYPE_OF_BUILDING type;
 
@@ -21,15 +20,13 @@ public class Vendor : MonoBehaviour
         img = GetComponent<Image>();
     }
 
-    public void Init(GameObject inGo, GameObject inTextObject, CoinManager inCoinMan, BuildingInformation.TYPE_OF_BUILDING inType)
+    public void Init(GameObject inGo, CoinManager inCoinMan, BuildingInformation.TYPE_OF_BUILDING inType)
     {
         go = inGo;
-        textObject = inTextObject;
         coinMan = inCoinMan;
 
         img = go.GetComponent<Image>();
         img.color = Color.white;
-        color = new Color();
         type = inType;
         cost = BuildingInformation.GetBuildingCost(type);
     }
@@ -38,8 +35,7 @@ public class Vendor : MonoBehaviour
     {
         if (!BuildingInformation.MaxLimitReached(type))
         {
-            color = img.color;
-            img.color = new Color(0.3f, 0.3f, 0.3f, 1.0f);
+            img.color = new Color(0.3f, 0.3f, 0.6f, 1.0f);
         }
     }
 
@@ -47,7 +43,7 @@ public class Vendor : MonoBehaviour
     {
         if (!BuildingInformation.MaxLimitReached(type))
         {
-            img.color = color;
+            img.color = Color.white;
         }
     }
 
@@ -143,7 +139,7 @@ public class Vendor : MonoBehaviour
     {
         tmpObject = Instantiate(go);
         tmpObject.transform.SetParent(GameManager.GameManagerObject.GetComponent<BuildingManager>().GetComponentInChildren<Canvas>().transform);
-        tmpObject.GetComponent<Image>().color = color;
+        tmpObject.GetComponent<Image>().color = Color.white;
         tmpObject.GetComponent<BoxCollider2D>().enabled = false; // this wont push the player character around
 
         Tile tmpTile = GridManager.GetTile(new Vector2(0, 0));
