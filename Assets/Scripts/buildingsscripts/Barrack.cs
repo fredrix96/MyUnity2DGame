@@ -140,6 +140,7 @@ public class Barrack : Building
             if (coinMan.SpendMoney(soldierCost))
             {
                 HumansCounter.nrOfHumans--;
+                SoldierCounter.nrToSpawn++;
             }
         }
     }

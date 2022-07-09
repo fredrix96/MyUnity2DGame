@@ -30,7 +30,7 @@ public class Main : MonoBehaviour
         GridManager.Init(res);
 
         player = new Player();
-        int moneyToStartWith = 500000;
+        int moneyToStartWith = 1000;
         coinMan = new CoinManager(am, moneyToStartWith);
         charMan = new CharacterManager(player, coinMan);
         

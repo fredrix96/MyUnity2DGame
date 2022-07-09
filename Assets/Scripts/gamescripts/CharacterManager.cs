@@ -15,14 +15,15 @@ public static class EnemyCounter
 {
     public static int counter = 0;
     public static int nrOfEnemies = 0;
-    public static int max = 1000;
+    public static int max = 10;
 }
 
 public static class SoldierCounter
 {
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
-    public static int max = 2;
+    public static int nrToSpawn = 0;
+    public static int max = 1000;
 }
 
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)
@@ -69,7 +70,7 @@ public class CharacterManager
         enemies = new List<Enemy>();
         soldiers = new List<Soldier>();
 
-        enemySpawnDelay = 0.3f;
+        enemySpawnDelay = 5.0f;
         soldierSpawnDelay = 0.6f;
         playerSpawnDelay = 5.0f;
 
@@ -197,13 +198,16 @@ public class CharacterManager
 
     void UpdateSoldiers()
     {
-        if (SoldierCounter.nrOfSoldiers < SoldierCounter.max)
+        if (SoldierCounter.nrToSpawn > 0)
         {
-            soldierSpawnTimer += Time.deltaTime;
-            if (soldierSpawnTimer > soldierSpawnDelay)
+            if (SoldierCounter.nrOfSoldiers < SoldierCounter.max)
             {
-                SpawnSoldier();
-                soldierSpawnTimer = 0;
+                soldierSpawnTimer += Time.deltaTime;
+                if (soldierSpawnTimer > soldierSpawnDelay)
+                {
+                    SpawnSoldier();
+                    soldierSpawnTimer = 0;
+                }
             }
         }
 
@@ -249,7 +253,7 @@ public class CharacterManager
 
     void SpawnEnemy()
     {
-        enemies.Add(new Enemy(enemyObjects, coinMan));
+        enemies.Add(new Enemy(enemyObjects, coinMan, 15));
         EnemyCounter.counter++;
         EnemyCounter.nrOfEnemies++;
     }
@@ -266,6 +270,7 @@ public class CharacterManager
         soldiers.Add(new Soldier(soldierObjects));
         SoldierCounter.counter++;
         SoldierCounter.nrOfSoldiers++;
+        SoldierCounter.nrToSpawn--;
     }
 
     void RemoveSoldier(Soldier soldier)
