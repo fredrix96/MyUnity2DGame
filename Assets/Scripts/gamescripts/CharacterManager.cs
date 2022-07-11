@@ -127,7 +127,7 @@ public class CharacterManager
         // This is done because it allows us to have a "clever" AI while also having good FPS
         if (characters.Count > 0)
         {
-            List<T> listToUpdate = GetListToUpdate(characters, 10);
+            List<T> listToUpdate = GetListToUpdate(characters, 30);
 
             if (multithreading)
             {
@@ -241,7 +241,7 @@ public class CharacterManager
         {
             playerSpawnTimer += Time.deltaTime;
 
-            // Respawn the player object after a certain amount of time
+            // Respawn the player character after a certain amount of time
             if (playerSpawnTimer > playerSpawnDelay)
             {
                 player.Respawn();

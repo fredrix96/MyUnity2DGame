@@ -18,16 +18,35 @@ public class Selector : MonoBehaviour
 
     void Update()
     {
-        // Deselect the object if the user clicks somewhere else or if the shop is active
-        if (Input.GetMouseButtonDown(1) || ShopManager.active == true)
+        // Deselect the object if the user clicks somewhere else or if the shop is active, however, dont deselect when the user presses a button
+        if (ShopManager.active)
         {
-            objectPressed = false;
-            Tools.OutlineMaterialSettings.Enable(ref sr, false);
-            toolBarObject.SetActive(false);
-
-            if (textObject != null) textObject.SetActive(false);
-            if (btnObject != null) btnObject.SetActive(false);
+            SelectionActivated(false);
         }
+        else if (Input.GetMouseButtonDown(0) && !mouseOnObject)
+        {
+            if (btnObject == null)
+            {
+                SelectionActivated(false);
+            }
+            else
+            {
+                if (!btnObject.GetComponent<ButtonEvents>().ButtonPressed())
+                {
+                    SelectionActivated(false);
+                }
+            }
+        }
+    }
+
+    void SelectionActivated(bool activated)
+    {
+        objectPressed = activated;
+        Tools.OutlineMaterialSettings.Enable(ref sr, activated);
+        toolBarObject.SetActive(activated);
+
+        if (textObject != null) textObject.SetActive(activated);
+        if (btnObject != null) btnObject.SetActive(activated);
     }
 
     public void Init(GameObject inGo, SpriteRenderer inSr, GameObject inTextGo = null, GameObject inBtnGo = null)
@@ -69,12 +88,7 @@ public class Selector : MonoBehaviour
     {
         if (!ShopManager.active)
         {
-            objectPressed = true;
-            Tools.OutlineMaterialSettings.Enable(ref sr, true);
-            toolBarObject.SetActive(true);
-
-            if (textObject != null) textObject.SetActive(true);
-            if (btnObject != null) btnObject.SetActive(true);
+            SelectionActivated(true);
         }
     }
 

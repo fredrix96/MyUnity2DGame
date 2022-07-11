@@ -106,11 +106,14 @@ public class Barrack : Building
         text.fontStyle = FontStyle.Bold;
         text.alignment = TextAnchor.UpperCenter;
 
+        textObject.SetActive(false);
+
         // Button
         buttonObject = new GameObject { name = go.name + "_trainSoldierButton" };
         buttonObject.transform.SetParent(go.transform);
         buttonObject.transform.position = toolBarObject.transform.position;
         buttonObject.AddComponent<GraphicRaycaster>();
+        buttonObject.AddComponent<ButtonEvents>();
 
         canvasButton = buttonObject.GetComponent<Canvas>();
         canvasButton.transform.SetParent(buttonObject.transform);
