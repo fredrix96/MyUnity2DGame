@@ -22,6 +22,8 @@ public class Building
 
     protected BuildingInformation.TYPE_OF_BUILDING type;
 
+    protected List<Building> buildings;
+
     protected bool shouldBeRemoved;
 
     public Building()
@@ -104,14 +106,6 @@ public class Building
     public Tile GetCenterTile()
     {
         return centerTile;
-    }
-
-    public void CheckIfDestroyed()
-    {
-        if (health.GetHealth() <= 0)
-        {
-            shouldBeRemoved = true;
-        }
     }
 
     public bool ShouldBeRemoved()

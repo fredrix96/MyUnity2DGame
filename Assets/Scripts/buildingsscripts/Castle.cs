@@ -5,12 +5,13 @@ using UnityEngine.UI;
 
 public class Castle : Building
 {
-    public Castle(GameObject parent, Tile inPos, CoinManager inCoinMan)
+    public Castle(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.Castle;
 
         centerTile = inPos;
         coinMan = inCoinMan;
+        buildings = inBuildings;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type) };
         go.transform.SetParent(parent.transform);
@@ -96,5 +97,13 @@ public class Castle : Building
         text.color = Color.white;
         text.fontStyle = FontStyle.Bold;
         text.alignment = TextAnchor.UpperCenter;
+    }
+
+    public void CheckIfDestroyed()
+    {
+        if (health.GetHealth() <= 0)
+        {
+            shouldBeRemoved = true;
+        }
     }
 }

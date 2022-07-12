@@ -11,18 +11,20 @@ public class House : Building
     double time;
     float timeDelay;
 
-    public House(GameObject parent, Tile inPos, CoinManager inCoinMan)
+    public House(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.House;
 
         nrOfHumans = 0;
         maxHumans = 5;
+        HumansCounter.max += maxHumans;
 
         time = 0;
         timeDelay = 5f;
 
         centerTile = inPos;
         coinMan = inCoinMan;
+        buildings = inBuildings;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };
         go.transform.SetParent(parent.transform);
@@ -126,5 +128,25 @@ public class House : Building
         text.alignment = TextAnchor.MiddleCenter;
 
         textObject.SetActive(false);
+    }
+
+    public int GetNrOfHumans()
+    {
+        return nrOfHumans;
+    }
+
+    public void RemoveHuman()
+    {
+        nrOfHumans--;
+        text.text = nrOfHumans + " / " + maxHumans + " Humans";
+    }
+
+    public void CheckIfDestroyed()
+    {
+        if (health.GetHealth() <= 0)
+        {
+            HumansCounter.max -= maxHumans;
+            shouldBeRemoved = true;
+        }
     }
 }

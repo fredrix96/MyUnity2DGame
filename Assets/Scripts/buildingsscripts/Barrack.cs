@@ -7,14 +7,15 @@ public class Barrack : Building
 {
     int soldierCost;
 
-    public Barrack(GameObject parent, Tile inPos, CoinManager inCoinMan)
+    public Barrack(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.Barrack;
 
         centerTile = inPos;
         coinMan = inCoinMan;
+        buildings = inBuildings;
 
-        soldierCost = 10;
+        soldierCost = 50;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };
         go.transform.SetParent(parent.transform);
@@ -144,7 +145,35 @@ public class Barrack : Building
             {
                 HumansCounter.nrOfHumans--;
                 SoldierCounter.nrToSpawn++;
+                RemoveHumanFromRandomHouse();
             }
+        }
+    }
+
+    void RemoveHumanFromRandomHouse()
+    {
+        List<House> houses = new List<House>();
+        foreach (Building building in buildings)
+        {
+            if (building is House)
+            {
+                House house = building as House;
+                if (house.GetNrOfHumans() > 0)
+                {
+                    houses.Add(house);
+                }
+            }
+        }
+
+        int index = Random.Range(0, houses.Count - 1);
+        houses[index].RemoveHuman();
+    }
+
+    public void CheckIfDestroyed()
+    {
+        if (health.GetHealth() <= 0)
+        {
+            shouldBeRemoved = true;
         }
     }
 }

@@ -2,31 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : Character
+public class Soldier : Character
 {
-    CoinManager coinMan;
-    int value;
-    
-    public Enemy(GameObject inGo, CoinManager inCoinMan, int inValue = 1)
+    public Soldier(GameObject inGo)
     {
-        type = TYPE_OF_CHARACTER.Enemy;
+        type = TYPE_OF_CHARACTER.Soldier;
 
-        coinMan = inCoinMan;
-        value = inValue;
-
-        go = new GameObject { name = "enemy" + EnemyCounter.counter };
-        go.transform.parent = inGo.transform;
+        go = new GameObject { name = "soldier" + SoldierCounter.counter };
+        go.transform.SetParent(inGo.transform);
         go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
-        go.layer = LayerMask.NameToLayer("Enemies");
+        go.layer = LayerMask.NameToLayer("Soldiers");
 
         cm = go.AddComponent<CollisionManager>();
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/StickFigureMonster", "Character");
-        sm.FlipX();
+        sm.Init(go, "Sprites/StickFigure", "Character");
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
-        Vector2 spawnTile = new Vector2(GridManager.GetRes().x - 1, randomY);
+        Vector2 spawnTile = new Vector2(0, randomY);
         go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
 
         // This is to make sure that feet of the character wont walk on another sprite
@@ -36,11 +29,11 @@ public class Enemy : Character
         lastXPos = ph.position.x;
 
         health = go.AddComponent<Health>();
-        health.Init(go, "Sprites/EnemyHealth", 100);
+        health.Init(go,"Sprites/SoldierHealth", 100);
 
-        speed = 1.2f;
-        damage = 10;
-        direction = -1;
+        speed = 2.0f;
+        damage = 20;
+        direction = 1;
 
         currTile = GridManager.GetTile(spawnTile);
         currTile.IncreaseCharacters(this);
@@ -69,10 +62,22 @@ public class Enemy : Character
             }
             else if (sm.IsAttacking())
             {
-                // Damage every time the attack animation has completed
                 if (sm.Attack())
                 {
                     Damage();
+                }
+            }
+            else if (sm.IsIdle())
+            {
+                UpdatePositionHandler();
+
+                if (ph.targetFound)
+                {
+                    sm.StartWalking();
+                }
+                else
+                {
+                    sm.Idle();
                 }
             }
 
@@ -81,8 +86,6 @@ public class Enemy : Character
                 isDead = true;
                 currTile.DecreaseCharacters(this);
                 GridManager.GetCharacterTiles(type).Remove(currTile);
-                coinMan.CreateCoin(go.transform.position, new Vector2(0.2f, 0.2f), Vector3.up, 1, 1.5f, true);
-                coinMan.AddCoins(value);
             }
         }
         else
@@ -96,9 +99,9 @@ public class Enemy : Character
 
     void Damage()
     {
-        List<Collider2D> results = sm.GetListOfOverlapColliders(
-                        LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player") | LayerMask.GetMask("Buildings"));
+        List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"));
 
+        // Only hit one character per attack
         foreach (Collider2D col in results)
         {
             if (col.gameObject.GetComponent<Health>() != null)
@@ -106,45 +109,31 @@ public class Enemy : Character
                 col.gameObject.GetComponent<Health>().Damage(damage);
 
                 // Turn towards the target
-                if (go.transform.position.x < col.transform.position.x && direction == -1)
-                {
-                    direction = 1;
-                    sm.FlipX();
-                }
-                else if (go.transform.position.x > col.transform.position.x && direction == 1)
+                if (go.transform.position.x > col.transform.position.x && direction == 1)
                 {
                     direction = -1;
                     sm.FlipX();
                 }
-            }
-            else if (col.gameObject.GetComponent<PlayerHealth>() != null)
-            {
-                col.gameObject.GetComponent<PlayerHealth>().Damage(damage);
+                else if (go.transform.position.x < col.transform.position.x && direction == -1)
+                {
+                    direction = 1;
+                    sm.FlipX();
+                }
 
-                // Turn towards the target
-                if (go.transform.position.x < col.transform.position.x && direction == -1)
-                {
-                    direction = 1;
-                    sm.FlipX();
-                }
-                else if (go.transform.position.x > col.transform.position.x && direction == 1)
-                {
-                    direction = -1;
-                    sm.FlipX();
-                }
+                break;
             }
         }
 
-        // Are there any soldiers left around the character?
+        // Are there any enemies left around the character?
         if (results.Count == 0)
         {
             // Else, resume walking
             sm.StartWalking();
 
             // Turn if necessary
-            if (direction == 1)
+            if (direction == -1)
             {
-                direction = -1;
+                direction = 1;
                 sm.FlipX();
             }
         }

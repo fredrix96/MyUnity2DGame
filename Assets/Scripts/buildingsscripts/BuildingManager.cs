@@ -20,7 +20,7 @@ public static class BuildingInformation
 
     static readonly int[] cost = new int[]
     {
-        400, 50, 200
+        500, 250, 800
     };
 
     static readonly int[] health = new int[]
@@ -238,19 +238,24 @@ public class BuildingManager : MonoBehaviour
 
         if (type == BuildingInformation.TYPE_OF_BUILDING.Castle)
         {
-            Castle castle = new Castle(go, inPos, coinMan);
+            Castle castle = new Castle(go, inPos, coinMan, buildings);
             buildings.Add(castle);
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.House)
         {
-            House house = new House(go, inPos, coinMan);
+            House house = new House(go, inPos, coinMan, buildings);
             buildings.Add(house);
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack)
         {
-            Barrack barrack = new Barrack(go, inPos, coinMan);
+            Barrack barrack = new Barrack(go, inPos, coinMan, buildings);
             buildings.Add(barrack);
         }
+    }
+
+    public List<Building> GetBuildings()
+    {
+        return buildings;
     }
 
     public Sprite GetSprite(BuildingInformation.TYPE_OF_BUILDING type)

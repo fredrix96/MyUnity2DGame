@@ -15,6 +15,7 @@ public class CoinManager
     CanvasScaler cs;
     Text value;
     PopUpMessage message;
+    Coin coinUI;
 
     List<Coin> coinList;
 
@@ -27,6 +28,8 @@ public class CoinManager
 
         message = go.AddComponent<PopUpMessage>();
         message.Init(go);
+
+        coinUI = new Coin(go);
 
         coinList = new List<Coin>();
 
