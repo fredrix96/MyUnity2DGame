@@ -11,8 +11,6 @@ public static class CoinCounter
 public class CoinManager
 {
     GameObject go, canvasObject, valueObject;
-    AudioManager am;
-    Coin coin;
     Canvas canvas;
     CanvasScaler cs;
     Text value;
@@ -22,17 +20,13 @@ public class CoinManager
 
     int nrOfCoins;
 
-    public CoinManager(AudioManager inAm, int startAmount)
+    public CoinManager(int startAmount)
     {
-        am = inAm;
-
         go = new GameObject { name = "coins" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
 
         message = go.AddComponent<PopUpMessage>();
         message.Init(go);
-
-        coin = new Coin(go);
 
         coinList = new List<Coin>();
 
@@ -72,7 +66,7 @@ public class CoinManager
     {
         Coin coin = new Coin(go, pos, scale, dir, speed, lifeTime, rotate);
         coinList.Add(coin);
-        am.PlayAudio3D("Coin Sound", 0.1f, pos);
+        AudioManager.PlayAudio3D("Coin Sound", 0.1f, pos);
     }
 
     public void AddCoins(int amount)

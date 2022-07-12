@@ -170,16 +170,14 @@ public class BuildingManager : MonoBehaviour
     CanvasScaler cs;
     List<Building> buildings;
     List<Sprite> sprites;
-    AudioManager audioMan;
     CoinManager coinMan;
 
     void Start()
     {
     }
 
-    public void Init(AudioManager inAudioMan, CoinManager inCoinMan)
+    public void Init(CoinManager inCoinMan)
     {
-        audioMan = inAudioMan;
         coinMan = inCoinMan;
 
         go = new GameObject() { name = "buildings" };
@@ -224,7 +222,7 @@ public class BuildingManager : MonoBehaviour
     {
         BuildingInformation.TYPE_OF_BUILDING type = building.GetBuildingType();
 
-        audioMan.PlayAudio3D("Destruction", 0.4f, building.GetPosition());
+        AudioManager.PlayAudio3D("Destruction", 0.4f, building.GetPosition());
 
         building.MarkOrUnmarkTiles(type, building.GetCenterTile(), false);
         building.Destroy();
@@ -236,7 +234,7 @@ public class BuildingManager : MonoBehaviour
 
     public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos)
     {
-        audioMan.PlayAudio3D("Construct", 0.4f, inPos.GetWorldPos());
+        AudioManager.PlayAudio2D("Construct", 0.4f);
 
         if (type == BuildingInformation.TYPE_OF_BUILDING.Castle)
         {

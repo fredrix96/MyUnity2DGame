@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class Main : MonoBehaviour 
 {
-    AudioManager am;
     Player player;
     CharacterManager charMan;
     Controller ctrl;
@@ -16,10 +15,9 @@ public class Main : MonoBehaviour
 
         GameManager.Init();
         Graphics.Init();
+        AudioManager.Init();
 
-        am = new AudioManager();
-
-        if (!am.PlayBackgroundMusic("Game Background Music", 0.5f, true))
+        if (!AudioManager.PlayBackgroundMusic("Game Background Music", 0.5f, true))
         {
             Debug.LogWarning("Warning: Could not play background music!");
         }
@@ -31,11 +29,11 @@ public class Main : MonoBehaviour
 
         player = new Player();
         int moneyToStartWith = 1000;
-        coinMan = new CoinManager(am, moneyToStartWith);
+        coinMan = new CoinManager(moneyToStartWith);
         charMan = new CharacterManager(player, coinMan);
         
         buildMan = GameManager.GameManagerObject.AddComponent<BuildingManager>();
-        buildMan.Init(am, coinMan);
+        buildMan.Init(coinMan);
 
         shopMan = new ShopManager(coinMan, buildMan);
         ctrl = new Controller(player, shopMan);

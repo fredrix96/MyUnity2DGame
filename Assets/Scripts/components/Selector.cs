@@ -88,6 +88,7 @@ public class Selector : MonoBehaviour
     {
         if (!ShopManager.active)
         {
+            AudioManager.PlayAudio2D("Select", 0.1f);
             SelectionActivated(true);
         }
     }

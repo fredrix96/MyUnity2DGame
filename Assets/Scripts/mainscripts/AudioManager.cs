@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioManager
+public static class AudioManager
 {
-    GameObject go;
-    AudioClip[] audioClips;
-    AudioSource audioSource2D;
-    AudioSource audioSource3D;
-    AudioSource backgroundMusic;
+    static GameObject go;
+    static AudioClip[] audioClips;
+    static AudioSource audioSource2D;
+    static AudioSource audioSource3D;
+    static AudioSource backgroundMusic;
 
-    public AudioManager()
+    public static void Init()
     {
         audioClips = Resources.LoadAll<AudioClip>("Audio/");
         go = new GameObject { name = "audio_source" };
@@ -20,7 +20,7 @@ public class AudioManager
         audioSource3D = go.AddComponent<AudioSource>();
     }
 
-    public bool PlayBackgroundMusic(string audioName, float volume, bool loop = false)
+    public static bool PlayBackgroundMusic(string audioName, float volume, bool loop = false)
     {
         bool found = false;
 
@@ -47,7 +47,7 @@ public class AudioManager
         return found;
     }
 
-    public bool PlayAudio2D(string audioName, float volume, bool loop = false)
+    public static bool PlayAudio2D(string audioName, float volume, bool loop = false)
     {
         bool found = false;
 
@@ -74,7 +74,7 @@ public class AudioManager
         return found;
     }
 
-    public bool PlayAudio3D(string audioName, float volume, Vector3 pos, float fadeDist = 30, float atMaxDist = 2, float dopplerLevel = 0, bool loop = false)
+    public static bool PlayAudio3D(string audioName, float volume, Vector3 pos, float fadeDist = 30, float atMaxDist = 2, float dopplerLevel = 0, bool loop = false)
     {
         bool found = false;
 

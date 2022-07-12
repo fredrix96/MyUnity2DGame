@@ -14,6 +14,7 @@ public class ButtonEvents : MonoBehaviour, IPointerClickHandler, IPointerUpHandl
 
     public void OnPointerClick(PointerEventData pointerEventData)
     {
+        AudioManager.PlayAudio2D("Button", 0.3f);
     }
 
     public void OnPointerUp(PointerEventData pointerEventData)
