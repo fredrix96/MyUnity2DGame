@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player
+public class Player : Character
 {
-    GameObject go;
-    SpriteManager sm;
-    PlayerHealth health;
-    Tile currTile;
+    PlayerHealth playerHealth;
 
-    bool isDead;
-    bool shouldBeRemoved;
     int playerSpeed;
-    int damage;
     int maxHealth;
     double regenerationTimer;
     float regenerationDelay;
@@ -28,7 +22,7 @@ public class Player
         Respawn();
     }
 
-    public void Update()
+    public override void Update()
     {
         if (!isDead)
         {
@@ -39,6 +33,7 @@ public class Player
             {
                 if (sm.Attack())
                 {
+                    PlaySwordSound();
                     Damage();
                 }
             }
@@ -52,18 +47,25 @@ public class Player
                 sm.Idle();
             }
 
-            if (health.GetHealth() <= 0)
+            if (playerHealth.GetHealth() <= 0)
             {
                 isDead = true;
                 currTile.PlayerOnTile(false);
                 GridManager.SetPlayerTile(null);
+                AudioManager.PlayAudio3D("Player Death", 0.2f, go.transform.position);
             }
         }
         else
         {
-            if (sm.Die() > 3)
+            if (sm.Die() > 3 && go != null)
             {
                 shouldBeRemoved = true;
+
+                // End the game if the player dies without any castle to respawn in
+                if (BuildingInformation.GetCounter(BuildingInformation.TYPE_OF_BUILDING.Castle) < 1)
+                {
+                    GameManager.GameOver();
+                }
             }
         }
     }
@@ -149,13 +151,13 @@ public class Player
 
     void RegenerateHealth()
     {
-        if (health.GetHealth() < maxHealth && health.GetHealth() > 0)
+        if (playerHealth.GetHealth() < maxHealth && playerHealth.GetHealth() > 0)
         {
             regenerationTimer += Time.deltaTime;
 
             if (regenerationTimer > regenerationDelay)
             {
-                health.IncreaseHealth(1);
+                playerHealth.IncreaseHealth(1);
                 regenerationTimer = 0;
             }
         }
@@ -166,10 +168,15 @@ public class Player
         return shouldBeRemoved;
     }
 
-    public void Destroy()
+    public void HasBeenRemoved()
+    {
+        shouldBeRemoved = false;
+    }
+
+    public override void Destroy()
     {
         Object.Destroy(go);
-        health.Destroy();
+        playerHealth.Destroy();
     }
 
     public void Respawn()
@@ -187,8 +194,8 @@ public class Player
         sm = go.AddComponent<SpriteManager>();
         sm.Init(go, "Sprites/StickFigureKing", "Player", false);
 
-        health = go.AddComponent<PlayerHealth>();
-        health.Init(go, maxHealth);
+        playerHealth = go.AddComponent<PlayerHealth>();
+        playerHealth.Init(go, maxHealth);
 
         dirVector = Vector2.zero;
         isDead = false;
@@ -198,8 +205,8 @@ public class Player
         currTile.PlayerOnTile(true);
     }
 
-    public Vector3 GetPosition()
+    public GameObject GetPlayerObject()
     {
-        return go.transform.position;
+        return go;
     }
 }

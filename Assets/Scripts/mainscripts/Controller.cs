@@ -84,7 +84,7 @@ public class Controller
     void UpdateKeys()
     {
         // Player related keys
-        if (!player.Remove())
+        if (player.GetPlayerObject() != null)
         {
             player.Idle();
 
@@ -117,5 +117,14 @@ public class Controller
         {
             shopMan.ChangeActive();
         }
+
+        // If game over, restart the game
+        //if (GameManager.IsGameOver())
+        //{
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                GameManager.Quit();
+            }
+        //}
     }
 }

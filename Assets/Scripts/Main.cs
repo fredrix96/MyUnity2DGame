@@ -33,7 +33,7 @@ public class Main : MonoBehaviour
         charMan = new CharacterManager(player, coinMan);
         
         buildMan = GameManager.GameManagerObject.AddComponent<BuildingManager>();
-        buildMan.Init(coinMan);
+        buildMan.Init(coinMan, player);
 
         shopMan = new ShopManager(coinMan, buildMan);
         ctrl = new Controller(player, shopMan);
@@ -44,11 +44,15 @@ public class Main : MonoBehaviour
 
     void Update()
     {
-        CameraManager.Update();
-
         ctrl.Update();
-        charMan.Update();
-        coinMan.Update();
-        shopMan.Update();
+
+        if (!GameManager.IsGameOver())
+        {
+            CameraManager.Update();
+
+            charMan.Update();
+            coinMan.Update();
+            shopMan.Update();
+        }
     }
 }

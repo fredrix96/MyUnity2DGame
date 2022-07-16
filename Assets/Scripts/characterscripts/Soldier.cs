@@ -64,6 +64,7 @@ public class Soldier : Character
             {
                 if (sm.Attack())
                 {
+                    PlaySwordSound();
                     Damage();
                 }
             }

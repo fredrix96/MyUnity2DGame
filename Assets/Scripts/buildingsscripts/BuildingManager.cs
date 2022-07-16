@@ -171,14 +171,16 @@ public class BuildingManager : MonoBehaviour
     List<Building> buildings;
     List<Sprite> sprites;
     CoinManager coinMan;
+    Player player;
 
     void Start()
     {
     }
 
-    public void Init(CoinManager inCoinMan)
+    public void Init(CoinManager inCoinMan, Player inPlayer)
     {
         coinMan = inCoinMan;
+        player = inPlayer;
 
         go = new GameObject() { name = "buildings" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
@@ -238,7 +240,7 @@ public class BuildingManager : MonoBehaviour
 
         if (type == BuildingInformation.TYPE_OF_BUILDING.Castle)
         {
-            Castle castle = new Castle(go, inPos, coinMan, buildings);
+            Castle castle = new Castle(go, inPos, coinMan, buildings, player);
             buildings.Add(castle);
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.House)

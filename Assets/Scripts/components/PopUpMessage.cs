@@ -41,7 +41,7 @@ public class PopUpMessage : MonoBehaviour
             {
                 messageTime += Time.deltaTime;
 
-                if (messageTime > messageLifeTime)
+                if (messageTime > messageLifeTime && messageLifeTime != -1)
                 {
                     messageObject.SetActive(false);
                     messageTime = 0;
@@ -80,6 +80,7 @@ public class PopUpMessage : MonoBehaviour
         messageObject.SetActive(false);
     }
 
+    /// <summary> A lifeTime of -1 means that the message wont disappear </summary> 
     public void SendPopUpMessage(string text, float lifeTime = 2.5f, int fontSize = 30, Color? color = null)
     {
         // Returns left value if it is not null, otherwise it returns the value to the right

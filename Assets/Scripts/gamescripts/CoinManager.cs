@@ -63,6 +63,13 @@ public class CoinManager
                 coinList.Remove(coin);
             }
         }
+
+#if DEBUG
+        if (Input.GetKey(KeyCode.Z))
+        {
+            AddCoins(1);
+        }
+# endif
     }
 
     public void CreateCoin(Vector3 pos, Vector2 scale, Vector3 dir, float speed, float lifeTime = 2, bool rotate = false)

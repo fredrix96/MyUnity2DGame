@@ -145,6 +145,7 @@ public class House : Building
     {
         if (health.GetHealth() <= 0)
         {
+            HumansCounter.nrOfHumans -= nrOfHumans;
             HumansCounter.max -= maxHumans;
             shouldBeRemoved = true;
         }

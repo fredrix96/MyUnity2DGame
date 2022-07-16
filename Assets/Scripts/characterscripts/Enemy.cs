@@ -6,6 +6,8 @@ public class Enemy : Character
 {
     CoinManager coinMan;
     int value;
+    float groanDelay;
+    double time;
     
     public Enemy(GameObject inGo, CoinManager inCoinMan, int inValue = 1)
     {
@@ -13,6 +15,9 @@ public class Enemy : Character
 
         coinMan = inCoinMan;
         value = inValue;
+
+        groanDelay = 5.0f;
+        time = 0;
 
         go = new GameObject { name = "enemy" + EnemyCounter.counter };
         go.transform.parent = inGo.transform;
@@ -55,6 +60,8 @@ public class Enemy : Character
     {
         if (!isDead)
         {
+            time += Time.deltaTime;
+
             if (sm.IsWalking())
             {
                 sm.Walk();
@@ -76,6 +83,13 @@ public class Enemy : Character
                 }
             }
 
+            // Groan
+            if (time > groanDelay)
+            {
+                Groan();
+                time = 0;
+            }
+
             if (health.GetHealth() <= 0)
             {
                 isDead = true;
@@ -83,6 +97,7 @@ public class Enemy : Character
                 GridManager.GetCharacterTiles(type).Remove(currTile);
                 coinMan.CreateCoin(go.transform.position, new Vector2(0.2f, 0.2f), Vector3.up, 1, 1.5f, true);
                 coinMan.AddCoins(value);
+                AudioManager.PlayAudio3D("Enemy Death", 0.2f, go.transform.position);
             }
         }
         else
@@ -152,6 +167,34 @@ public class Enemy : Character
                 direction = -1;
                 sm.FlipX();
             }
+        }
+    }
+
+    void Groan()
+    {
+        // 10% chance to groan
+        int index = Random.Range(0, 49);
+
+        switch (index)
+        {
+            case 0:
+                AudioManager.PlayAudio3D("Groan", 0.1f, go.transform.position);
+                break;
+            case 1:
+                AudioManager.PlayAudio3D("Groan2", 0.1f, go.transform.position);
+                break;
+            case 2:
+                AudioManager.PlayAudio3D("Groan3", 0.1f, go.transform.position);
+                break;
+            case 3:
+                AudioManager.PlayAudio3D("Groan4", 0.1f, go.transform.position);
+                break;
+            case 4:
+                AudioManager.PlayAudio3D("Groan5", 0.1f, go.transform.position);
+                break;
+            default:
+                // Be quiet
+                break;
         }
     }
 

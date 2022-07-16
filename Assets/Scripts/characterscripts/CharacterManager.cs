@@ -52,8 +52,8 @@ public class CharacterManager
 
     GameObject characterObjects, enemyObjects, soldierObjects;
 
-    float enemySpawnDelay, soldierSpawnDelay, playerSpawnDelay;
-    double enemySpawnTimer, soldierSpawnTimer, playerSpawnTimer;
+    float enemySpawnDelay, soldierSpawnDelay;
+    double enemySpawnTimer, soldierSpawnTimer;
 
     public CharacterManager(Player inPlayer, CoinManager inCoinMan)
     {
@@ -75,11 +75,9 @@ public class CharacterManager
 
         enemySpawnDelay = 5.0f; // decreases with time
         soldierSpawnDelay = 0.6f;
-        playerSpawnDelay = 5.0f;
 
         enemySpawnTimer = 0;
         soldierSpawnTimer = 0;
-        playerSpawnTimer = 0;
 
         DisplayCharacterData();
     }
@@ -90,6 +88,17 @@ public class CharacterManager
         UpdateSoldiers();
         UpdatePlayer();
         UpdateCharacterTextData();
+
+#if DEBUG
+        if (Input.GetKey(KeyCode.X))
+        {
+            SpawnEnemy();
+        }
+        if (Input.GetKey(KeyCode.C))
+        {
+            SpawnSoldier();
+        }
+# endif
     }
 
     List<T> GetListToUpdate<T>(List<T> characters, float targetFrame)
@@ -243,23 +252,11 @@ public class CharacterManager
         player.Update();
 
         // Remove the player object if it is dead
-        if (player.Remove() && playerSpawnTimer == 0)
+        if (player.Remove() && !GameManager.IsGameOver())
         {
+            player.HasBeenRemoved();
             player.Destroy();
-            playerSpawnTimer += Time.deltaTime;
             message.SendPopUpMessage("The King is dead!", 2.5f);
-        }
-        else if (playerSpawnTimer > 0)
-        {
-            playerSpawnTimer += Time.deltaTime;
-
-            // Respawn the player character after a certain amount of time
-            if (playerSpawnTimer > playerSpawnDelay)
-            {
-                player.Respawn();
-                playerSpawnTimer = 0;
-                message.SendPopUpMessage("A new King has arrived!" + System.Environment.NewLine + "All hail the new King!", 2.5f);
-            }
         }
     }
 

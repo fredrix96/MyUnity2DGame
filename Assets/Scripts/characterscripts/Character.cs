@@ -177,4 +177,28 @@ public class Character
             }
         }
     }
+
+    protected void PlaySwordSound()
+    {
+        int index = UnityEngine.Random.Range(0, 4);
+
+        switch (index)
+        {
+            case 0:
+                AudioManager.PlayAudio3D("Sword Swing", 0.1f, go.transform.position);
+                break;
+            case 1:
+                AudioManager.PlayAudio3D("Sword Swing2", 0.1f, go.transform.position);
+                break;
+            case 2:
+                AudioManager.PlayAudio3D("Sword Swing3", 0.1f, go.transform.position);
+                break;
+            case 3:
+                AudioManager.PlayAudio3D("Sword Swing4", 0.1f, go.transform.position);
+                break;
+            default:
+                AudioManager.PlayAudio3D("Sword Swing", 0.1f, go.transform.position);
+                break;
+        }
+    }
 }

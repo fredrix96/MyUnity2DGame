@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
-    GameObject go, canvasObject, imageObject, healthObject, heartObject;
+    GameObject go, canvasObject, imageObject, healthObject, heartObject, playerObject;
     Canvas canvas;
     CanvasScaler cs;
     Image healthBar, heart;
@@ -16,9 +16,11 @@ public class PlayerHealth : MonoBehaviour
 
     public void Init(GameObject inGo, int inHealth)
     {
+        playerObject = inGo;
+
         // Head object
-        go = new GameObject { name = inGo.name + "_healthbar" };
-        go.transform.SetParent(inGo.transform);
+        go = new GameObject { name = playerObject.name + "_healthbar" };
+        go.transform.SetParent(playerObject.transform);
 
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
@@ -120,6 +122,8 @@ public class PlayerHealth : MonoBehaviour
 
             // Set the correct color
             ChangeColor(health);
+
+            //AudioManager.PlayAudio3D("Player Hit", 0.1f, playerObject.transform.position);
         }
     }
 

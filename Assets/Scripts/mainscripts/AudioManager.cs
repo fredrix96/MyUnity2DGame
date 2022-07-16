@@ -6,23 +6,52 @@ public static class AudioManager
 {
     static GameObject go;
     static AudioClip[] audioClips;
-    static AudioSource audioSource2D;
-    static AudioSource audioSource3D;
-    static AudioSource backgroundMusic;
+    static List<AudioSource> audioSource2DList;
+    static List<AudioSource> audioSource3DList;
+    static List<AudioSource> backgroundMusicList;
 
     public static void Init()
     {
         audioClips = Resources.LoadAll<AudioClip>("Audio/");
-        go = new GameObject { name = "audio_source" };
+        go = new GameObject { name = "audio_pool" };
         go.transform.parent = GameManager.GameManagerObject.transform;
-        backgroundMusic = go.AddComponent<AudioSource>();
-        audioSource2D = go.AddComponent<AudioSource>();
-        audioSource3D = go.AddComponent<AudioSource>();
+        audioSource2DList = new List<AudioSource>();
+        audioSource3DList = new List<AudioSource>();
+        backgroundMusicList = new List<AudioSource>();
+    }
+
+    static AudioSource GetAudioSource(List<AudioSource> list, string audioName)
+    {
+        AudioSource audioSource = null;
+
+        bool sourceExists = false;
+        foreach (AudioSource source in list)
+        {
+            if (source.clip != null)
+            {
+                if (source.clip.name == audioName && !source.isPlaying)
+                {
+                    sourceExists = true;
+                    audioSource = source;
+                }
+            }
+        }
+
+        if (!sourceExists)
+        {
+            AudioSource newAudioSource = go.AddComponent<AudioSource>();
+            list.Add(newAudioSource);
+            audioSource = newAudioSource;
+        }
+
+        return audioSource;
     }
 
     public static bool PlayBackgroundMusic(string audioName, float volume, bool loop = false)
     {
         bool found = false;
+
+        AudioSource audioSource = GetAudioSource(backgroundMusicList, audioName);
 
         foreach (AudioClip clip in audioClips)
         {
@@ -30,10 +59,10 @@ public static class AudioManager
             {
                 found = true;
 
-                backgroundMusic.clip = clip;
-                backgroundMusic.volume = volume;
-                backgroundMusic.loop = loop;
-                backgroundMusic.Play();
+                audioSource.clip = clip;
+                audioSource.volume = volume;
+                audioSource.loop = loop;
+                audioSource.Play();
 
                 return found;
             }
@@ -50,6 +79,8 @@ public static class AudioManager
     public static bool PlayAudio2D(string audioName, float volume, bool loop = false)
     {
         bool found = false;
+
+        AudioSource audioSource2D = GetAudioSource(audioSource2DList, audioName);
 
         foreach (AudioClip clip in audioClips)
         {
@@ -77,6 +108,8 @@ public static class AudioManager
     public static bool PlayAudio3D(string audioName, float volume, Vector3 pos, float fadeDist = 30, float atMaxDist = 2, float dopplerLevel = 0, bool loop = false)
     {
         bool found = false;
+
+        AudioSource audioSource3D = GetAudioSource(audioSource3DList, audioName);
 
         foreach (AudioClip clip in audioClips)
         {

@@ -5,17 +5,29 @@ using UnityEngine.UI;
 
 public class Castle : Building
 {
-    public Castle(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings)
+    Player player;
+    PopUpMessage message;
+    double remainingTime;
+    float timeToRespawn;
+
+    public Castle(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings, Player inPlayer)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.Castle;
 
         centerTile = inPos;
         coinMan = inCoinMan;
         buildings = inBuildings;
+        player = inPlayer;
+
+        timeToRespawn = 10.0f;
+        remainingTime = timeToRespawn;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type) };
         go.transform.SetParent(parent.transform);
         go.layer = LayerMask.NameToLayer("Buildings");
+
+        message = go.AddComponent<PopUpMessage>();
+        message.Init(go);
 
         go.AddComponent<CollisionManager>();
 
@@ -50,21 +62,27 @@ public class Castle : Building
         CheckIfDestroyed();
 
         LookIfIgnored();
+
+        RespawnTimer();
     }
 
     void CreateToolBar()
     {
-        toolBarObject = new GameObject();
-        toolBarObject.name = go.name + "_toolBar";
+        // Toolbar
+        toolBarObject = new GameObject { name = go.name + "_toolBar" };
         toolBarObject.transform.SetParent(go.transform);
 
+        // Canvas
         canvasToolBar = toolBarObject.AddComponent<Canvas>();
+        canvasToolBar.transform.localScale = new Vector3(0.05f * CameraManager.GetCamera().aspect, 0.05f, 1f);
+
+        // Sprite
         srToolBar = toolBarObject.AddComponent<SpriteRenderer>();
         srToolBar.sortingLayerName = "UI";
-
+        srToolBar.sortingOrder = 0;
         srToolBar.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
         srToolBar.drawMode = SpriteDrawMode.Sliced;
-        srToolBar.size = new Vector2(2.5f, 2f);
+        srToolBar.size = new Vector2(100f, 100f);
 
         float height = 0;
         if (go.transform.GetComponent<BoxCollider2D>() == null)
@@ -77,13 +95,12 @@ public class Castle : Building
         }
 
         toolBarObject.transform.position = new Vector3(toolBarObject.transform.parent.position.x, toolBarObject.transform.parent.position.y + height, toolBarObject.transform.parent.position.z);
-
         toolBarObject.SetActive(false);
 
         // Text
-        textObject = new GameObject { name = "textObject" };
+        textObject = new GameObject { name = go.name + "textObject" };
         textObject.transform.SetParent(go.transform);
-        textObject.transform.position = go.transform.position;
+        textObject.transform.position = toolBarObject.transform.position;
 
         canvasText = textObject.AddComponent<Canvas>();
         canvasText.transform.localScale = new Vector3(0.05f * CameraManager.GetCamera().aspect, 0.05f, 1f);
@@ -91,12 +108,14 @@ public class Castle : Building
         canvasText.sortingOrder = 1;
 
         text = textObject.AddComponent<Text>();
-        //text.text = nrOfHumans + " / " + maxHumans + " Humans";
+        text.text = "The king is alive";
         text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        //text.fontSize = (int)(0.0001f * Graphics.resolution);
+        text.fontSize = (int)(1.5f * Graphics.resolution);
         text.color = Color.white;
         text.fontStyle = FontStyle.Bold;
-        text.alignment = TextAnchor.UpperCenter;
+        text.alignment = TextAnchor.MiddleCenter;
+
+        textObject.SetActive(false);
     }
 
     public void CheckIfDestroyed()
@@ -106,4 +125,25 @@ public class Castle : Building
             shouldBeRemoved = true;
         }
     }
+
+    void RespawnTimer()
+    {
+        if (!player.IsDead())
+        {
+            text.text = "The king is alive";
+        }
+        else if (player.GetPlayerObject() == null)
+        {
+            remainingTime -= Time.deltaTime;
+            text.text = "The king respawns in " + remainingTime.ToString("F2");
+
+            if (remainingTime <= 0)
+            {
+                player.Respawn();
+                message.SendPopUpMessage("A new King has arrived!" + System.Environment.NewLine + "All hail the new King!", 2.5f);
+                remainingTime = timeToRespawn;
+            }
+        }
+    }
+
 }
