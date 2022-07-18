@@ -32,6 +32,62 @@ public class Building
 
     public virtual void Update() { }
 
+    protected void CreateToolbarObject(Vector2 inSize, float inHeight)
+    {
+        // Toolbar
+        toolBarObject = new GameObject { name = go.name + "_toolBar" };
+        toolBarObject.transform.SetParent(go.transform);
+        toolBarObject.AddComponent<BoxCollider2D>();
+
+        // Canvas
+        canvasToolBar = toolBarObject.AddComponent<Canvas>();
+        canvasToolBar.transform.localScale = new Vector3(0.1f, 0.05f, 1f);
+
+        // Sprite
+        srToolBar = toolBarObject.AddComponent<SpriteRenderer>();
+        srToolBar.sortingLayerName = "UI";
+        srToolBar.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
+        srToolBar.drawMode = SpriteDrawMode.Sliced;
+        srToolBar.size = inSize * Graphics.resolution;
+
+        float height = 0;
+        if (go.transform.GetComponent<BoxCollider2D>() == null)
+        {
+            Debug.Log("Warning: " + go.name + " does not have a box collider! Could not apply the correct height for the tool bar...");
+        }
+        else
+        {
+            height = srToolBar.sprite.bounds.max.y * inHeight;
+        }
+
+        toolBarObject.transform.position = new Vector3(toolBarObject.transform.parent.position.x, toolBarObject.transform.parent.position.y + height, toolBarObject.transform.parent.position.z);
+        toolBarObject.SetActive(false);
+    }
+
+    protected void CreateInfoText(string inText, TextAnchor inAlignement, Vector2 inSize)
+    {
+        // Text
+        textObject = new GameObject { name = go.name + "_textObject" };
+        textObject.transform.SetParent(go.transform);
+        textObject.transform.position = toolBarObject.transform.position;
+
+        canvasText = textObject.AddComponent<Canvas>();
+        canvasText.transform.localScale = new Vector2(0.03f, 0.03f);
+        canvasText.sortingLayerName = "UI";
+        canvasText.sortingOrder = 2;
+
+        text = textObject.AddComponent<Text>();
+        text.text = inText;
+        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.fontSize = (int)(5.0f * Graphics.resolution);
+        text.color = Color.white;
+        text.fontStyle = FontStyle.Bold;
+        text.alignment = inAlignement;
+        text.rectTransform.sizeDelta = inSize * Graphics.resolution;
+
+        textObject.SetActive(false);
+    }
+
     public void MarkOrUnmarkTiles(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, bool mark)
     {
         Vector2 size = BuildingInformation.GetBuildingSize(type);

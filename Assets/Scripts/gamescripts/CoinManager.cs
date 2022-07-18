@@ -115,16 +115,16 @@ public class CoinManager
         value = valueObject.AddComponent<Text>();
         value.text = nrOfCoins.ToString();
         value.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        value.fontSize = 40;
+        value.fontSize = (int)(5 * Graphics.resolution);
         value.alignment = TextAnchor.MiddleRight;
 
         // Reset anchor
         value.rectTransform.anchorMin = Vector2.zero;
         value.rectTransform.anchorMax = Vector2.zero;
-        value.rectTransform.sizeDelta = new Vector2(184, 100);
+        value.rectTransform.sizeDelta = new Vector2(28.0f, 10.0f) * Graphics.resolution;
 
         // Anchor the image
-        value.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - 155, canvas.pixelRect.height - 30, 0);
+        value.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - canvas.pixelRect.width / 10, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
     }
 
 

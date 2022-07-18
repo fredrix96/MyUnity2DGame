@@ -47,9 +47,10 @@ public class Coin
         // Reset anchor
         coin.rectTransform.anchorMin = Vector2.zero;
         coin.rectTransform.anchorMax = Vector2.zero;
+        coin.rectTransform.sizeDelta = new Vector2(20, 20) * Graphics.resolution;
 
         // Anchor the image
-        coin.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - 40, canvas.pixelRect.height - 30, 0);
+        coin.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - canvas.pixelRect.width / 42, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         shouldBeRemoved = false;
     }

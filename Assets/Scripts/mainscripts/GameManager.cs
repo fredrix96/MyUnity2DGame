@@ -30,7 +30,7 @@ public static class GameManager
 
     public static void GameOver()
     {
-        message.SendPopUpMessage("GAME OVER" + System.Environment.NewLine + "Press ESC to quit", -1, 60);
+        message.SendPopUpMessage("GAME OVER" + System.Environment.NewLine + "Press ESC to quit", -1);
         gameOver = true;
     }
 

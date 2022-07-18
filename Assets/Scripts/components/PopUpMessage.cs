@@ -19,6 +19,7 @@ public class PopUpMessage : MonoBehaviour
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
         canvasObject.transform.parent = go.transform;
+
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = CameraManager.GetCamera();
@@ -54,28 +55,26 @@ public class PopUpMessage : MonoBehaviour
     {
         // Message object
         messageObject = new GameObject { name = "popUpMessage" };
-
         messageObject.transform.SetParent(canvas.transform);
-        messageObject.transform.localScale = new Vector2(0.8f, 0.55f);
+        messageObject.transform.localScale = new Vector2(1f, 1f);
+
+        RectTransform rectTitle = messageObject.AddComponent<RectTransform>();
+        rectTitle.anchorMin = Vector2.zero;
+        rectTitle.anchorMax = Vector2.zero;
+        rectTitle.pivot = new Vector2(0.5f, 0.5f);
+        rectTitle.anchoredPosition = new Vector2(canvas.pixelRect.width / 2, canvas.pixelRect.height / 2);
+        rectTitle.sizeDelta = new Vector2(0.55f * canvas.pixelRect.width, 0.3f * canvas.pixelRect.height);
 
         Outline outline = messageObject.AddComponent<Outline>();
-        outline.effectDistance = new Vector2(3, 3);
+        outline.effectDistance = new Vector2(3.0f, 3.0f);
 
         message = messageObject.AddComponent<Text>();
         message.text = "";
         message.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        message.fontSize = 20 * (int)CameraManager.GetCamera().aspect;
+        message.fontSize = 2 * (int)Graphics.resolution;
         message.color = Color.white;
         message.fontStyle = FontStyle.Bold;
         message.alignment = TextAnchor.MiddleCenter;
-
-        // Reset anchor
-        message.rectTransform.anchorMin = Vector2.zero;
-        message.rectTransform.anchorMax = Vector2.zero;
-        message.rectTransform.sizeDelta = new Vector2(1920, 1080);
-
-        // Anchor the image
-        message.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width / 2, canvas.pixelRect.height / 2, 0);
 
         messageObject.SetActive(false);
     }
@@ -86,7 +85,7 @@ public class PopUpMessage : MonoBehaviour
         // Returns left value if it is not null, otherwise it returns the value to the right
         message.color = color ?? Color.white;
 
-        message.fontSize = fontSize * (int)CameraManager.GetCamera().aspect;
+        message.fontSize = fontSize * (int)Graphics.resolution / 4;
         messageLifeTime = lifeTime;
         message.text = text;
         messageObject.SetActive(true);

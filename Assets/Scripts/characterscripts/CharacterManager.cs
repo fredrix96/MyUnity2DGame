@@ -312,14 +312,14 @@ public class CharacterManager
         barObject.transform.localScale = new Vector2(0.3f, 0.3f);
 
         Image barImage = barObject.AddComponent<Image>();
-        barImage.color = new Color(0, 0, 0, 0.9f);
+        barImage.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
 
         // Reset anchor
         barImage.rectTransform.anchorMin = Vector2.zero;
         barImage.rectTransform.anchorMax = Vector2.zero;
 
-        barImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width / 2, canvas.pixelRect.height - 30, 0);
-        barImage.rectTransform.sizeDelta = new Vector2(1800, 120);
+        barImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width / 2, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
+        barImage.rectTransform.sizeDelta = new Vector2(190, 20) * Graphics.resolution;
 
         // Humans
 
@@ -334,9 +334,10 @@ public class CharacterManager
         // Reset anchor
         humansDataImage.rectTransform.anchorMin = Vector2.zero;
         humansDataImage.rectTransform.anchorMax = Vector2.zero;
+        humansDataImage.rectTransform.sizeDelta = new Vector2(15, 15) * Graphics.resolution;
 
         // Anchor the image
-        humansDataImage.rectTransform.anchoredPosition = new Vector3((canvas.pixelRect.width / 2) - 200, canvas.pixelRect.height - 30, 0);
+        humansDataImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.41f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         // Text object
         GameObject humansDataTextObject = new GameObject { name = "humansDataText" };
@@ -346,15 +347,15 @@ public class CharacterManager
         humansDataText = humansDataTextObject.AddComponent<Text>();
         humansDataText.text = HumansCounter.nrOfHumans.ToString() + " / " + HumansCounter.max;
         humansDataText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        humansDataText.fontSize = 40;
+        humansDataText.fontSize = (int)(5 * Graphics.resolution);
         humansDataText.alignment = TextAnchor.MiddleLeft;
 
         // Reset anchor
         humansDataText.rectTransform.anchorMin = Vector2.zero;
         humansDataText.rectTransform.anchorMax = Vector2.zero;
-        humansDataText.rectTransform.sizeDelta = new Vector2(184, 100);
+        humansDataText.rectTransform.sizeDelta = new Vector2(30, 30) * Graphics.resolution;
 
-        humansDataText.rectTransform.anchoredPosition = new Vector3((canvas.pixelRect.width / 2) - 140, canvas.pixelRect.height - 30, 0);
+        humansDataText.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.45f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         // Soldiers
 
@@ -369,9 +370,10 @@ public class CharacterManager
         // Reset anchor
         soldiersDataImage.rectTransform.anchorMin = Vector2.zero;
         soldiersDataImage.rectTransform.anchorMax = Vector2.zero;
+        soldiersDataImage.rectTransform.sizeDelta = new Vector2(15, 15) * Graphics.resolution;
 
         // Anchor the image
-        soldiersDataImage.rectTransform.anchoredPosition = new Vector3((canvas.pixelRect.width / 2) - 80, canvas.pixelRect.height - 30, 0);
+        soldiersDataImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.47f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         // Text object
         GameObject soldiersDataTextObject = new GameObject { name = "soldiersDataText" };
@@ -381,15 +383,15 @@ public class CharacterManager
         soldiersDataText = soldiersDataTextObject.AddComponent<Text>();
         soldiersDataText.text = SoldierCounter.nrOfSoldiers.ToString();
         soldiersDataText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        soldiersDataText.fontSize = 40;
+        soldiersDataText.fontSize = (int)(5 * Graphics.resolution);
         soldiersDataText.alignment = TextAnchor.MiddleLeft;
 
         // Reset anchor
         soldiersDataText.rectTransform.anchorMin = Vector2.zero;
         soldiersDataText.rectTransform.anchorMax = Vector2.zero;
-        soldiersDataText.rectTransform.sizeDelta = new Vector2(184, 100);
+        soldiersDataText.rectTransform.sizeDelta = new Vector2(30, 30) * Graphics.resolution;
 
-        soldiersDataText.rectTransform.anchoredPosition = new Vector3((canvas.pixelRect.width / 2) - 20, canvas.pixelRect.height - 30, 0);
+        soldiersDataText.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.51f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         // Enemies
 
@@ -404,9 +406,10 @@ public class CharacterManager
         // Reset anchor
         enemiesDataImage.rectTransform.anchorMin = Vector2.zero;
         enemiesDataImage.rectTransform.anchorMax = Vector2.zero;
+        enemiesDataImage.rectTransform.sizeDelta = new Vector2(15, 15) * Graphics.resolution;
 
         // Anchor the image
-        enemiesDataImage.rectTransform.anchoredPosition = new Vector3((canvas.pixelRect.width / 2) + 40, canvas.pixelRect.height - 30, 0);
+        enemiesDataImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.53f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         // Text object
         GameObject enemiesDataTextObject = new GameObject { name = "enemiesDataText" };
@@ -416,15 +419,15 @@ public class CharacterManager
         enemiesDataText = enemiesDataTextObject.AddComponent<Text>();
         enemiesDataText.text = EnemyCounter.nrOfEnemies.ToString();
         enemiesDataText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        enemiesDataText.fontSize = 40;
+        enemiesDataText.fontSize = (int)(5 * Graphics.resolution);
         enemiesDataText.alignment = TextAnchor.MiddleLeft;
 
         // Reset anchor
         enemiesDataText.rectTransform.anchorMin = Vector2.zero;
         enemiesDataText.rectTransform.anchorMax = Vector2.zero;
-        enemiesDataText.rectTransform.sizeDelta = new Vector2(184, 100);
+        enemiesDataText.rectTransform.sizeDelta = new Vector2(30, 30) * Graphics.resolution;
 
-        enemiesDataText.rectTransform.anchoredPosition = new Vector3((canvas.pixelRect.width / 2) + 100, canvas.pixelRect.height - 30, 0);
+        enemiesDataText.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.57f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         // Kills
         // Image object
@@ -438,9 +441,10 @@ public class CharacterManager
         // Reset anchor
         killsDataImage.rectTransform.anchorMin = Vector2.zero;
         killsDataImage.rectTransform.anchorMax = Vector2.zero;
+        killsDataImage.rectTransform.sizeDelta = new Vector2(15, 15) * Graphics.resolution;
 
         // Anchor the image
-        killsDataImage.rectTransform.anchoredPosition = new Vector3((canvas.pixelRect.width / 2) + 160, canvas.pixelRect.height - 30, 0);
+        killsDataImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.58f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         // Text object
         GameObject killsDataTextObject = new GameObject { name = "killsDataText" };
@@ -451,15 +455,15 @@ public class CharacterManager
         int killed = EnemyCounter.counter - EnemyCounter.nrOfEnemies;
         killsDataText.text = killed.ToString();
         killsDataText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        killsDataText.fontSize = 40;
+        killsDataText.fontSize = (int)(5 * Graphics.resolution);
         killsDataText.alignment = TextAnchor.MiddleLeft;
 
         // Reset anchor
         killsDataText.rectTransform.anchorMin = Vector2.zero;
         killsDataText.rectTransform.anchorMax = Vector2.zero;
-        killsDataText.rectTransform.sizeDelta = new Vector2(184, 100);
+        killsDataText.rectTransform.sizeDelta = new Vector2(30, 30) * Graphics.resolution;
 
-        killsDataText.rectTransform.anchoredPosition = new Vector3((canvas.pixelRect.width / 2) + 220, canvas.pixelRect.height - 30, 0);
+        killsDataText.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.62f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
     }
 
     void UpdateCharacterTextData()
@@ -470,6 +474,5 @@ public class CharacterManager
 
         int killed = EnemyCounter.counter - EnemyCounter.nrOfEnemies;
         killsDataText.text = killed.ToString();
-
     }
 }

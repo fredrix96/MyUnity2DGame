@@ -25,66 +25,59 @@ public class PlayerHealth : MonoBehaviour
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
         canvasObject.transform.parent = go.transform;
+
         canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "UI";
 
         cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         cs.referenceResolution = new Vector2(1920, 1080);
-        cs.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        cs.matchWidthOrHeight = 1; // match with height (1)
 
         // Health object
         healthObject = new GameObject { name = "healthObject" };
         healthObject.transform.SetParent(canvasObject.transform);
-        healthObject.transform.localScale = new Vector2(1.8f, 0.5f);
-
-        RectTransform rectHO = healthObject.AddComponent<RectTransform>();
-        rectHO.anchorMax = Vector2.zero;
-        rectHO.anchorMin = Vector2.zero;
-        rectHO.anchoredPosition = new Vector3(160, 952, 0);
+        healthObject.transform.localScale = new Vector2(0.3f, 0.3f);
 
         slider = healthObject.AddComponent<Slider>();
         slider.interactable = false;
         slider.transition = Selectable.Transition.None;
         slider.navigation = Navigation.defaultNavigation;
 
-        // Image object
-        imageObject = new GameObject { name = "health" };
-        imageObject.transform.SetParent(healthObject.transform); 
-        imageObject.transform.localScale = healthObject.transform.localScale;
+        imageObject = new GameObject { name = "healthbarImage" };
+        imageObject.transform.SetParent(canvasObject.transform);
+        imageObject.transform.localScale = new Vector2(0.1f, 0.02f);
 
         healthBar = imageObject.AddComponent<Image>();
         healthBar.color = Color.green;
-
-        slider.fillRect = healthBar.rectTransform;
-
-        healthBar.rectTransform.pivot = new Vector2(0.0f, 0.5f);
-        healthBar.rectTransform.sizeDelta = Vector2.zero;
 
         // Reset anchor
         healthBar.rectTransform.anchorMin = Vector2.zero;
         healthBar.rectTransform.anchorMax = Vector2.zero;
 
         // Anchor the image
-        healthBar.rectTransform.anchoredPosition = new Vector3(0, 150, 0);
+        healthBar.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.04f, canvas.pixelRect.height * 0.455f, 0);
+
+        healthBar.rectTransform.pivot = new Vector2(0.0f, 0.5f);
+        healthBar.rectTransform.sizeDelta = new Vector2(12.5f, 10.0f) * Graphics.resolution;
+
+        slider.fillRect = healthBar.rectTransform;
 
         // Heart object
         heartObject = new GameObject { name = "heart" };
         heartObject.transform.SetParent(canvasObject.transform);
-        heartObject.transform.localScale = new Vector2(0.5f, 0.5f);
+        heartObject.transform.localScale = new Vector2(0.3f, 0.3f);
 
         heart = heartObject.AddComponent<Image>();
         heart.sprite = Resources.Load<Sprite>("Sprites/Heart");
+        heart.rectTransform.sizeDelta = new Vector2(20.0f, 20.0f) * Graphics.resolution;
 
         // Reset anchor
         heart.rectTransform.anchorMin = Vector2.zero;
         heart.rectTransform.anchorMax = Vector2.zero;
 
         // Anchor the image
-        heart.rectTransform.anchoredPosition = new Vector3(80, 1030, 0);
+        heart.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.04f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
 
         slider.value = 1;
 
@@ -92,7 +85,7 @@ public class PlayerHealth : MonoBehaviour
         health = maxHealth;
 
         // Move the UI interface out of the way of the game world to 
-        go.transform.position = new Vector3(200, 0, 0);
+        //go.transform.position = new Vector3(200, 0, 0);
     }
 
     void Update()
