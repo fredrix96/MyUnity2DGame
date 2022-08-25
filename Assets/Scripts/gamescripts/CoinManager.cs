@@ -10,9 +10,7 @@ public static class CoinCounter
 
 public class CoinManager
 {
-    GameObject go, canvasObject, valueObject;
-    Canvas canvas;
-    CanvasScaler cs;
+    GameObject go;
     Text value;
     PopUpMessage message;
     Coin coinUI;
@@ -35,18 +33,7 @@ public class CoinManager
 
         nrOfCoins = startAmount;
 
-        // Canvas
-        canvasObject = new GameObject { name = "canvas" };
-        canvasObject.transform.parent = go.transform;
-        canvas = canvasObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = CameraManager.GetCamera();
-        canvas.sortingLayerName = "UI";
-
-        cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.referenceResolution = new Vector2(1920, 1080);
-
-        CreateValueUI();
+        value = UIManager.CreateText(null, "valueText", nrOfCoins.ToString(), 35, new Vector2(780, 500), new Vector2(100, 100), TextAnchor.MiddleRight);
     }
 
     public void Update()
@@ -104,28 +91,4 @@ public class CoinManager
 
         return false;
     }
-
-    void CreateValueUI()
-    {
-        // Value object
-        valueObject = new GameObject { name = "value" };
-        valueObject.transform.SetParent(canvas.transform);
-        valueObject.transform.localScale = new Vector2(1.0f, 0.5f);
-
-        value = valueObject.AddComponent<Text>();
-        value.text = nrOfCoins.ToString();
-        value.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        value.fontSize = (int)(5 * Graphics.resolution);
-        value.alignment = TextAnchor.MiddleRight;
-
-        // Reset anchor
-        value.rectTransform.anchorMin = Vector2.zero;
-        value.rectTransform.anchorMax = Vector2.zero;
-        value.rectTransform.sizeDelta = new Vector2(28.0f, 10.0f) * Graphics.resolution;
-
-        // Anchor the image
-        value.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - canvas.pixelRect.width / 10, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
-    }
-
-
 }

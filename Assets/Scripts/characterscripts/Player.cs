@@ -11,6 +11,7 @@ public class Player : Character
     double regenerationTimer;
     float regenerationDelay;
     Vector2 dirVector;
+    bool playerHasSpawned; // checks if the player character (the king) has spawned for the first time
 
     public Player()
     {
@@ -18,8 +19,8 @@ public class Player : Character
         regenerationDelay = 0.3f;
         playerSpeed = 5;
         damage = 20;
-
-        Respawn();
+        playerHasSpawned = false;
+        isDead = true;
     }
 
     public override void Update()
@@ -55,7 +56,7 @@ public class Player : Character
                 AudioManager.PlayAudio3D("Player Death", 0.2f, go.transform.position);
             }
         }
-        else
+        else if (playerHasSpawned)
         {
             if (sm.Die() > 3 && go != null)
             {
@@ -179,14 +180,12 @@ public class Player : Character
         playerHealth.Destroy();
     }
 
-    public void Respawn()
+    public void Respawn(Tile spawnTile)
     {
-        Vector2 spawnTile = new Vector2(0, 3);
-
         go = new GameObject { name = "player" };
         go.transform.parent = GameManager.GameManagerObject.transform;
         go.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
-        go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
+        go.transform.position = spawnTile.GetWorldPos();
         go.layer = LayerMask.NameToLayer("Player");
 
         go.AddComponent<CollisionManager>();
@@ -195,14 +194,16 @@ public class Player : Character
         sm.Init(go, "Sprites/StickFigureKing", "Player", false);
 
         playerHealth = go.AddComponent<PlayerHealth>();
-        playerHealth.Init(go, maxHealth);
+        playerHealth.Init(maxHealth);
 
         dirVector = Vector2.zero;
         isDead = false;
         shouldBeRemoved = false;
 
-        currTile = GridManager.GetTile(spawnTile);
+        currTile = spawnTile;
         currTile.PlayerOnTile(true);
+
+        playerHasSpawned = true;
     }
 
     public GameObject GetPlayerObject()

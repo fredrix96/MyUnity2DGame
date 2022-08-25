@@ -5,8 +5,7 @@ using UnityEngine.UI;
 
 public class Vendor : MonoBehaviour
 {
-    GameObject go;
-    GameObject tmpObject;
+    GameObject go, tmpObject;
     Image img;
     CoinManager coinMan;
 
@@ -63,7 +62,7 @@ public class Vendor : MonoBehaviour
 
                 // Hide shop UI
                 go.GetComponentInParent<Canvas>().enabled = false;
-                go.transform.parent.GetComponentInChildren<SpriteRenderer>().enabled = false;
+                go.transform.parent.GetComponentInChildren<Image>().enabled = false;
             }
         }
         else
@@ -131,20 +130,22 @@ public class Vendor : MonoBehaviour
 
             // Show shop UI
             go.GetComponentInParent<Canvas>().enabled = true;
-            go.transform.parent.GetComponentInChildren<SpriteRenderer>().enabled = true;
+            go.transform.parent.GetComponentInChildren<Image>().enabled = true;
         }
     }
 
     void CreateBuildingImage()
     {
-        tmpObject = Instantiate(go);
+        tmpObject = new GameObject(go.name + "_tmp");
         tmpObject.transform.SetParent(GameManager.GameManagerObject.GetComponent<BuildingManager>().GetComponentInChildren<Canvas>().transform);
-        tmpObject.GetComponent<Image>().color = Color.white;
-        tmpObject.GetComponent<BoxCollider2D>().enabled = false; // this wont push the player character around
 
+        Image newImg = tmpObject.AddComponent<Image>();
+        newImg.sprite = img.sprite;
+        newImg.color = Color.white;
+        
         Tile tmpTile = GridManager.GetTile(new Vector2(0, 0));
         RectTransform rect = tmpObject.GetComponent<RectTransform>();
-        Vector2 size = BuildingInformation.GetBuildingSize(type) * 100;
+        Vector2 size = BuildingInformation.GetBuildingSize(type) * 12 * Graphics.resolution;
         tmpObject.transform.localScale = new Vector3(tmpTile.GetSize().x * size.x / rect.sizeDelta.x, tmpTile.GetSize().y * size.y / rect.sizeDelta.y, 1);
     }
 

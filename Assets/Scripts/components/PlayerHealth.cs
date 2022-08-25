@@ -5,87 +5,19 @@ using UnityEngine.UI;
 
 public class PlayerHealth : MonoBehaviour
 {
-    GameObject go, canvasObject, imageObject, healthObject, heartObject, playerObject;
-    Canvas canvas;
-    CanvasScaler cs;
     Image healthBar, heart;
     Slider slider;
 
     int health;
     int maxHealth;
 
-    public void Init(GameObject inGo, int inHealth)
+    public void Init(int inHealth)
     {
-        playerObject = inGo;
-
-        // Head object
-        go = new GameObject { name = playerObject.name + "_healthbar" };
-        go.transform.SetParent(playerObject.transform);
-
-        // Canvas
-        canvasObject = new GameObject { name = "canvas" };
-        canvasObject.transform.parent = go.transform;
-
-        canvas = canvasObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = CameraManager.GetCamera();
-        canvas.sortingLayerName = "UI";
-
-        cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.referenceResolution = new Vector2(1920, 1080);
-
-        // Health object
-        healthObject = new GameObject { name = "healthObject" };
-        healthObject.transform.SetParent(canvasObject.transform);
-        healthObject.transform.localScale = new Vector2(0.3f, 0.3f);
-
-        slider = healthObject.AddComponent<Slider>();
-        slider.interactable = false;
-        slider.transition = Selectable.Transition.None;
-        slider.navigation = Navigation.defaultNavigation;
-
-        imageObject = new GameObject { name = "healthbarImage" };
-        imageObject.transform.SetParent(canvasObject.transform);
-        imageObject.transform.localScale = new Vector2(0.1f, 0.02f);
-
-        healthBar = imageObject.AddComponent<Image>();
-        healthBar.color = Color.green;
-
-        // Reset anchor
-        healthBar.rectTransform.anchorMin = Vector2.zero;
-        healthBar.rectTransform.anchorMax = Vector2.zero;
-
-        // Anchor the image
-        healthBar.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.04f, canvas.pixelRect.height * 0.455f, 0);
-
-        healthBar.rectTransform.pivot = new Vector2(0.0f, 0.5f);
-        healthBar.rectTransform.sizeDelta = new Vector2(12.5f, 10.0f) * Graphics.resolution;
-
-        slider.fillRect = healthBar.rectTransform;
-
-        // Heart object
-        heartObject = new GameObject { name = "heart" };
-        heartObject.transform.SetParent(canvasObject.transform);
-        heartObject.transform.localScale = new Vector2(0.3f, 0.3f);
-
-        heart = heartObject.AddComponent<Image>();
-        heart.sprite = Resources.Load<Sprite>("Sprites/Heart");
-        heart.rectTransform.sizeDelta = new Vector2(20.0f, 20.0f) * Graphics.resolution;
-
-        // Reset anchor
-        heart.rectTransform.anchorMin = Vector2.zero;
-        heart.rectTransform.anchorMax = Vector2.zero;
-
-        // Anchor the image
-        heart.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.04f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
-
-        slider.value = 1;
+        slider = UIManager.CreateSlider("healthbarSlider", "healthbarImage", null, new Vector2(70, 500), new Vector2(10.0f, 2.0f), out healthBar, Color.green);
+        heart = UIManager.CreateImage(null, "heartImage", Resources.Load<Sprite>("Sprites/Heart"), new Vector2(-880, 505), new Vector2(50, 50)).GetComponent<Image>();
 
         maxHealth = inHealth;
         health = maxHealth;
-
-        // Move the UI interface out of the way of the game world to 
-        //go.transform.position = new Vector3(200, 0, 0);
     }
 
     void Update()
@@ -160,10 +92,8 @@ public class PlayerHealth : MonoBehaviour
 
     public void Destroy()
     {
-        Object.Destroy(go);
-        Object.Destroy(canvasObject);
-        Object.Destroy(imageObject);
-        Object.Destroy(healthObject);
-        Object.Destroy(heartObject);
+        Object.Destroy(GameObject.Find("heartImage"));
+        Object.Destroy(GameObject.Find("healthbarSlider"));
+        Object.Destroy(GameObject.Find("healthbarImage"));
     }
 }

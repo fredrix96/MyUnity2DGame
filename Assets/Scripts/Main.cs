@@ -16,6 +16,7 @@ public class Main : MonoBehaviour
         GameManager.Init();
         Graphics.Init();
         AudioManager.Init();
+        UIManager.Init();
 
         if (!AudioManager.PlayBackgroundMusic("Game Background Music", 0.5f, true))
         {

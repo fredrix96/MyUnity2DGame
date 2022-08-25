@@ -5,11 +5,12 @@ using UnityEngine.UI;
 
 public class ShopManager
 {
-    GameObject go, canvasObject, shopImageObject, titleObject;
-    List<GameObject> imageObjects, textObjects;
+    GameObject go, canvasObject;
+    List<GameObject> imageObjects;
+    List<Text> texts;
     Canvas canvas;
-    CanvasScaler cs;
-    SpriteRenderer shop;
+    CanvasScaler scaler;
+    Image shop;
     CoinManager coinMan;
     BuildingManager buildings;
     PopUpMessage message;
@@ -23,65 +24,27 @@ public class ShopManager
         buildings = inBuildings;
 
         imageObjects = new List<GameObject>();
-        textObjects = new List<GameObject>();
+        texts = new List<Text>();
 
         go = new GameObject() { name = "shopObject" };
         go.transform.SetParent(GameManager.GameManagerObject.transform);
 
-        // Canvas
-        canvasObject = new GameObject { name = "canvas" };
-        canvasObject.transform.parent = go.transform;
-
-        canvas = canvasObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        canvas = go.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "UI";
-        canvas.sortingOrder = 1;
 
-        cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.referenceResolution = new Vector2(1920, 1080);
+        scaler = go.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
 
-        // Image object
-        shopImageObject = new GameObject { name = "shop" };
-        shopImageObject.transform.SetParent(canvasObject.transform);
+        shop = UIManager.CreateImage(go, "shopImage", Resources.Load<Sprite>("Sprites/WoodenBackground"), new Vector2(-800, 0), new Vector2(300, 700)).GetComponent<Image>();
+        title = UIManager.CreateText(go, "shopTitle", "Shop", 80, new Vector2(-800, 280), new Vector2(100, 100), TextAnchor.MiddleCenter);
 
-        // Shop background
-        shop = shopImageObject.AddComponent<SpriteRenderer>();
-        shop.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
-        shop.drawMode = SpriteDrawMode.Sliced;
-        shop.size = new Vector2(4f, 8f);
-        shop.sortingLayerName = "UI";
-
-        RectTransform rect = shopImageObject.AddComponent<RectTransform>();
-        rect.anchorMin = Vector2.zero;
-        rect.anchorMax = Vector2.zero;
-        rect.pivot = new Vector2(0.5f, 0.5f);
-        rect.anchoredPosition = new Vector2(canvas.pixelRect.width * 0.1f, canvas.pixelRect.height / 2);
-        rect.sizeDelta = shop.size;
-
-        // Shop title
-        titleObject = new GameObject { name = "shopTitle" };
-        titleObject.transform.SetParent(canvasObject.transform);
-        titleObject.transform.localScale = new Vector3(2, 2, 0);
-
-        RectTransform rectTitle = titleObject.AddComponent<RectTransform>();
-        rectTitle.anchorMin = Vector2.zero;
-        rectTitle.anchorMax = Vector2.zero;
-        rectTitle.pivot = new Vector2(0.5f, 0.5f);
-        rectTitle.anchoredPosition = new Vector2(canvas.pixelRect.width * 0.1f, canvas.pixelRect.height * 0.7f);
-        rectTitle.sizeDelta = new Vector2(0.05f * canvas.pixelRect.width, 0.13f * canvas.pixelRect.height);
-
-        title = titleObject.AddComponent<Text>();
-        title.text = "Shop";
-        title.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        title.fontSize = (int)(4 * Graphics.resolution);
-        title.color = Color.white;
-        title.fontStyle = FontStyle.Bold;
-        title.alignment = TextAnchor.UpperCenter;
-
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Castle, new Vector3(canvas.pixelRect.width * 0.05f, canvas.pixelRect.height * 0.7f, 0));
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.House, new Vector3(canvas.pixelRect.width * 0.1f, canvas.pixelRect.height * 0.7f, 0));
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack, new Vector3(canvas.pixelRect.width * 0.15f, canvas.pixelRect.height * 0.7f, 0));
+        // Creating building images
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Castle, new Vector2(-880, 190));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.House, new Vector2(-800, 190));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack, new Vector2(-720, 190));
 
         // Disable at start
         active = false;
@@ -93,7 +56,7 @@ public class ShopManager
         // TODO: Find a more efficient way of doing this
         foreach (BuildingInformation.TYPE_OF_BUILDING type in System.Enum.GetValues(typeof(BuildingInformation.TYPE_OF_BUILDING)))
         {
-            GameObject imageObject = GameObject.Find(type.ToString());
+            GameObject imageObject = GameObject.Find(type.ToString() + "_image");
             if (imageObject != null)
             {
                 Image img = imageObject.GetComponent<Image>();
@@ -107,10 +70,12 @@ public class ShopManager
                     img.color = Color.white;
                 }
 
-                GameObject textObject = GameObject.Find(type.ToString() + "_info");
-                if (textObject != null)
+                foreach (Text text in texts)
                 {
-                    UpdateBuildingTextInformation(textObject.GetComponent<Text>(), type);
+                    if (text.name == type.ToString() + "_info")
+                    {
+                        UpdateBuildingTextInformation(text, type);
+                    }
                 }
             }
         }
@@ -130,43 +95,26 @@ public class ShopManager
         go.SetActive(active);
     }
 
-    void CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING type, Vector3 position)
+    void CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING type, Vector2 inPos)
     {
+        // If the type has not yet been created, create it
         if (GameObject.Find(type.ToString()) == null)
         {
-            GameObject imageObject = new GameObject() { name = type.ToString() };
-            imageObject.transform.SetParent(canvasObject.transform);
-            imageObject.AddComponent<BoxCollider2D>();
+            GameObject imageObject = UIManager.CreateImage(go, type.ToString() + "_image", buildings.GetSprite(type), inPos, new Vector2(70, 70));
+
+            BoxCollider2D col = imageObject.AddComponent<BoxCollider2D>();
+            col.size = new Vector2(100, 100);
+
             message = imageObject.AddComponent<PopUpMessage>();
             message.Init(go);
-
-            Image image = imageObject.AddComponent<Image>();
-            image.sprite = buildings.GetSprite(type);
-
-            image.rectTransform.sizeDelta = new Vector2(0.8f, 0.8f);
-            image.rectTransform.anchorMin = Vector2.zero;
-            image.rectTransform.anchorMax = Vector2.zero;
-            image.rectTransform.anchoredPosition = position;
-
-            GameObject textObject = new GameObject() { name = type.ToString() + "_info" };
-            textObject.transform.SetParent(canvasObject.transform);
-
-            Text text = textObject.AddComponent<Text>();
-            text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-            text.transform.localScale = new Vector3(1, 1, 1);
-            text.color = Color.black;
-            text.alignment = TextAnchor.MiddleCenter;
-
-            text.rectTransform.anchorMin = Vector2.zero;
-            text.rectTransform.anchorMax = Vector2.zero;
-            text.rectTransform.anchoredPosition = new Vector3(position.x, position.y - canvasObject.GetComponent<Canvas>().pixelRect.height * 0.07f, position.z);
-
-            textObjects.Add(textObject);
 
             Vendor vendor = imageObject.AddComponent<Vendor>();
             vendor.Init(imageObject, coinMan, type);
 
             imageObjects.Add(imageObject);
+
+            Text text = UIManager.CreateText(go, type.ToString() + "_info", "", 15, new Vector2(inPos.x, inPos.y - 55), new Vector2(100, 100), TextAnchor.MiddleCenter);
+            texts.Add(text);
         }
         else
         {

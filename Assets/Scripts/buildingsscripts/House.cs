@@ -80,9 +80,11 @@ public class House : Building
 
     void CreateToolBar()
     {
-        CreateToolbarObject(new Vector2(10, 10), 0.15f);
+        CreateCanvas();
 
-        CreateInfoText(nrOfHumans + " / " + maxHumans + " Humans", TextAnchor.MiddleCenter, new Vector2(40, 10));
+        CreateToolbarObject(new Vector2(1.5f, 0.5f), 0.8f);
+
+        CreateInfoText(nrOfHumans + " / " + maxHumans + " Humans", 25, TextAnchor.MiddleCenter, new Vector2(70f, 120f));
     }
 
     public int GetNrOfHumans()

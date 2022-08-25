@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class Castle : Building
 {
     Player player;
-    PopUpMessage message;
     double remainingTime;
     float timeToRespawn;
 
@@ -19,7 +18,7 @@ public class Castle : Building
         buildings = inBuildings;
         player = inPlayer;
 
-        timeToRespawn = 10.0f;
+        timeToRespawn = 3.0f;
         remainingTime = timeToRespawn;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type) };
@@ -68,9 +67,11 @@ public class Castle : Building
 
     void CreateToolBar()
     {
-        CreateToolbarObject(new Vector2(10f, 10f), 0.3f);
+        CreateCanvas();
 
-        CreateInfoText("The king is alive", TextAnchor.MiddleCenter, new Vector2(30, 25));
+        CreateToolbarObject(new Vector2(3.5f, 1.5f), 2f);
+
+        CreateInfoText("The king is alive", 25, TextAnchor.MiddleCenter, new Vector2(60, 70));
     }
 
     public void CheckIfDestroyed()
@@ -90,11 +91,14 @@ public class Castle : Building
         else if (player.GetPlayerObject() == null)
         {
             remainingTime -= Time.deltaTime;
-            text.text = "The king respawns" + System.Environment.NewLine + "in " + remainingTime.ToString("F2") + " seconds";
+            text.text = "The king" + System.Environment.NewLine + "respawns in" + System.Environment.NewLine + remainingTime.ToString("F2") + " sec";
 
             if (remainingTime <= 0)
             {
-                player.Respawn();
+                float offset = BuildingInformation.GetBuildingSize(type).y;
+                Tile spawnTile = GridManager.GetTile(new Vector2(centerTile.GetTilePosition().x, centerTile.GetTilePosition().y + offset / 2));
+
+                player.Respawn(spawnTile);
                 message.SendPopUpMessage("A new King has arrived!" + System.Environment.NewLine + "All hail the new King!", 2.5f);
                 remainingTime = timeToRespawn;
             }

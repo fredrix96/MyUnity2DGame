@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Coin
 {
-    GameObject go, canvasObject, imageObject;
+    GameObject go;
     Canvas canvas;
     CanvasScaler cs;
     Image coin;
@@ -24,33 +24,7 @@ public class Coin
         go = new GameObject() { name = "coin_UI" };
         go.transform.SetParent(inGo.transform);
 
-        // Canvas
-        canvasObject = new GameObject { name = "canvas" };
-        canvasObject.transform.parent = go.transform;
-
-        canvas = canvasObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = CameraManager.GetCamera();
-        canvas.sortingLayerName = "UI";
-
-        cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.referenceResolution = new Vector2(1920, 1080);
-
-        // Image object
-        imageObject = new GameObject { name = "coin" };
-        imageObject.transform.SetParent(canvasObject.transform);
-        imageObject.transform.localScale = new Vector2(0.3f, 0.3f);
-
-        coin = imageObject.AddComponent<Image>();
-        coin.sprite = Resources.Load<Sprite>("Sprites/Coin");
-
-        // Reset anchor
-        coin.rectTransform.anchorMin = Vector2.zero;
-        coin.rectTransform.anchorMax = Vector2.zero;
-        coin.rectTransform.sizeDelta = new Vector2(20, 20) * Graphics.resolution;
-
-        // Anchor the image
-        coin.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width - canvas.pixelRect.width / 42, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
+        coin = UIManager.CreateImage(null, "coinUIImage", Resources.Load<Sprite>("Sprites/Coin"), new Vector2(910, 500), new Vector2(50, 50)).GetComponent<Image>();
 
         shouldBeRemoved = false;
     }
@@ -107,7 +81,5 @@ public class Coin
     public void Destroy()
     {
         Object.Destroy(go);
-        Object.Destroy(canvasObject);
-        Object.Destroy(imageObject);
     }
 }

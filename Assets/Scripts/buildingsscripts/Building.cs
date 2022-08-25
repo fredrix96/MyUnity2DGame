@@ -1,11 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class Building
 {
-    protected GameObject go, toolBarObject, textObject, buttonObject;
+    protected GameObject go, canvasObject, toolBarObject, textObject, buttonObject;
     protected SpriteRenderer sr;
     protected BoxCollider2D collider;
     protected Rigidbody2D rb;
@@ -14,8 +16,10 @@ public class Building
     protected Material outline;
     protected Health health;
     protected Tile centerTile;
+    protected PopUpMessage message;
 
-    protected Canvas canvasToolBar, canvasText, canvasButton;
+    protected Canvas canvas, canvasText, canvasButton;
+    protected CanvasScaler scaler;
     protected Text text;
     protected SpriteRenderer srToolBar;
     protected Button button;
@@ -32,60 +36,52 @@ public class Building
 
     public virtual void Update() { }
 
-    protected void CreateToolbarObject(Vector2 inSize, float inHeight)
+    protected void CreateCanvas()
     {
-        // Toolbar
-        toolBarObject = new GameObject { name = go.name + "_toolBar" };
-        toolBarObject.transform.SetParent(go.transform);
-        toolBarObject.AddComponent<BoxCollider2D>();
+        canvasObject = new GameObject { name = go.name + "_canvas" };
+        canvasObject.transform.SetParent(go.transform);
 
-        // Canvas
-        canvasToolBar = toolBarObject.AddComponent<Canvas>();
-        canvasToolBar.transform.localScale = new Vector3(0.1f, 0.05f, 1f);
+        canvas = canvasObject.AddComponent<Canvas>();
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = CameraManager.GetCamera();
+        canvas.sortingLayerName = "UI";
 
-        // Sprite
-        srToolBar = toolBarObject.AddComponent<SpriteRenderer>();
-        srToolBar.sortingLayerName = "UI";
-        srToolBar.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
-        srToolBar.drawMode = SpriteDrawMode.Sliced;
-        srToolBar.size = inSize * Graphics.resolution;
-
-        float height = 0;
-        if (go.transform.GetComponent<BoxCollider2D>() == null)
-        {
-            Debug.Log("Warning: " + go.name + " does not have a box collider! Could not apply the correct height for the tool bar...");
-        }
-        else
-        {
-            height = srToolBar.sprite.bounds.max.y * inHeight;
-        }
-
-        toolBarObject.transform.position = new Vector3(toolBarObject.transform.parent.position.x, toolBarObject.transform.parent.position.y + height, toolBarObject.transform.parent.position.z);
-        toolBarObject.SetActive(false);
+        scaler = canvasObject.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920, 1080);
     }
 
-    protected void CreateInfoText(string inText, TextAnchor inAlignement, Vector2 inSize)
+    protected void CreateToolbarObject(Vector2 inSize, float inHeight)
     {
-        // Text
-        textObject = new GameObject { name = go.name + "_textObject" };
-        textObject.transform.SetParent(go.transform);
-        textObject.transform.position = toolBarObject.transform.position;
+        if (canvasObject == null)
+        {
+            Debug.Log("There exists no local canvas! You need to call CreateCanvas()");
+            return;
+        }
 
-        canvasText = textObject.AddComponent<Canvas>();
-        canvasText.transform.localScale = new Vector2(0.03f, 0.03f);
-        canvasText.sortingLayerName = "UI";
-        canvasText.sortingOrder = 2;
+        toolBarObject = UIManager.CreateImage(canvasObject, "toolBar", Resources.Load<Sprite>("Sprites/WoodenBackground"), new Vector2(go.transform.position.x, go.transform.position.y + inHeight), inSize);
+    }
 
-        text = textObject.AddComponent<Text>();
-        text.text = inText;
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        text.fontSize = (int)(5.0f * Graphics.resolution);
-        text.color = Color.white;
-        text.fontStyle = FontStyle.Bold;
-        text.alignment = inAlignement;
-        text.rectTransform.sizeDelta = inSize * Graphics.resolution;
+    protected void CreateInfoText(string inText, int fontSize, TextAnchor inAlignment, Vector2 inSize)
+    {
+        if (toolBarObject == null)
+        {
+            Debug.Log("There exists no toolbar object! You need to call CreateToolbarObject()");
+            return;
+        }
 
-        textObject.SetActive(false);
+        text = UIManager.CreateText(toolBarObject, "textInfo", inText, fontSize, canvasObject.transform.position, inSize, inAlignment);
+    }
+
+    protected void CreateButton(Sprite inSprite, Vector2 alignementFromCenter, Vector2 inSize, UnityAction function)
+    {
+        if (toolBarObject == null)
+        {
+            Debug.Log("There exists no toolbar object! You need to call CreateToolbarObject()");
+            return;
+        }
+
+        button = UIManager.CreateButton(toolBarObject, "button", inSprite, inSize, alignementFromCenter, function);
     }
 
     public void MarkOrUnmarkTiles(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, bool mark)
@@ -184,6 +180,6 @@ public class Building
 
     public void Destroy()
     {
-        Object.Destroy(go);
+        UnityEngine.Object.Destroy(go);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System;
 
 public class Barrack : Building
 {
@@ -22,6 +23,9 @@ public class Barrack : Building
         go.layer = LayerMask.NameToLayer("Buildings");
 
         go.AddComponent<CollisionManager>();
+
+        message = go.AddComponent<PopUpMessage>();
+        message.Init(go);
 
         sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = Resources.Load<Sprite>("Sprites/" + type.ToString());
@@ -54,40 +58,18 @@ public class Barrack : Building
         LookIfIgnored();
 
         // Update text
-        text.text = "Available Humans: " + HumansCounter.nrOfHumans;
+        text.text = "Recruit soldier" + Environment.NewLine + "Cost: " + soldierCost;
     }
 
     void CreateToolBar()
     {
-        CreateToolbarObject(new Vector2(10f, 12f), 0.4f);
+        CreateCanvas();
 
-        CreateInfoText("Available Humans: " + HumansCounter.nrOfHumans, TextAnchor.UpperCenter, new Vector2(30, 15));
+        CreateToolbarObject(new Vector2(3f, 2f), 2f);
 
-        // Button
-        buttonObject = new GameObject { name = go.name + "_trainSoldierButton" };
-        buttonObject.transform.SetParent(go.transform);
-        buttonObject.transform.position = toolBarObject.transform.position;
-        buttonObject.AddComponent<GraphicRaycaster>();
-        buttonObject.AddComponent<ButtonEvents>();
+        CreateInfoText("Recruit soldier" + Environment.NewLine + "Cost: " + soldierCost, 25, TextAnchor.UpperCenter, new Vector2(80, 65));
 
-        canvasButton = buttonObject.GetComponent<Canvas>();
-        canvasButton.transform.SetParent(buttonObject.transform);
-        canvasButton.transform.position = new Vector2(buttonObject.transform.position.x, buttonObject.transform.position.y - 0.3f);
-        canvasButton.transform.localScale = new Vector3(0.02f * CameraManager.GetCamera().aspect, 0.01f, 1f);
-        canvasButton.sortingLayerName = "UI";
-        canvasButton.sortingOrder = 2;
-
-        button = buttonObject.AddComponent<Button>();
-        button.transform.position = canvasButton.transform.position;
-        button.transform.SetParent(canvasButton.transform);
-
-        button.image = buttonObject.AddComponent<Image>();
-        button.image.sprite = Resources.Load<Sprite>("Sprites/Coin");
-        button.targetGraphic = button.image;
-
-        button.onClick.AddListener(SpawnSoldier);
-
-        buttonObject.SetActive(false);
+        CreateButton(Resources.Load<Sprite>("Sprites/RecruitButton"), new Vector2(0.0f, -0.6f), new Vector2(50, 30), SpawnSoldier);
     }
 
     void SpawnSoldier()
@@ -101,6 +83,10 @@ public class Barrack : Building
                 SoldierCounter.nrToSpawn++;
                 RemoveHumanFromRandomHouse();
             }
+        }
+        else
+        {
+            message.SendPopUpMessage("There are no humans to recruit!", 2.5f, 60);
         }
     }
 
@@ -119,7 +105,7 @@ public class Barrack : Building
             }
         }
 
-        int index = Random.Range(0, houses.Count - 1);
+        int index = UnityEngine.Random.Range(0, houses.Count - 1);
         houses[index].RemoveHuman();
     }
 

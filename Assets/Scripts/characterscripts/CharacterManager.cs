@@ -142,7 +142,8 @@ public class CharacterManager
         // This is done because it allows us to have a "clever" AI while also having good FPS
         if (characters.Count > 0)
         {
-            List<T> listToUpdate = GetListToUpdate(characters, 60);
+            int framesToWait = 60; // = n:th frame
+            List<T> listToUpdate = GetListToUpdate(characters, framesToWait);
 
             if (multithreading)
             {
@@ -291,179 +292,31 @@ public class CharacterManager
 
     void DisplayCharacterData()
     {
-        GameObject go = new GameObject() { name = "characterData" };
-        go.transform.SetParent(characterObjects.transform);
-
-        // Canvas
-        GameObject canvasObject = new GameObject { name = "canvas" };
-        canvasObject.transform.parent = go.transform;
-
-        Canvas canvas = canvasObject.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = CameraManager.GetCamera();
-        canvas.sortingLayerName = "UI";
-
-        CanvasScaler cs = canvasObject.AddComponent<CanvasScaler>();
-        cs.referenceResolution = new Vector2(1920, 1080);
+        string text;
 
         // Bar
-        GameObject barObject = new GameObject { name = "barImage" };
-        barObject.transform.SetParent(canvasObject.transform);
-        barObject.transform.localScale = new Vector2(0.3f, 0.3f);
-
-        Image barImage = barObject.AddComponent<Image>();
-        barImage.sprite = Resources.Load<Sprite>("Sprites/WoodenBackground");
-
-        // Reset anchor
-        barImage.rectTransform.anchorMin = Vector2.zero;
-        barImage.rectTransform.anchorMax = Vector2.zero;
-
-        barImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width / 2, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
-        barImage.rectTransform.sizeDelta = new Vector2(190, 20) * Graphics.resolution;
+        UIManager.CreateImage(null, "barImage", Resources.Load<Sprite>("Sprites/WoodenBackground"), new Vector2(0, 500), new Vector2(500f, 40f));
 
         // Humans
-
-        // Image object
-        GameObject humansDataImageObject = new GameObject { name = "humansDataImage" };
-        humansDataImageObject.transform.SetParent(canvasObject.transform);
-        humansDataImageObject.transform.localScale = new Vector2(0.3f, 0.3f);
-
-        Image humansDataImage = humansDataImageObject.AddComponent<Image>();
-        humansDataImage.sprite = Resources.Load<Sprite>("Sprites/HouseIcon");
-
-        // Reset anchor
-        humansDataImage.rectTransform.anchorMin = Vector2.zero;
-        humansDataImage.rectTransform.anchorMax = Vector2.zero;
-        humansDataImage.rectTransform.sizeDelta = new Vector2(15, 15) * Graphics.resolution;
-
-        // Anchor the image
-        humansDataImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.41f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
-
-        // Text object
-        GameObject humansDataTextObject = new GameObject { name = "humansDataText" };
-        humansDataTextObject.transform.SetParent(canvasObject.transform);
-        humansDataTextObject.transform.localScale = new Vector2(0.4f, 0.4f);
-
-        humansDataText = humansDataTextObject.AddComponent<Text>();
-        humansDataText.text = HumansCounter.nrOfHumans.ToString() + " / " + HumansCounter.max;
-        humansDataText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        humansDataText.fontSize = (int)(5 * Graphics.resolution);
-        humansDataText.alignment = TextAnchor.MiddleLeft;
-
-        // Reset anchor
-        humansDataText.rectTransform.anchorMin = Vector2.zero;
-        humansDataText.rectTransform.anchorMax = Vector2.zero;
-        humansDataText.rectTransform.sizeDelta = new Vector2(30, 30) * Graphics.resolution;
-
-        humansDataText.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.45f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
+        UIManager.CreateImage(null, "humansDataImage", Resources.Load<Sprite>("Sprites/HouseIcon"), new Vector2(-200, 500), new Vector2(30f, 30f));
+        text = HumansCounter.nrOfHumans.ToString() + " / " + HumansCounter.max.ToString();
+        humansDataText = UIManager.CreateText(null, "humansDataText", text, 22, new Vector2(-75, 500), new Vector2(100f, 100f));
 
         // Soldiers
-
-        // Image object
-        GameObject soldiersDataImageObject = new GameObject { name = "soldiersDataImage" };
-        soldiersDataImageObject.transform.SetParent(canvasObject.transform);
-        soldiersDataImageObject.transform.localScale = new Vector2(0.3f, 0.3f);
-
-        Image soldiersDataImage = soldiersDataImageObject.AddComponent<Image>();
-        soldiersDataImage.sprite = Resources.Load<Sprite>("Sprites/SwordIcon");
-
-        // Reset anchor
-        soldiersDataImage.rectTransform.anchorMin = Vector2.zero;
-        soldiersDataImage.rectTransform.anchorMax = Vector2.zero;
-        soldiersDataImage.rectTransform.sizeDelta = new Vector2(15, 15) * Graphics.resolution;
-
-        // Anchor the image
-        soldiersDataImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.47f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
-
-        // Text object
-        GameObject soldiersDataTextObject = new GameObject { name = "soldiersDataText" };
-        soldiersDataTextObject.transform.SetParent(canvasObject.transform);
-        soldiersDataTextObject.transform.localScale = new Vector2(0.4f, 0.4f);
-
-        soldiersDataText = soldiersDataTextObject.AddComponent<Text>();
-        soldiersDataText.text = SoldierCounter.nrOfSoldiers.ToString();
-        soldiersDataText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        soldiersDataText.fontSize = (int)(5 * Graphics.resolution);
-        soldiersDataText.alignment = TextAnchor.MiddleLeft;
-
-        // Reset anchor
-        soldiersDataText.rectTransform.anchorMin = Vector2.zero;
-        soldiersDataText.rectTransform.anchorMax = Vector2.zero;
-        soldiersDataText.rectTransform.sizeDelta = new Vector2(30, 30) * Graphics.resolution;
-
-        soldiersDataText.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.51f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
+        UIManager.CreateImage(null, "soldiersDataImage", Resources.Load<Sprite>("Sprites/SwordIcon"), new Vector2(-80, 500), new Vector2(30f, 30f));
+        text = SoldierCounter.nrOfSoldiers.ToString();
+        soldiersDataText = UIManager.CreateText(null, "soldiersDataText", text, 22, new Vector2(40, 500), new Vector2(100f, 100f));
 
         // Enemies
-
-        // Image object
-        GameObject enemiesDataImageObject = new GameObject { name = "enemiesDataImage" };
-        enemiesDataImageObject.transform.SetParent(canvasObject.transform);
-        enemiesDataImageObject.transform.localScale = new Vector2(0.3f, 0.3f);
-
-        Image enemiesDataImage = enemiesDataImageObject.AddComponent<Image>();
-        enemiesDataImage.sprite = Resources.Load<Sprite>("Sprites/MonsterIcon");
-
-        // Reset anchor
-        enemiesDataImage.rectTransform.anchorMin = Vector2.zero;
-        enemiesDataImage.rectTransform.anchorMax = Vector2.zero;
-        enemiesDataImage.rectTransform.sizeDelta = new Vector2(15, 15) * Graphics.resolution;
-
-        // Anchor the image
-        enemiesDataImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.53f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
-
-        // Text object
-        GameObject enemiesDataTextObject = new GameObject { name = "enemiesDataText" };
-        enemiesDataTextObject.transform.SetParent(canvasObject.transform);
-        enemiesDataTextObject.transform.localScale = new Vector2(0.4f, 0.4f);
-
-        enemiesDataText = enemiesDataTextObject.AddComponent<Text>();
-        enemiesDataText.text = EnemyCounter.nrOfEnemies.ToString();
-        enemiesDataText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        enemiesDataText.fontSize = (int)(5 * Graphics.resolution);
-        enemiesDataText.alignment = TextAnchor.MiddleLeft;
-
-        // Reset anchor
-        enemiesDataText.rectTransform.anchorMin = Vector2.zero;
-        enemiesDataText.rectTransform.anchorMax = Vector2.zero;
-        enemiesDataText.rectTransform.sizeDelta = new Vector2(30, 30) * Graphics.resolution;
-
-        enemiesDataText.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.57f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
+        UIManager.CreateImage(null, "enemiesDataImage", Resources.Load<Sprite>("Sprites/MonsterIcon"), new Vector2(80, 500), new Vector2(30f, 30f));
+        text = EnemyCounter.nrOfEnemies.ToString();
+        enemiesDataText = UIManager.CreateText(null, "enemiesDataText", text, 22, new Vector2(200, 500), new Vector2(100f, 100f));
 
         // Kills
-        // Image object
-        GameObject killsDataImageObject = new GameObject { name = "killsDataImage" };
-        killsDataImageObject.transform.SetParent(canvasObject.transform);
-        killsDataImageObject.transform.localScale = new Vector2(0.3f, 0.3f);
-
-        Image killsDataImage = killsDataImageObject.AddComponent<Image>();
-        killsDataImage.sprite = Resources.Load<Sprite>("Sprites/SkullIcon");
-
-        // Reset anchor
-        killsDataImage.rectTransform.anchorMin = Vector2.zero;
-        killsDataImage.rectTransform.anchorMax = Vector2.zero;
-        killsDataImage.rectTransform.sizeDelta = new Vector2(15, 15) * Graphics.resolution;
-
-        // Anchor the image
-        killsDataImage.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.58f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
-
-        // Text object
-        GameObject killsDataTextObject = new GameObject { name = "killsDataText" };
-        killsDataTextObject.transform.SetParent(canvasObject.transform);
-        killsDataTextObject.transform.localScale = new Vector2(0.4f, 0.4f);
-
-        killsDataText = killsDataTextObject.AddComponent<Text>();
+        UIManager.CreateImage(null, "killsDataImage", Resources.Load<Sprite>("Sprites/SkullIcon"), new Vector2(180, 500), new Vector2(30f, 30f));
         int killed = EnemyCounter.counter - EnemyCounter.nrOfEnemies;
-        killsDataText.text = killed.ToString();
-        killsDataText.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-        killsDataText.fontSize = (int)(5 * Graphics.resolution);
-        killsDataText.alignment = TextAnchor.MiddleLeft;
-
-        // Reset anchor
-        killsDataText.rectTransform.anchorMin = Vector2.zero;
-        killsDataText.rectTransform.anchorMax = Vector2.zero;
-        killsDataText.rectTransform.sizeDelta = new Vector2(30, 30) * Graphics.resolution;
-
-        killsDataText.rectTransform.anchoredPosition = new Vector3(canvas.pixelRect.width * 0.62f, canvas.pixelRect.height - canvas.pixelRect.height / 25, 0);
+        text = killed.ToString();
+        killsDataText = UIManager.CreateText(null, "killsDataText", text, 22, new Vector2(300, 500), new Vector2(100f, 100f));
     }
 
     void UpdateCharacterTextData()
