@@ -784,7 +784,7 @@ public static class PathFinding
 
         Vector2 currentTilePos = startTilePosition;
 
-        int gridLength = 10;
+        int gridLength = 5;
         int startX = (int)currentTilePos.x - gridLength;
         int endX = (int)currentTilePos.x + gridLength;
 

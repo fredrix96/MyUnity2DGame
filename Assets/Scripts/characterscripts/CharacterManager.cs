@@ -142,7 +142,7 @@ public class CharacterManager
         // This is done because it allows us to have a "clever" AI while also having good FPS
         if (characters.Count > 0)
         {
-            int framesToWait = 60; // = n:th frame
+            int framesToWait = 3; // = n:th frame
             List<T> listToUpdate = GetListToUpdate(characters, framesToWait);
 
             if (multithreading)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using Unity.Mathematics;
 
 // Serialization is the process of taking an object in ram (classes, fields, etc...)
 // and making a disk representation of it which can be recreated at any point in the future.
@@ -57,6 +58,11 @@ public static class Tools
     }
 
     public static float CalculateVectorDistance(Vector2 v1, Vector2 v2)
+    {
+        return Mathf.Sqrt(Mathf.Pow(v2.x - v1.x, 2) + Mathf.Pow(v2.y - v1.y, 2));
+    }
+
+    public static float CalculateFloatDistance(float2 v1, float2 v2)
     {
         return Mathf.Sqrt(Mathf.Pow(v2.x - v1.x, 2) + Mathf.Pow(v2.y - v1.y, 2));
     }

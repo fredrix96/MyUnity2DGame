@@ -30,6 +30,8 @@ public class Character
     {
         isDead = false;
         shouldBeRemoved = false;
+
+        ph.posReached = true;
     }
 
     public virtual void Update() { }
@@ -96,6 +98,12 @@ public class Character
         // Notice how we adjust the height based on the pivot difference
         go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, ph.position.x, speed * Time.deltaTime),
             Mathf.MoveTowards(go.transform.position.y, ph.position.y + pivotHeightDiff, speed * Time.deltaTime), 0);
+
+        // If the new position is reached, search for a new position
+        if (go.transform.position.x == ph.position.x && go.transform.position.y == ph.position.y + pivotHeightDiff)
+        {
+            ph.posReached = true;
+        }
     }
 
     protected void CheckDirection(TYPE_OF_CHARACTER type)
@@ -144,21 +152,25 @@ public class Character
         public bool isDead;
         public bool isAttacking;
         public bool isIdle;
+        public bool posReached;
         public float speed;
+        public float dist;
 
         public void UpdatePosition()
         {
             // Only search for targets if the character is alive
-            if (!isDead && !isAttacking)
+            if (!isDead && !isAttacking && posReached)
             {
+                float defaultValue = -99999;
                 isIdle = false;
-                float2 newPos;
+                float2 newPos = new float2(defaultValue, defaultValue);
 
                 if (type == TYPE_OF_CHARACTER.Enemy)
                 {
                     newPos = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Soldier, TYPE_OF_CHARACTER.Enemy, out targetFound, false);
 
                     position = new float3(newPos, position.z);
+                    posReached = false;
                 }
                 else if (type == TYPE_OF_CHARACTER.Soldier)
                 {
@@ -172,6 +184,7 @@ public class Character
                     else
                     {
                         position = new float3(newPos, position.z);
+                        posReached = false;
                     }
                 }
             }
