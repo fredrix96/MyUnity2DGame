@@ -1,7 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Mathematics; // more optimized math, good for multithreading
+using Unity.Collections;
+using System.Reflection;
 
 public class Character
 {
@@ -26,12 +28,23 @@ public class Character
     protected bool isDead;
     protected bool shouldBeRemoved;
 
+    int pathCounter;
+    List<float2> path;
+    int nrOfSteps;
+
     public Character()
     {
         isDead = false;
         shouldBeRemoved = false;
 
         ph.posReached = true;
+
+        path = new List<float2>();
+
+        // Get the length of the struct
+        FieldInfo[] fields = typeof(PathStruct).GetFields();
+        nrOfSteps = fields.Length;
+        pathCounter = nrOfSteps - 1;
     }
 
     public virtual void Update() { }
@@ -86,6 +99,25 @@ public class Character
         ph.isDead = IsDead();
         ph.isAttacking = sm.IsAttacking();
 
+        // If the new position is reached, search for a new position
+        //if (pathCounter == nrOfSteps - 1)
+        //{
+            path.Clear();
+            path.Add(ph.path.one);
+            path.Add(ph.path.two);
+            path.Add(ph.path.three);
+            path.Add(ph.path.four);
+            path.Add(ph.path.five);
+            path.Add(ph.path.six);
+            path.Add(ph.path.seven);
+            path.Add(ph.path.eight);
+            path.Add(ph.path.nine);
+            path.Add(ph.path.ten);
+
+        //ph.posReached = true;
+        //pathCounter = 0;
+        //}
+
         // Out
         if (ph.isIdle)
         {
@@ -96,13 +128,36 @@ public class Character
     protected void WalkToNewPosition()
     {
         // Notice how we adjust the height based on the pivot difference
-        go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, ph.position.x, speed * Time.deltaTime),
-            Mathf.MoveTowards(go.transform.position.y, ph.position.y + pivotHeightDiff, speed * Time.deltaTime), 0);
+        //go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, ph.position.x, speed * Time.deltaTime),
+        //    Mathf.MoveTowards(go.transform.position.y, ph.position.y + pivotHeightDiff, speed * Time.deltaTime), 0);
 
-        // If the new position is reached, search for a new position
-        if (go.transform.position.x == ph.position.x && go.transform.position.y == ph.position.y + pivotHeightDiff)
+        if (path.Count != 0)
         {
-            ph.posReached = true;
+            go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[pathCounter].x, speed * Time.deltaTime),
+                Mathf.MoveTowards(go.transform.position.y, path[pathCounter].y + pivotHeightDiff, speed * Time.deltaTime), 0);
+
+            if (pathCounter == nrOfSteps - 1)
+            {
+                ph.posReached = true;
+                pathCounter = 0;
+                path.Clear();
+            }
+            else if (go.transform.position.x == path[pathCounter].x && go.transform.position.y == path[pathCounter].y + pivotHeightDiff)
+            {
+                pathCounter++;
+            }
+        }
+        else
+        {
+            go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[0].x, speed * Time.deltaTime),
+                Mathf.MoveTowards(go.transform.position.y, path[0].y + pivotHeightDiff, speed * Time.deltaTime), 0);
+
+            if (go.transform.position.x == path[0].x && go.transform.position.y == path[0].y + pivotHeightDiff)
+            {
+                ph.posReached = true;
+                pathCounter = 0;
+                path.Clear();
+            }
         }
     }
 
@@ -143,10 +198,27 @@ public class Character
         ph = inPh;
     }
 
+    // This struct is used as a list because Unity.jobs can not handle unmanaged types... if it works, it works
+    // Just make sure that the struct has as many fields as float2s in the pathList
+    public struct PathStruct
+    {
+        public float2 one;
+        public float2 two;
+        public float2 three;
+        public float2 four;
+        public float2 five;
+        public float2 six;
+        public float2 seven;
+        public float2 eight;
+        public float2 nine;
+        public float2 ten;
+    }
+
     public struct PositionHandler
     {
         public TYPE_OF_CHARACTER type;
-        public float3 position;
+        public PathStruct path;
+        public float2 position;
         public float2 tilePosition;
         public bool targetFound;
         public bool isDead;
@@ -161,31 +233,49 @@ public class Character
             // Only search for targets if the character is alive
             if (!isDead && !isAttacking && posReached)
             {
-                float defaultValue = -99999;
                 isIdle = false;
-                float2 newPos = new float2(defaultValue, defaultValue);
+                List<float2> pathList = new List<float2>();
+
+                // Get the length of the struct
+                FieldInfo[] fields = typeof(PathStruct).GetFields();
+                int nrOfSteps = fields.Length;
 
                 if (type == TYPE_OF_CHARACTER.Enemy)
                 {
-                    newPos = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Soldier, TYPE_OF_CHARACTER.Enemy, out targetFound, false);
-
-                    position = new float3(newPos, position.z);
+                    position = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Soldier, TYPE_OF_CHARACTER.Enemy, nrOfSteps, out targetFound, out pathList);
                     posReached = false;
                 }
                 else if (type == TYPE_OF_CHARACTER.Soldier)
                 {
-                    newPos = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Enemy, TYPE_OF_CHARACTER.Soldier, out targetFound, true);
+                    position = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Enemy, TYPE_OF_CHARACTER.Soldier, nrOfSteps, out targetFound, out pathList);
 
                     // If the soldier has reached half of the field, then stop if there are no enemies nearby
-                    if (!targetFound && position.x > Graphics.GetLevelLimits().y / 2)
-                    {
-                        isIdle = true;
-                    }
-                    else
-                    {
-                        position = new float3(newPos, position.z);
+                    //if (position.x > Graphics.GetLevelLimits().y / 2 && !targetFound)
+                    //{
+                    //    isIdle = true;
+                    //}
+                    //else
+                    //{
                         posReached = false;
-                    }
+                    //}
+                }
+
+                if (pathList.Count > 0)
+                {
+                    path.one = pathList[0];
+                    path.two = pathList[1];
+                    path.three = pathList[2];
+                    path.four = pathList[3];
+                    path.five = pathList[4];
+                    path.six = pathList[5];
+                    path.seven = pathList[6];
+                    path.eight = pathList[7];
+                    path.nine = pathList[8];
+                    path.ten = pathList[9];
+                }
+                else
+                {
+                    path.one = position;
                 }
             }
         }

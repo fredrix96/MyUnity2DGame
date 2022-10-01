@@ -37,7 +37,7 @@ public class Enemy : Character
         // This is to make sure that feet of the character wont walk on another sprite
         pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
         go.transform.position = sm.GetColliderPivotPoint(go);
-        ph.position = go.transform.position;
+        ph.position = new Vector2(go.transform.position.x, go.transform.position.y);
         lastXPos = ph.position.x;
 
         health = go.AddComponent<Health>();
@@ -49,6 +49,7 @@ public class Enemy : Character
 
         currTile = GridManager.GetTile(spawnTile);
         currTile.IncreaseCharacters(this);
+        GridManager.GetCharacterTiles(type).Add(currTile);
 
         ph.type = type;
         ph.isIdle = false;

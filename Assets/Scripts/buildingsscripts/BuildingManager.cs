@@ -11,7 +11,7 @@ public static class BuildingInformation
 
     private static int castleMax = 1;
     private static int houseMax = 15;
-    private static int barrackMax = 4;
+    private static int barrackMax = 1;
 
     public enum TYPE_OF_BUILDING
     {
@@ -69,7 +69,7 @@ public static class BuildingInformation
         }
         else if (type is TYPE_OF_BUILDING.Barrack)
         {
-            if (barrackCounter == houseMax)
+            if (barrackCounter == barrackMax)
             {
                 limitReached = true;
             }
