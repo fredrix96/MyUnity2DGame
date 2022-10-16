@@ -21,6 +21,8 @@ public class Player : Character
         damage = 20;
         playerHasSpawned = false;
         isDead = true;
+
+        Respawn(GridManager.GetTile(new Vector2(5, 5)));
     }
 
     public override void Update()
@@ -63,10 +65,10 @@ public class Player : Character
                 shouldBeRemoved = true;
 
                 // End the game if the player dies without any castle to respawn in
-                if (BuildingInformation.GetCounter(BuildingInformation.TYPE_OF_BUILDING.Castle) < 1)
-                {
+                //if (BuildingInformation.GetCounter(BuildingInformation.TYPE_OF_BUILDING.Castle) < 1)
+                //{
                     GameManager.GameOver();
-                }
+                //}
             }
         }
     }
@@ -81,7 +83,7 @@ public class Player : Character
             range *= -1;
         }
 
-        swordSwingBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y - (GridManager.GetTileHeight() * 2.5f));
+        swordSwingBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
         swordSwingBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 3, GridManager.GetTileHeight() * 3);
 
         BoxCollider2D swordBc = swordSwingBox.AddComponent<BoxCollider2D>();
@@ -217,8 +219,10 @@ public class Player : Character
         asp.die = 13;
         asp.dieEnd = 17;
 
+        boundingBoxOffset = new Vector2(0.0f, -1.5f);
+
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", "Player", asp, true, false);
+        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", "Player", asp, boundingBoxOffset, true, false);
 
         playerHealth = go.AddComponent<PlayerHealth>();
         playerHealth.Init(maxHealth);

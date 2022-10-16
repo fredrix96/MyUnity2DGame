@@ -18,13 +18,14 @@ public static class PathFinding
 
         List<Tile> tilesWithObjects = new List<Tile>(); 
         if (friend == Character.TYPE_OF_CHARACTER.Enemy) tilesWithObjects = GridManager.GetObjectTiles();
+        Tile playerTile = GridManager.GetPlayerTile();
 
         // Nothing to hunt, stay put
         if (tilesWithCharacters.Count == 0 && friend == Character.TYPE_OF_CHARACTER.Soldier)
         {
             return startTile.GetWorldPos();
         }
-        else if (tilesWithCharacters.Count == 0 && tilesWithObjects.Count == 0 && friend == Character.TYPE_OF_CHARACTER.Enemy)
+        else if (tilesWithCharacters.Count == 0 && tilesWithObjects.Count == 0 && friend == Character.TYPE_OF_CHARACTER.Enemy && playerTile == null)
         {
             return startTile.GetWorldPos();
         }
@@ -64,16 +65,16 @@ public static class PathFinding
                         closestTarget = currentTile;
                     }
                 }
+            }
 
-                currentTile = GridManager.GetPlayerTile();
-                if (currentTile != null)
+            currentTile = playerTile;
+            if (currentTile != null)
+            {
+                dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
+                if (dist < shortestDistance)
                 {
-                    dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
-                    if (dist < shortestDistance)
-                    {
-                        shortestDistance = dist;
-                        closestTarget = currentTile;
-                    }
+                    shortestDistance = dist;
+                    closestTarget = currentTile;
                 }
             }
         }

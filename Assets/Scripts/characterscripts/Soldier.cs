@@ -25,8 +25,10 @@ public class Soldier : Character
         asp.die = 16;
         asp.dieEnd = 20;
 
+        boundingBoxOffset = new Vector2(0.0f, -0.25f);
+
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", "Character", asp);
+        sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", "Character", asp, boundingBoxOffset);
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
         Vector2 spawnTile = new Vector2(0, randomY);
@@ -112,9 +114,22 @@ public class Soldier : Character
 
     void Damage()
     {
-        List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"));
+        GameObject spearBox = new GameObject { name = "SpearBox" };
 
-        // Only hit one character per attack
+        float range = GridManager.GetTileWidth();
+        if (sm.IsFlipped())
+        {
+            range *= -1;
+        }
+
+        spearBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
+        spearBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 4.0f, GridManager.GetTileHeight() * 1.0f);
+
+        BoxCollider2D spearBc = spearBox.AddComponent<BoxCollider2D>();
+        Physics2D.IgnoreCollision(sm.GetBoxCollider2D(), spearBc);
+
+        List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"), spearBc);
+
         foreach (Collider2D col in results)
         {
             if (col.gameObject.GetComponent<Health>() != null)
@@ -133,7 +148,8 @@ public class Soldier : Character
                     sm.FlipX();
                 }
 
-                break;
+                // Only hit one character per attack
+                //break;
             }
         }
 
@@ -150,6 +166,8 @@ public class Soldier : Character
                 sm.FlipX();
             }
         }
+
+        Object.Destroy(spearBc);
     }
 
     public bool Remove()

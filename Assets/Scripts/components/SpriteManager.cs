@@ -30,7 +30,11 @@ public class SpriteManager : MonoBehaviour
     int idle, attack, walk, die;
     bool isIdle, isAttacking, isWalking, isDead;
 
-    public void Init(GameObject go, string spritePath, string sortingLayer, AnimationStartingPoints inAsp, bool isPlayer = false, bool kinematic = true)
+    /// <summary>
+    /// inAsp is a struct filled with information of which sprites the animations starts and stops.
+    /// boundingBoxOffset makes sure that the boundingboxes are placed correctly to the incoming sprites
+    /// </summary>
+    public void Init(GameObject go, string spritePath, string sortingLayer, AnimationStartingPoints inAsp, Vector2 boundingBoxOffset, bool isPlayer = false, bool kinematic = true)
     {
         asp = inAsp;
         sprites = Resources.LoadAll<Sprite>(spritePath);
@@ -38,11 +42,12 @@ public class SpriteManager : MonoBehaviour
         sr.sprite = sprites[asp.idle];
         sr.sortingLayerID = SortingLayer.NameToID(sortingLayer);
 
-        bc = go.AddComponent<BoxCollider2D>();
         float heightOfTile = GridManager.GetTileHeight();
         float widthOfTile = GridManager.GetTileWidth();
+
+        bc = go.AddComponent<BoxCollider2D>();
         bc.size = new Vector2(widthOfTile, heightOfTile);
-        bc.offset = new Vector2(0, -heightOfTile * 1.5f);
+        bc.offset = new Vector2(boundingBoxOffset.x, heightOfTile * boundingBoxOffset.y);
 
         if (isPlayer)
         {

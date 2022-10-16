@@ -36,8 +36,10 @@ public class Enemy : Character
         asp.die = 17;
         asp.dieEnd = 19;
 
+        boundingBoxOffset = new Vector2(0.0f, -0.5f);
+
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", "Character", asp);
+        sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", "Character", asp, boundingBoxOffset);
         sm.FlipX();
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
@@ -122,12 +124,26 @@ public class Enemy : Character
 
     void Damage()
     {
+        GameObject attackBox = new GameObject { name = "AttackBox" };
+
+        float range = GridManager.GetTileWidth();
+        if (sm.IsFlipped())
+        {
+            range *= -1;
+        }
+
+        attackBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
+        attackBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 1.5f, GridManager.GetTileHeight() * 1.5f);
+
+        BoxCollider2D attackBc = attackBox.AddComponent<BoxCollider2D>();
+        Physics2D.IgnoreCollision(sm.GetBoxCollider2D(), attackBc);
+
         List<Collider2D> results = sm.GetListOfOverlapColliders(
-                        LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player") | LayerMask.GetMask("Buildings"));
+                        LayerMask.GetMask("Soldiers") | LayerMask.GetMask("Player") | LayerMask.GetMask("Buildings"),
+                        attackBc);
 
         foreach (Collider2D col in results)
         {
-            // Only hit one character per attack
             if (col.gameObject.GetComponent<Health>() != null)
             {
                 col.gameObject.GetComponent<Health>().Damage(damage);
@@ -144,7 +160,8 @@ public class Enemy : Character
                     sm.FlipX();
                 }
 
-                break;
+                // Only hit one character per attack
+                //break;
             }
             else if (col.gameObject.GetComponent<PlayerHealth>() != null)
             {
@@ -162,7 +179,8 @@ public class Enemy : Character
                     sm.FlipX();
                 }
 
-                break;
+                // Only hit one character per attack
+                //break;
             }
         }
 
@@ -179,6 +197,8 @@ public class Enemy : Character
                 sm.FlipX();
             }
         }
+
+        Object.Destroy(attackBox);
     }
 
     void Groan()

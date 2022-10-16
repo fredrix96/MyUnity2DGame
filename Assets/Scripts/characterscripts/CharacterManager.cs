@@ -203,8 +203,8 @@ public class CharacterManager
                 SpawnEnemy();
                 enemySpawnTimer = 0;
 
-                if (enemySpawnDelay > 3) enemySpawnDelay -= 0.08f;
-                if (enemySpawnDelay > 2) enemySpawnDelay -= 0.03f;
+                if (enemySpawnDelay > 3) enemySpawnDelay -= 0.1f;
+                if (enemySpawnDelay > 2) enemySpawnDelay -= 0.05f;
                 if (enemySpawnDelay > 1) enemySpawnDelay -= 0.01f;
                 if (enemySpawnDelay > 0.5f) enemySpawnDelay -= 0.005f;
                 if (enemySpawnDelay > 0.25f) enemySpawnDelay -= 0.001f;

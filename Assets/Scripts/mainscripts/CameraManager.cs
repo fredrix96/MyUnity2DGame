@@ -15,6 +15,8 @@ public static class CameraManager
 
     static Vector2 dirVector;
 
+    static bool onPlayer;
+
     static CameraManager()
     {
         camOrtoSize = 5.0f;
@@ -30,15 +32,34 @@ public static class CameraManager
         dirVector = Vector2.zero;
     }
 
-    public static void Update()
+    public static void Update(Player player)
     {
-        if (dirVector.x != 0 || dirVector.y != 0)
+        // Movement with player
+        if (player != null && onPlayer)
         {
-            Move();
+            PlayerMove(player);
+        }
+        else
+        {
+            // Movement with mouse
+            if (dirVector.x != 0 || dirVector.y != 0)
+            {
+                MouseMove();
+            }
         }
 
         SetDirX();
         SetDirY();
+    }
+
+    public static void ActivateOnPlayer(bool activate)
+    {
+        onPlayer = activate;
+    }
+
+    public static bool IsOnPlayerActivated()
+    {
+        return onPlayer;
     }
 
     public static void CreateCamera(GameObject inGo, bool orthographic = false, CameraClearFlags flag = CameraClearFlags.Skybox)
@@ -131,10 +152,35 @@ public static class CameraManager
         return camBorder;
     }
 
-    static void Move()
+    static void MouseMove()
     {
         mainCam.transform.position = new Vector3(mainCam.transform.position.x + cameraSpeed * Time.deltaTime * dirVector.x,
             mainCam.transform.position.y + cameraSpeed * Time.deltaTime * dirVector.y, mainCam.transform.position.z);
+    }
+
+    static void PlayerMove(Player player)
+    {
+        Vector2 playerPos = player.GetPosition();
+        mainCam.transform.position = new Vector3(playerPos.x, playerPos.y, mainCam.transform.position.z);
+
+        // Stay inside of border
+        if (Graphics.GetWorldLimits().x > GetPosX() - GetWorldSpaceWidth() / 2)
+        {
+            SetPosX(Graphics.GetWorldLimits().x + GetWorldSpaceWidth() / 2);
+        }
+        else if (Graphics.GetLevelLimits().y < GetPosX() + GetWorldSpaceWidth() / 2)
+        {
+            SetPosX(Graphics.GetWorldLimits().y - GetWorldSpaceWidth() / 2);
+        }
+
+        if (Graphics.GetWorldLimits().w < GetPosY() + GetWorldSpaceHeight() / 2)
+        {
+            SetPosY(Graphics.GetWorldLimits().w - GetWorldSpaceHeight() / 2);
+        }
+        else if (Graphics.GetWorldLimits().z > GetPosY() - GetWorldSpaceHeight() / 2)
+        {
+            SetPosY(Graphics.GetWorldLimits().z + GetWorldSpaceHeight() / 2);
+        }
     }
 
     public static void SetDirX(int x = 0)

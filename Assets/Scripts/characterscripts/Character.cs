@@ -28,6 +28,8 @@ public class Character
     protected bool isDead;
     protected bool shouldBeRemoved;
 
+    protected Vector2 boundingBoxOffset;
+
     int pathCounter;
     List<float2> path;
     int nrOfSteps;

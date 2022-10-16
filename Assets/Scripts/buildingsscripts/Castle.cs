@@ -62,7 +62,7 @@ public class Castle : Building
 
         LookIfIgnored();
 
-        RespawnTimer();
+        //RespawnTimer();
     }
 
     void CreateToolBar()

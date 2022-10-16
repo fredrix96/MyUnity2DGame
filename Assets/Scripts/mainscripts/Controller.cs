@@ -118,6 +118,14 @@ public class Controller
             shopMan.ChangeActive();
         }
 
+        // Control if the camera will follow the player or the mouse
+        int scrollWheelButton = 2;
+        if (Input.GetMouseButtonDown(scrollWheelButton))
+        {
+            if (CameraManager.IsOnPlayerActivated()) CameraManager.ActivateOnPlayer(false);
+            else CameraManager.ActivateOnPlayer(true);
+        }
+
         // If game over, restart the game
         //if (GameManager.IsGameOver())
         //{

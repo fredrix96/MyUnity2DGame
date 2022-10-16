@@ -44,8 +44,11 @@ public class Main : MonoBehaviour
         shopMan = new ShopManager(coinMan, buildMan);
         ctrl = new Controller(player, shopMan);
 
+        // Start at the player
+        CameraManager.ActivateOnPlayer(true);
+
         // Start at the left side of the world
-        CameraManager.SetPosX(Graphics.GetLevelLimits().x + CameraManager.GetWorldSpaceWidth() / 2);
+        //CameraManager.SetPosX(Graphics.GetLevelLimits().x + CameraManager.GetWorldSpaceWidth() / 2);
     }
 
     void Update()
@@ -54,7 +57,7 @@ public class Main : MonoBehaviour
 
         if (!GameManager.IsGameOver())
         {
-            CameraManager.Update();
+            CameraManager.Update(player);
 
             charMan.Update();
             coinMan.Update();
