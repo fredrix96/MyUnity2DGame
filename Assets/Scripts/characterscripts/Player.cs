@@ -12,6 +12,7 @@ public class Player : Character
     float regenerationDelay;
     Vector2 dirVector;
     bool playerHasSpawned; // checks if the player character (the king) has spawned for the first time
+    float critChance; // calculate in percent (0.1 = 10%)
 
     public Player()
     {
@@ -19,6 +20,7 @@ public class Player : Character
         regenerationDelay = 0.3f;
         playerSpeed = 5;
         damage = 20;
+        critChance = 0.1f;
         playerHasSpawned = false;
         isDead = true;
 
@@ -91,11 +93,22 @@ public class Player : Character
 
         List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"), swordBc);
 
+        int damageDone = damage;
+        bool crit = false;
+
+        // Calculate if the player crits
+        if (Random.value < critChance)
+        {
+            float critDamage = Random.Range(damage * 0.1f, damage * 1);
+            damageDone += (int)critDamage;
+            crit = true;
+        }
+
         foreach (Collider2D col in results)
         {
             if (col.gameObject.GetComponent<Health>() != null)
             {
-                col.gameObject.GetComponent<Health>().Damage(damage);
+                col.gameObject.GetComponent<Health>().Damage(damageDone, crit, true);
             }
         }
 

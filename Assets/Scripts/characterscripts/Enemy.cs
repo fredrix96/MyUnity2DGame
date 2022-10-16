@@ -176,7 +176,7 @@ public class Enemy : Character
         {
             if (col.gameObject.GetComponent<Health>() != null)
             {
-                col.gameObject.GetComponent<Health>().Damage(damage);
+                col.gameObject.GetComponent<Health>().Damage(damage, false, false);
 
                 // Turn towards the target
                 if (go.transform.position.x < col.transform.position.x && direction == -1)

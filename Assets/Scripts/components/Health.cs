@@ -8,6 +8,7 @@ public class Health : MonoBehaviour
     GameObject go;
     Canvas canvas;
     SpriteRenderer sr;
+    DamageText dt;
 
     float height;
 
@@ -52,10 +53,25 @@ public class Health : MonoBehaviour
     }
 
     // How much health should the character lose?
-    public void Damage(int damage)
+    public void Damage(int damage, bool crit, bool displayDamage)
     {
         int oldHealth = health;
         health -= damage;
+
+        if (displayDamage)
+        {
+            dt = go.AddComponent<DamageText>();
+            
+            Color color = Color.white;
+            Vector2 size = new Vector2(1, 1);
+            if (crit)
+            {
+                color = Color.red;
+                size = new Vector2(1.25f, 1.25f);
+            }
+
+            dt.CreateDamageText(go, damage, go.transform.position, color, size);
+        }
 
         // Health can not go below 0
         if (health <= 0)
