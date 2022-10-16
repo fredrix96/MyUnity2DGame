@@ -6,7 +6,8 @@ using System;
 
 public class Barrack : Building
 {
-    int soldierCost;
+    float spawnDelay;
+    double timer;
 
     public Barrack(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings)
     {
@@ -16,7 +17,7 @@ public class Barrack : Building
         coinMan = inCoinMan;
         buildings = inBuildings;
 
-        soldierCost = 50;
+        spawnDelay = 5;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };
         go.transform.SetParent(parent.transform);
@@ -57,19 +58,21 @@ public class Barrack : Building
 
         LookIfIgnored();
 
-        // Update text
-        text.text = "Recruit soldier" + Environment.NewLine + "Cost: " + soldierCost;
+        timer += Time.deltaTime;
+        if (timer > spawnDelay)
+        {
+            SpawnSoldier();
+            timer = 0;
+        }
     }
 
     void CreateToolBar()
     {
         CreateCanvas();
 
-        CreateToolbarObject(new Vector2(3f, 2f), 2f);
+        CreateToolbarObject(new Vector2(3f, 1f), 2f);
 
-        CreateInfoText("Recruit soldier" + Environment.NewLine + "Cost: " + soldierCost, 25, TextAnchor.UpperCenter, new Vector2(80, 65));
-
-        CreateButton(Resources.Load<Sprite>("Sprites/RecruitButton"), new Vector2(0.0f, -0.6f), new Vector2(50, 30), SpawnSoldier);
+        CreateInfoText("Foot soldiers", 30, TextAnchor.MiddleCenter, new Vector2(65, 75));
     }
 
     void SpawnSoldier()
@@ -77,16 +80,9 @@ public class Barrack : Building
         // Are there any humans available?
         if (HumansCounter.nrOfHumans != 0)
         {
-            if (coinMan.SpendMoney(soldierCost))
-            {
-                HumansCounter.nrOfHumans--;
-                SoldierCounter.nrToSpawn++;
-                RemoveHumanFromRandomHouse();
-            }
-        }
-        else
-        {
-            message.SendPopUpMessage("There are no humans to recruit!", 2.5f, 60);
+            HumansCounter.nrOfHumans--;
+            SoldierCounter.nrToSpawn++;
+            RemoveHumanFromRandomHouse();
         }
     }
 

@@ -2,12 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct AnimationStartingPoints
+{
+    public int idle;
+    public int idleEnd;
+    public int attack;
+    public int attackEnd;
+    public int walk;
+    public int walkEnd;
+    public int die;
+    public int dieEnd;
+}
+
 public class SpriteManager : MonoBehaviour
 {
     SpriteRenderer sr;
     Sprite[] sprites;
     BoxCollider2D bc;
     Rigidbody2D rb;
+    AnimationStartingPoints asp;
 
     double animationTimer, deadTimer;
 
@@ -17,28 +30,33 @@ public class SpriteManager : MonoBehaviour
     int idle, attack, walk, die;
     bool isIdle, isAttacking, isWalking, isDead;
 
-    public void Init(GameObject go, string spritePath, string sortingLayer, bool kinematic = true)
+    public void Init(GameObject go, string spritePath, string sortingLayer, AnimationStartingPoints inAsp, bool isPlayer = false, bool kinematic = true)
     {
+        asp = inAsp;
         sprites = Resources.LoadAll<Sprite>(spritePath);
         sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = sprites[idle];
+        sr.sprite = sprites[asp.idle];
         sr.sortingLayerID = SortingLayer.NameToID(sortingLayer);
 
         bc = go.AddComponent<BoxCollider2D>();
-        float heightOfTile = GridManager.GetTile(Vector2.zero).GetSize().y / go.transform.localScale.y;
-        bc.size = new Vector2(bc.size.x / 2, heightOfTile);
-        bc.offset = new Vector2(0, -heightOfTile / 2);
+        float heightOfTile = GridManager.GetTileHeight();
+        float widthOfTile = GridManager.GetTileWidth();
+        bc.size = new Vector2(widthOfTile, heightOfTile);
+        bc.offset = new Vector2(0, -heightOfTile * 1.5f);
 
-        rb = go.AddComponent<Rigidbody2D>();
-        if (kinematic)
+        if (isPlayer)
         {
-            rb.isKinematic = true;
-            rb.useFullKinematicContacts = true;
-        }
-        else
-        {
-            rb.gravityScale = 0;
-            rb.freezeRotation = true;
+            rb = go.AddComponent<Rigidbody2D>();
+            if (kinematic)
+            {
+                rb.isKinematic = true;
+                rb.useFullKinematicContacts = true;
+            }
+            else
+            {
+                rb.gravityScale = 0;
+                rb.freezeRotation = true;
+            }
         }
 
         ResetAnimations();
@@ -58,12 +76,14 @@ public class SpriteManager : MonoBehaviour
 
     public void Idle()
     {
-        animationTimer += Time.deltaTime;
+        ResetAttack();
 
+        animationTimer += Time.deltaTime;
+        
         if (animationTimer > idleDelay)
         {
             sr.sprite = sprites[idle];
-
+        
             if (idleFlip)
             {
                 idle--;
@@ -72,36 +92,43 @@ public class SpriteManager : MonoBehaviour
             {
                 idle++;
             }
-
-            if (idle == 2)
+        
+            if (idle == asp.idleEnd)
             {
                 idleFlip = true;
             }
-            else if (idle == 0)
+            else if (idle == asp.idle)
             {
                 idleFlip = false;
             }
-
+        
             animationTimer = 0;
         }
     }
 
     public void Walk()
     {
-        animationTimer += Time.deltaTime;
+        ResetAttack();
 
+        animationTimer += Time.deltaTime;
+        
         if (animationTimer > walkDelay)
         {
             sr.sprite = sprites[walk];
             walk++;
-
-            if (walk > 11)
+        
+            if (walk > asp.walkEnd)
             {
-                walk = 7;
+                walk = asp.walk;
             }
-
+        
             animationTimer = 0;
         }
+    }
+
+    void ResetAttack()
+    {
+        attack = asp.attack;
     }
 
     public bool Attack()
@@ -116,9 +143,9 @@ public class SpriteManager : MonoBehaviour
             sr.sprite = sprites[attack];
             attack++;
 
-            if (attack > 6)
+            if (attack > asp.attackEnd)
             {
-                attack = 3;
+                attack = asp.attack;
 
                 // Do damage
                 damage = true;
@@ -139,7 +166,7 @@ public class SpriteManager : MonoBehaviour
             sr.sprite = sprites[die];
             die++;
 
-            if (die > 15)
+            if (die > asp.dieEnd)
             {
                 StartDying();
             }
@@ -174,14 +201,14 @@ public class SpriteManager : MonoBehaviour
 
     public void ResetAnimations()
     {
-        idle = 0;
         idleFlip = false;
-        attack = 3;
-        walk = 7;
-        die = 12;
-
         animationTimer = 0;
         deadTimer = 0;
+
+        idle = asp.idle;
+        attack = asp.attack;
+        walk = asp.walk;
+        die = asp.die;
     }
 
     public void StartAttacking()
@@ -216,7 +243,8 @@ public class SpriteManager : MonoBehaviour
         isDead = true;
 
         bc.isTrigger = true;
-        rb.useFullKinematicContacts = false;
+
+        if (rb != null) rb.useFullKinematicContacts = false;
     }
 
     public bool IsAttacking()
@@ -239,15 +267,23 @@ public class SpriteManager : MonoBehaviour
         return isIdle;
     }
 
-    public List<Collider2D> GetListOfOverlapColliders(LayerMask layerMask)
+    public List<Collider2D> GetListOfOverlapColliders(LayerMask layerMask, BoxCollider2D customBox = null)
     {
         ContactFilter2D filter = new ContactFilter2D();
         filter.SetLayerMask(layerMask);
 
         List<Collider2D> results = new List<Collider2D>();
-        bc.OverlapCollider(filter, results);
+
+        // If no custom collider box
+        if (customBox == null) bc.OverlapCollider(filter, results);
+        else customBox.OverlapCollider(filter, results);
 
         return results;
+    }
+
+    public BoxCollider2D GetBoxCollider2D()
+    {
+        return bc;
     }
 
     public Vector3 GetColliderPivotPoint(GameObject go)

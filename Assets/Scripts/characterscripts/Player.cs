@@ -73,7 +73,21 @@ public class Player : Character
 
     void Damage()
     {
-        List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"));
+        GameObject swordSwingBox = new GameObject { name = "SwordSwingBox" };
+
+        float range = GridManager.GetTileWidth();
+        if (sm.IsFlipped())
+        {
+            range *= -1;
+        }
+
+        swordSwingBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y - (GridManager.GetTileHeight() * 2.5f));
+        swordSwingBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 3, GridManager.GetTileHeight() * 3);
+
+        BoxCollider2D swordBc = swordSwingBox.AddComponent<BoxCollider2D>();
+        Physics2D.IgnoreCollision(sm.GetBoxCollider2D(), swordBc);
+
+        List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"), swordBc);
 
         foreach (Collider2D col in results)
         {
@@ -82,6 +96,8 @@ public class Player : Character
                 col.gameObject.GetComponent<Health>().Damage(damage);
             }
         }
+
+        Object.Destroy(swordSwingBox);
     }
 
     public void SetDirX(int x = 0)
@@ -139,7 +155,8 @@ public class Player : Character
 
     void MarkTile()
     {
-        Tile newTile = GridManager.GetTileFromWorldPosition(go.transform.position);
+        // "-(GridManager.GetTileHeight() * 2.5f))" is necessary to get the correct tile placement because of the sprite size
+        Tile newTile = GridManager.GetTileFromWorldPosition(new Vector2(go.transform.position.x, go.transform.position.y - (GridManager.GetTileHeight() * 2.5f)));
 
         if (newTile != currTile && newTile != null)
         {
@@ -184,14 +201,24 @@ public class Player : Character
     {
         go = new GameObject { name = "player" };
         go.transform.parent = GameManager.GameManagerObject.transform;
-        go.transform.localScale = new Vector3(0.07f, 0.07f, 0.07f);
+        go.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         go.transform.position = spawnTile.GetWorldPos();
         go.layer = LayerMask.NameToLayer("Player");
 
         go.AddComponent<CollisionManager>();
 
+        AnimationStartingPoints asp;
+        asp.idle = 20;
+        asp.idleEnd = 27;
+        asp.walk = 30;
+        asp.walkEnd = 37;
+        asp.attack = 0;
+        asp.attackEnd = 3;
+        asp.die = 13;
+        asp.dieEnd = 17;
+
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/StickFigureKing", "Player", false);
+        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", "Player", asp, true, false);
 
         playerHealth = go.AddComponent<PlayerHealth>();
         playerHealth.Init(maxHealth);

@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 public static class GameManager
 {
     public static GameObject GameManagerObject;
+    public static Toggles toggles;
+
     static GameObject eventSystemObject;
     static PopUpMessage message;
     static bool gameOver;
@@ -16,6 +18,7 @@ public static class GameManager
         GameManagerObject = new GameObject { name = "GameManager" };
         GameManagerObject.transform.position = Vector3.zero;
         GameManagerObject.AddComponent<PhysicsUpdater>();
+        toggles = GameManagerObject.AddComponent<Toggles>();
 
         message = GameManagerObject.AddComponent<PopUpMessage>();
         message.Init(GameManagerObject);

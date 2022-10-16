@@ -31,7 +31,7 @@ public static class BuildingInformation
     // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
     static readonly Vector2[] size = new Vector2[] 
     {
-        new Vector2(7,11), new Vector2(3,5), new Vector2(9,13)
+        new Vector2(7,11), new Vector2(5,7), new Vector2(7,9)
     };
 
     public static int GetBuildingHealth(TYPE_OF_BUILDING type)

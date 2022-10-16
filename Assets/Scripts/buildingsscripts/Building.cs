@@ -142,7 +142,7 @@ public class Building
     public void CreateHealthBar(BuildingInformation.TYPE_OF_BUILDING type)
     {
         health = go.AddComponent<Health>();
-        health.Init(go, "Sprites/SoldierHealth", BuildingInformation.GetBuildingHealth(type), true);
+        health.Init(go, "Sprites/SoldierHealth", BuildingInformation.GetBuildingHealth(type), new Vector2(0.6f, 0.3f), true);
     }
 
     public Vector3 GetPosition()

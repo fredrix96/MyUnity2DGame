@@ -13,7 +13,7 @@ public class Health : MonoBehaviour
 
     int health;
 
-    public void Init(GameObject inGo, string spriteSource, int inHealth, bool building = false)
+    public void Init(GameObject inGo, string spriteSource, int inHealth, Vector2 size, bool building = false)
     {
         go = new GameObject();
         go.name = inGo.name + "_healthbar";
@@ -24,11 +24,8 @@ public class Health : MonoBehaviour
 
         sr.sprite = Resources.Load<Sprite>(spriteSource);
         sr.drawMode = SpriteDrawMode.Sliced;
-        sr.size = new Vector2(2.5f, 1);
+        sr.size = new Vector2(sr.size.x * size.x, sr.size.y * size.y);
         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, 0.8f);
-
-        go.transform.localScale = sr.size;
-        go.GetComponent<RectTransform>().sizeDelta = sr.size;
 
         health = inHealth;
 

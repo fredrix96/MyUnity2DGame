@@ -10,13 +10,23 @@ public class Soldier : Character
 
         go = new GameObject { name = "soldier" + SoldierCounter.counter };
         go.transform.SetParent(inGo.transform);
-        go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+        go.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         go.layer = LayerMask.NameToLayer("Soldiers");
 
         cm = go.AddComponent<CollisionManager>();
 
+        AnimationStartingPoints asp;
+        asp.idle = 24;
+        asp.idleEnd = 31;
+        asp.walk = 34;
+        asp.walkEnd = 41;
+        asp.attack = 8;
+        asp.attackEnd = 11;
+        asp.die = 16;
+        asp.dieEnd = 20;
+
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/StickFigure", "Character");
+        sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", "Character", asp);
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
         Vector2 spawnTile = new Vector2(0, randomY);
@@ -29,10 +39,10 @@ public class Soldier : Character
         lastXPos = ph.position.x;
 
         health = go.AddComponent<Health>();
-        health.Init(go,"Sprites/SoldierHealth", 100);
+        health.Init(go,"Sprites/SoldierHealth", 100, new Vector2(0.2f, 0.15f));
 
         speed = 2.0f;
-        damage = 20;
+        damage = 10;
         direction = 1;
 
         currTile = GridManager.GetTile(spawnTile);

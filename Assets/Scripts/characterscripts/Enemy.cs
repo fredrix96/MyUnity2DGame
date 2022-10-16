@@ -21,13 +21,23 @@ public class Enemy : Character
 
         go = new GameObject { name = "enemy" + EnemyCounter.counter };
         go.transform.parent = inGo.transform;
-        go.transform.localScale = new Vector3(0.05f, 0.05f, 0.05f);
+        go.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         go.layer = LayerMask.NameToLayer("Enemies");
 
         cm = go.AddComponent<CollisionManager>();
 
+        AnimationStartingPoints asp;
+        asp.idle = 20;
+        asp.idleEnd = 23;
+        asp.walk = 24;
+        asp.walkEnd = 31;
+        asp.attack = 0;
+        asp.attackEnd = 8;
+        asp.die = 17;
+        asp.dieEnd = 19;
+
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/StickFigureMonster", "Character");
+        sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", "Character", asp);
         sm.FlipX();
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
@@ -41,10 +51,10 @@ public class Enemy : Character
         lastXPos = ph.position.x;
 
         health = go.AddComponent<Health>();
-        health.Init(go, "Sprites/EnemyHealth", 100);
+        health.Init(go, "Sprites/EnemyHealth", 100, new Vector2(0.2f, 0.15f));
 
         speed = 1.2f;
-        damage = 10;
+        damage = 50;
         direction = -1;
 
         currTile = GridManager.GetTile(spawnTile);
@@ -96,7 +106,7 @@ public class Enemy : Character
                 isDead = true;
                 currTile.DecreaseCharacters(this);
                 GridManager.GetCharacterTiles(type).Remove(currTile);
-                coinMan.CreateCoin(go.transform.position, new Vector2(0.2f, 0.2f), Vector3.up, 1, 1.5f, true);
+                coinMan.CreateCoin(go.transform.position, new Vector2(0.01f, 0.01f), Vector3.up, 1, 1.5f, true);
                 coinMan.AddCoins(value);
                 AudioManager.PlayAudio3D("Enemy Death", 0.2f, go.transform.position);
             }

@@ -14,7 +14,7 @@ public class PlayerHealth : MonoBehaviour
     public void Init(int inHealth)
     {
         slider = UIManager.CreateSlider("healthbarSlider", "healthbarImage", null, new Vector2(70, 500), new Vector2(10.0f, 2.0f), out healthBar, Color.green);
-        heart = UIManager.CreateImage(null, "heartImage", Resources.Load<Sprite>("Sprites/Heart"), new Vector2(-880, 505), new Vector2(50, 50)).GetComponent<Image>();
+        heart = UIManager.CreateImage(null, "heartImage", Resources.Load<Sprite>("Sprites/Heart"), new Vector2(-880, 505), new Vector2(60, 60)).GetComponent<Image>();
 
         maxHealth = inHealth;
         health = maxHealth;

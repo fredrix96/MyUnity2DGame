@@ -123,6 +123,11 @@ public class Character
         {
             sm.StartIdle();
         }
+        else if (ph.targetFound)
+        {
+            sm.StartAttacking();
+            ph.targetFound = false;
+        }
     }
 
     protected void WalkToNewPosition()

@@ -78,11 +78,12 @@ public static class PathFinding
             }
         }
 
-        if (shortestDistance != float.MaxValue)
+        float attackRange = 5.0f;
+        if (shortestDistance <= attackRange)
         {
             targetFound = true;
         }
-        else
+        else if (shortestDistance == float.MaxValue)
         {
             return startTilePosition;
         }
@@ -97,26 +98,46 @@ public static class PathFinding
         Tile nextTile = startTile;
 
         float2 currentTilePos = startTilePosition;
-        float2 oldTilePos = currentTilePos;
         int startX = 0;
         int endX = 0;
         int startY = 0;
         int endY = 0;
 
+        //Unity.Mathematics.Random rnd = new Unity.Mathematics.Random();
+        //rnd.InitState();
+        //bool down = Convert.ToBoolean(rnd.NextInt(0, 1));
+
         while (true)
         {
             startX = (int)currentTilePos.x - 1;
             endX = (int)currentTilePos.x + 1;
+
             startY = (int)currentTilePos.y - 1;
             endY = (int)currentTilePos.y + 1;
+
+            //if (down)
+            //{
+            //    startY = (int)currentTilePos.y;
+            //    endY = (int)currentTilePos.y + 1;
+            //}
+            //else
+            //{
+            //    startY = (int)currentTilePos.y - 1;
+            //    endY = (int)currentTilePos.y;
+            //}
 
             // Check neighbors
             for (int x = startX; x <= endX; x++)
             {
                 for (int y = startY; y <= endY; y++)
                 {
+                    // Skip start tile
+                    if (x == startTilePosition.x && y == startTilePosition.y)
+                    {
+                        continue;
+                    }
                     // Skip current tile
-                    if (x == currentTilePos.x && y == currentTilePos.y)
+                    else if (x == currentTilePos.x && y == currentTilePos.y)
                     {
                         continue;
                     }
@@ -157,8 +178,18 @@ public static class PathFinding
                     }
                 }
             }
+            
+            // This is to prevent the algorithm to "backtrack"
+            // Remember that the y-axis grows in the downward direction
+            //if (nextTile.GetTilePosition().y > currentTilePos.y)
+            //{
+            //    down = true;
+            //}
+            //else
+            //{
+            //    down = false;
+            //}
 
-            oldTilePos = currentTilePos;
             currentTilePos = nextTile.GetTilePosition();
 
             checkList.Add(nextTile.GetTilePosition());
@@ -171,8 +202,8 @@ public static class PathFinding
         }
 
 #if DEBUG
-        //if (Tools.DebugMode)
-        //{
+        if (Tools.DebugMode)
+        {
             //Draw lines to visualize the path
             for (int i = 1; i < destinationList.Count; i++)
             {
@@ -180,7 +211,7 @@ public static class PathFinding
                 Vector2 end = new Vector3(destinationList[i].x, destinationList[i].y);
                 Debug.DrawLine(start, end, Color.white, 0.5f);
             }
-        //}
+        }
 #endif
 
         path = destinationList;

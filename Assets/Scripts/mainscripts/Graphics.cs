@@ -38,7 +38,7 @@ public static class Graphics
         background.transform.parent = GameManager.GameManagerObject.transform;
 
         SpriteRenderer srBg = background.AddComponent<SpriteRenderer>();
-        srBg.sprite = Resources.Load<Sprite>("Sprites/Background2");
+        srBg.sprite = Resources.Load<Sprite>("Sprites/Background");
         srBg.sortingLayerName = "Level";
         RectTransform transformBg = background.AddComponent<RectTransform>();
         transformBg.anchoredPosition = new Vector3(transformLvl.position.x, transformLvl.position.y + transformLvl.rect.height, transformLvl.position.z);

@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Jobs.LowLevel.Unsafe;
 
 public class Main : MonoBehaviour 
 {
@@ -11,6 +12,10 @@ public class Main : MonoBehaviour
 
     void Start() 
     {
+        // Make sure that Unity get all the available cores except for one (to not overload the CPU due to some issues in the Job system)
+        JobsUtility.JobWorkerCount = SystemInfo.processorCount - 1;
+        Debug.Log("Available cores: " + JobsUtility.JobWorkerCount);
+
         Tools.DebugMode = false;
 
         GameManager.Init();
@@ -29,7 +34,7 @@ public class Main : MonoBehaviour
         GridManager.Init(res);
 
         player = new Player();
-        int moneyToStartWith = 1500;
+        int moneyToStartWith = 15000;
         coinMan = new CoinManager(moneyToStartWith);
         charMan = new CharacterManager(player, coinMan);
         

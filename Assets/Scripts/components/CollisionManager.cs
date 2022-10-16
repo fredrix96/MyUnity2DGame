@@ -5,7 +5,7 @@ using UnityEngine;
 public class CollisionManager : MonoBehaviour
 {
     void OnCollisionEnter2D(Collision2D col)
-    {   
+    {
         // If a soldier collides with an enemy
         if (col.collider.name[0] == 's' && col.otherCollider.name[0] == 'e')
         {

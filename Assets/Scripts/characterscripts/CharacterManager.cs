@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using Unity.Jobs;
 using Unity.Collections;
 using Unity.Burst;
+using Unity.Jobs.LowLevel.Unsafe;
 
 public static class HumansCounter
 {
@@ -73,7 +74,7 @@ public class CharacterManager
         enemies = new List<Enemy>();
         soldiers = new List<Soldier>();
 
-        enemySpawnDelay = 5.0f; // decreases with time
+        enemySpawnDelay = 4.0f; // decreases with time
         soldierSpawnDelay = 0.6f;
 
         enemySpawnTimer = 0;
@@ -107,7 +108,7 @@ public class CharacterManager
 
         if (characters.Count < targetFrame)
         {
-            chunkSize = characters.Count;
+          chunkSize = characters.Count;
         }
         else
         {
@@ -117,20 +118,20 @@ public class CharacterManager
         List<List<T>> chunks = Tools.PartitionList(characters, (int)Mathf.Ceil(chunkSize));
         List<T> listToUpdate = new List<T>();
 
-        if (Time.frameCount % targetFrame == 0)
-        {
-            listToUpdate = chunks[0];
-        }
-        else
-        {
-            for (int i = 1; i < targetFrame; i++)
-            {
-                if (Time.frameCount % targetFrame == i && chunks.Count >= i + 1)
-                {
-                    listToUpdate = chunks[i];
-                }
-            }
-        }
+       if (Time.frameCount % targetFrame == 0)
+       {
+         listToUpdate = chunks[0];
+       }
+       else
+       {
+           for (int i = 1; i < targetFrame; i++)
+           {
+               if (Time.frameCount % targetFrame == i && chunks.Count >= i + 1)
+               {
+                   listToUpdate = chunks[i];
+               }
+           }
+       }
 
         return listToUpdate;
     }
@@ -161,9 +162,16 @@ public class CharacterManager
                     characterDataArray = characterDataArray,
                 };
 
+
+                int nrOfBatches = listToUpdate.Count / JobsUtility.JobWorkerCount;
+                if (nrOfBatches < 1)
+                {
+                    nrOfBatches = 1;
+                }
+
                 // Child threads ----------------------------------------
 
-                var jobHandle = job.Schedule(listToUpdate.Count, 1);
+                var jobHandle = job.Schedule(listToUpdate.Count, nrOfBatches);
                 jobHandle.Complete();
 
                 // Main thread ------------------------------------------
@@ -195,15 +203,15 @@ public class CharacterManager
                 SpawnEnemy();
                 enemySpawnTimer = 0;
 
-                if (enemySpawnDelay > 4) enemySpawnDelay -= 0.05f;
-                if (enemySpawnDelay > 3) enemySpawnDelay -= 0.01f;
-                if (enemySpawnDelay > 2) enemySpawnDelay -= 0.005f;
-                if (enemySpawnDelay > 1) enemySpawnDelay -= 0.001f;
-                if (enemySpawnDelay > 0.5f) enemySpawnDelay -= 0.0005f;
+                if (enemySpawnDelay > 3) enemySpawnDelay -= 0.08f;
+                if (enemySpawnDelay > 2) enemySpawnDelay -= 0.03f;
+                if (enemySpawnDelay > 1) enemySpawnDelay -= 0.01f;
+                if (enemySpawnDelay > 0.5f) enemySpawnDelay -= 0.005f;
+                if (enemySpawnDelay > 0.25f) enemySpawnDelay -= 0.001f;
             }
         }
 
-        UpdateCharacterPosition(enemies, true);
+        UpdateCharacterPosition(enemies, GameManager.toggles.GetMultithreadingOn());
 
         for (int i = 0; i < enemies.Count; i++)
         {
@@ -233,7 +241,7 @@ public class CharacterManager
             }
         }
 
-        UpdateCharacterPosition(soldiers, true);
+        UpdateCharacterPosition(soldiers, GameManager.toggles.GetMultithreadingOn());
 
         for (int i = 0; i < soldiers.Count; i++)
         {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Unity.Burst;
 
 public static class GridManager
 {
@@ -16,6 +15,9 @@ public static class GridManager
 
     static Image areaImage;
     static Canvas canvas;
+
+    static float heightOfTile;
+    static float widthOfTile;
 
     public static void Init(Vector2 inRes)
     {
@@ -52,6 +54,9 @@ public static class GridManager
         areaImage.color = new Color(0.4f, 1.0f, 0.0f, 0.2f);
 
         imageObject.SetActive(false);
+
+        heightOfTile = GridManager.GetTile(Vector2.zero).GetSize().y / go.transform.localScale.y;
+        widthOfTile = GridManager.GetTile(Vector2.zero).GetSize().x / go.transform.localScale.x;
     }
 
     public static void ActivateAreaImage(bool active)
@@ -338,5 +343,15 @@ public static class GridManager
     {
         Vector4 placementArea = new Vector4(grid[0, 0].GetWorldPos().x, grid[(int)res.x / 3, 0].GetWorldPos().x, grid[0, (int)res.y - 1].GetWorldPos().y, grid[0, 0].GetWorldPos().y);
         return placementArea;
+    }
+
+    public static float GetTileHeight()
+    {
+        return heightOfTile;
+    }
+
+    public static float GetTileWidth()
+    {
+        return widthOfTile;
     }
 }
