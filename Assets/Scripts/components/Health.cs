@@ -13,7 +13,7 @@ public class Health : MonoBehaviour
 
     int health;
 
-    public void Init(GameObject inGo, string spriteSource, int inHealth, Vector2 size, bool building = false)
+    public void Init(GameObject inGo, string spriteSource, int inHealth, Vector2 size, float inExtraHeight = 0, bool building = false)
     {
         go = new GameObject();
         go.name = inGo.name + "_healthbar";
@@ -42,6 +42,7 @@ public class Health : MonoBehaviour
             height = go.transform.parent.GetComponent<BoxCollider2D>().size.y * go.transform.parent.localScale.y * 0.65f;
         }
 
+        height += inExtraHeight;
         go.transform.position = new Vector3(go.transform.parent.position.x, go.transform.parent.position.y + height, go.transform.parent.position.z);
     }
 

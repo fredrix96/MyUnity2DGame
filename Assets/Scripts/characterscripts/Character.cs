@@ -12,6 +12,7 @@ public class Character
         Enemy, Soldier, Player
     }
     public TYPE_OF_CHARACTER type;
+
     public PositionHandler ph;
 
     protected GameObject go;

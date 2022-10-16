@@ -7,6 +7,125 @@ using Unity.Collections;
 using Unity.Burst;
 using Unity.Jobs.LowLevel.Unsafe;
 
+public static class CharacterInformation
+{
+    public enum TYPE_OF_ENEMY
+    {
+        Eye, Mushroom, Goblin, Skeleton
+    }
+    public enum TYPE_OF_SOLDIER
+    {
+        Spearman
+    }
+
+    static readonly int[] enemyDamage = new int[]
+    {
+        20, 40, 60, 80
+    };
+
+    static readonly int[] enemyHealth = new int[]
+    {
+        40, 80, 100, 120
+    };
+
+    static readonly int[] enemyValue = new int[]
+    {
+        5, 10, 20, 40
+    };
+
+    static readonly float[] enemySpeed = new float[]
+    {
+        1.8f, 1.6f, 1.4f, 1.2f
+    };
+
+    static readonly int[] soldierDamage = new int[]
+    {
+        10
+    };
+
+
+    public static int GetEnemyDamage(TYPE_OF_ENEMY type)
+    {
+        return enemyDamage[(int)type];
+    }
+
+    public static int GetEnemyHealth(TYPE_OF_ENEMY type)
+    {
+        return enemyHealth[(int)type];
+    }
+
+    public static int GetEnemyValue(TYPE_OF_ENEMY type)
+    {
+        return enemyValue[(int)type];
+    }
+
+    public static float GetEnemySpeed(TYPE_OF_ENEMY type)
+    {
+        return enemySpeed[(int)type];
+    }
+
+    public static int GetSoldierDamage(TYPE_OF_SOLDIER type)
+    {
+        return soldierDamage[(int)type];
+    }
+
+
+    public static AnimationStartingPoints GetEnemyAnimationStartingPoints(TYPE_OF_ENEMY type)
+    {
+        AnimationStartingPoints asp;
+
+        if (type == TYPE_OF_ENEMY.Mushroom || type == TYPE_OF_ENEMY.Goblin)
+        {
+            asp.idle = 20;
+            asp.idleEnd = 23;
+            asp.walk = 24;
+            asp.walkEnd = 31;
+            asp.attack = 0;
+            asp.attackEnd = 7;
+            asp.die = 17;
+            asp.dieEnd = 20;
+        }
+        else if (type == TYPE_OF_ENEMY.Eye)
+        {
+            asp.idle = 20;
+            asp.idleEnd = 27;
+            asp.walk = 20;
+            asp.walkEnd = 27;
+            asp.attack = 0;
+            asp.attackEnd = 7;
+            asp.die = 16;
+            asp.dieEnd = 19;
+        }
+        else if (type == TYPE_OF_ENEMY.Skeleton)
+        {
+            asp.idle = 20;
+            asp.idleEnd = 23;
+            asp.walk = 32;
+            asp.walkEnd = 35;
+            asp.attack = 0;
+            asp.attackEnd = 7;
+            asp.die = 16;
+            asp.dieEnd = 19;
+        }
+        else
+        {
+            asp.idle = 0;
+            asp.idleEnd = 0;
+            asp.walk = 0;
+            asp.walkEnd = 0;
+            asp.attack = 0;
+            asp.attackEnd = 0;
+            asp.die = 0;
+            asp.dieEnd = 0;
+
+            Debug.LogWarning("No animations found for " + type.ToString());
+        }
+
+        return asp;
+    }
+    
+}
+
 public static class HumansCounter
 {
     public static int counter = 0;
@@ -271,7 +390,9 @@ public class CharacterManager
 
     void SpawnEnemy()
     {
-        enemies.Add(new Enemy(enemyObjects, coinMan, 15));
+        CharacterInformation.TYPE_OF_ENEMY eType = (CharacterInformation.TYPE_OF_ENEMY)Random.Range(0, 4);
+
+        enemies.Add(new Enemy(enemyObjects, eType, coinMan));
         EnemyCounter.counter++;
         EnemyCounter.nrOfEnemies++;
     }

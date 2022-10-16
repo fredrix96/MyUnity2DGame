@@ -39,7 +39,7 @@ public class SpriteManager : MonoBehaviour
         asp = inAsp;
         sprites = Resources.LoadAll<Sprite>(spritePath);
         sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = sprites[asp.idle];
+        sr.sprite = sprites[0];
         sr.sortingLayerID = SortingLayer.NameToID(sortingLayer);
 
         float heightOfTile = GridManager.GetTileHeight();
@@ -171,7 +171,7 @@ public class SpriteManager : MonoBehaviour
             sr.sprite = sprites[die];
             die++;
 
-            if (die > asp.dieEnd)
+            if (die == asp.dieEnd)
             {
                 StartDying();
             }

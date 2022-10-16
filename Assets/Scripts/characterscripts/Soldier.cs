@@ -23,7 +23,7 @@ public class Soldier : Character
         asp.attack = 8;
         asp.attackEnd = 11;
         asp.die = 16;
-        asp.dieEnd = 20;
+        asp.dieEnd = 21;
 
         boundingBoxOffset = new Vector2(0.0f, -0.25f);
 

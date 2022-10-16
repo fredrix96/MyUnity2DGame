@@ -8,13 +8,15 @@ public class Enemy : Character
     int value;
     float groanDelay;
     double time;
+    CharacterInformation.TYPE_OF_ENEMY eType;
     
-    public Enemy(GameObject inGo, CoinManager inCoinMan, int inValue = 1)
+    public Enemy(GameObject inGo, CharacterInformation.TYPE_OF_ENEMY inType, CoinManager inCoinMan)
     {
         type = TYPE_OF_CHARACTER.Enemy;
+        eType = inType;
 
         coinMan = inCoinMan;
-        value = inValue;
+        value = CharacterInformation.GetEnemyValue(eType);
 
         groanDelay = 5.0f;
         time = 0;
@@ -25,21 +27,39 @@ public class Enemy : Character
         go.layer = LayerMask.NameToLayer("Enemies");
 
         cm = go.AddComponent<CollisionManager>();
-
-        AnimationStartingPoints asp;
-        asp.idle = 20;
-        asp.idleEnd = 23;
-        asp.walk = 24;
-        asp.walkEnd = 31;
-        asp.attack = 0;
-        asp.attackEnd = 8;
-        asp.die = 17;
-        asp.dieEnd = 19;
-
-        boundingBoxOffset = new Vector2(0.0f, -0.5f);
-
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", "Character", asp, boundingBoxOffset);
+        health = go.AddComponent<Health>();
+
+        int hp = CharacterInformation.GetEnemyHealth(eType);
+        AnimationStartingPoints asp = CharacterInformation.GetEnemyAnimationStartingPoints(eType);
+        switch (eType)
+        {
+            case CharacterInformation.TYPE_OF_ENEMY.Mushroom:
+                boundingBoxOffset = new Vector2(0.0f, -0.5f);
+                health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f));
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", "Character", asp, boundingBoxOffset);
+                break;
+            case CharacterInformation.TYPE_OF_ENEMY.Goblin:
+                boundingBoxOffset = new Vector2(0.0f, -0.5f);
+                health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f));
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Goblin", "Character", asp, boundingBoxOffset);
+                break;
+            case CharacterInformation.TYPE_OF_ENEMY.Eye:
+                boundingBoxOffset = new Vector2(0.0f, 0.0f);
+                health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f));
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Flying Eye", "Character", asp, boundingBoxOffset);
+                break;
+            case CharacterInformation.TYPE_OF_ENEMY.Skeleton:
+                boundingBoxOffset = new Vector2(0.0f, -0.5f);
+                health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f), 0.2f);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Skeleton", "Character", asp, boundingBoxOffset);
+                break;
+            default:
+                boundingBoxOffset = new Vector2(0.0f, 0.0f);
+                health.Init(go, "Sprites/EnemyHealth", 0, new Vector2(0.0f, 0.0f), 0);
+                Debug.LogError("No enemy type " + eType.ToString() + " was found!");
+                break;
+        }
         sm.FlipX();
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
@@ -52,11 +72,8 @@ public class Enemy : Character
         ph.position = new Vector2(go.transform.position.x, go.transform.position.y);
         lastXPos = ph.position.x;
 
-        health = go.AddComponent<Health>();
-        health.Init(go, "Sprites/EnemyHealth", 100, new Vector2(0.2f, 0.15f));
-
-        speed = 1.2f;
-        damage = 50;
+        speed = CharacterInformation.GetEnemySpeed(eType);
+        damage = CharacterInformation.GetEnemyDamage(eType);
         direction = -1;
 
         currTile = GridManager.GetTile(spawnTile);
@@ -132,8 +149,21 @@ public class Enemy : Character
             range *= -1;
         }
 
-        attackBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
-        attackBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 1.5f, GridManager.GetTileHeight() * 1.5f);
+        if (CharacterInformation.TYPE_OF_ENEMY.Mushroom == eType || CharacterInformation.TYPE_OF_ENEMY.Eye == eType)
+        {
+            attackBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
+            attackBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 1.5f, GridManager.GetTileHeight() * 1.5f);
+        }
+        else if (CharacterInformation.TYPE_OF_ENEMY.Goblin == eType)
+        {
+            attackBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
+            attackBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 3.0f, GridManager.GetTileHeight() * 3.0f);
+        }
+        else if (CharacterInformation.TYPE_OF_ENEMY.Skeleton == eType)
+        {
+            attackBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
+            attackBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 3.0f, GridManager.GetTileHeight() * 3.0f);
+        }
 
         BoxCollider2D attackBc = attackBox.AddComponent<BoxCollider2D>();
         Physics2D.IgnoreCollision(sm.GetBoxCollider2D(), attackBc);
