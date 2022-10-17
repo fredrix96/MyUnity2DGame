@@ -37,22 +37,22 @@ public class Enemy : Character
             case CharacterInformation.TYPE_OF_ENEMY.Mushroom:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
                 health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f));
-                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", "Character", asp, boundingBoxOffset);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", asp, boundingBoxOffset);
                 break;
             case CharacterInformation.TYPE_OF_ENEMY.Goblin:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
                 health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f));
-                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Goblin", "Character", asp, boundingBoxOffset);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Goblin", asp, boundingBoxOffset);
                 break;
             case CharacterInformation.TYPE_OF_ENEMY.Eye:
                 boundingBoxOffset = new Vector2(0.0f, 0.0f);
                 health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f));
-                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Flying Eye", "Character", asp, boundingBoxOffset);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Flying Eye", asp, boundingBoxOffset);
                 break;
             case CharacterInformation.TYPE_OF_ENEMY.Skeleton:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
                 health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f), 0.2f);
-                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Skeleton", "Character", asp, boundingBoxOffset);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Skeleton", asp, boundingBoxOffset);
                 break;
             default:
                 boundingBoxOffset = new Vector2(0.0f, 0.0f);

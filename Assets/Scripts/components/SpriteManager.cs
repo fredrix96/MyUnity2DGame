@@ -34,13 +34,14 @@ public class SpriteManager : MonoBehaviour
     /// inAsp is a struct filled with information of which sprites the animations starts and stops.
     /// boundingBoxOffset makes sure that the boundingboxes are placed correctly to the incoming sprites
     /// </summary>
-    public void Init(GameObject go, string spritePath, string sortingLayer, AnimationStartingPoints inAsp, Vector2 boundingBoxOffset, bool isPlayer = false, bool kinematic = true)
+    public void Init(GameObject go, string spritePath, AnimationStartingPoints inAsp, Vector2 boundingBoxOffset, bool isPlayer = false, bool kinematic = true)
     {
         asp = inAsp;
         sprites = Resources.LoadAll<Sprite>(spritePath);
         sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = sprites[0];
-        sr.sortingLayerID = SortingLayer.NameToID(sortingLayer);
+
+        go.AddComponent<PositionRendererSorter>();
 
         float heightOfTile = GridManager.GetTileHeight();
         float widthOfTile = GridManager.GetTileWidth();

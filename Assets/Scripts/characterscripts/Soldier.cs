@@ -28,7 +28,7 @@ public class Soldier : Character
         boundingBoxOffset = new Vector2(0.0f, -0.25f);
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", "Character", asp, boundingBoxOffset);
+        sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", asp, boundingBoxOffset);
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
         spawnTile = new Vector2(0, randomY);

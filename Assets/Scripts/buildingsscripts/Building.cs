@@ -87,9 +87,9 @@ public class Building
     public void MarkOrUnmarkTiles(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos, bool mark)
     {
         Vector2 size = BuildingInformation.GetBuildingSize(type);
-        int startX = -Mathf.FloorToInt(size.x / 2f);
+        int startX = - Mathf.FloorToInt(size.x / 2f);
         int endX = Mathf.CeilToInt(size.x / 2f);
-        int startY = -Mathf.FloorToInt(size.y / 2f);
+        int startY = 0;// -Mathf.FloorToInt(size.y / 2f);
         int endY = Mathf.CeilToInt(size.y / 2f);
 
         for (int x = startX; x < endX; x++)

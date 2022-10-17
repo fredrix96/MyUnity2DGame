@@ -30,11 +30,11 @@ public class House : Building
         go.transform.SetParent(parent.transform);
         go.layer = LayerMask.NameToLayer("Buildings");
 
+        go.AddComponent<PositionRendererSorter>();
         go.AddComponent<CollisionManager>();
 
         sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = Resources.Load<Sprite>("Sprites/" + type.ToString());
-        sr.sortingLayerName = "Buildings";
 
         go.transform.position = inPos.GetWorldPos();
 
@@ -47,6 +47,9 @@ public class House : Building
 
         CreateHealthBar(type);
         CreateToolBar();
+
+        collider.size = new Vector2(sr.size.x, sr.size.y / 2);
+        collider.offset = new Vector2(0, -(sr.size.y / 4));
 
         selector = go.AddComponent<Selector>();
         selector.Init(toolBarObject, sr, textObject, null);

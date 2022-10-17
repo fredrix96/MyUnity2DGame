@@ -210,11 +210,11 @@ public class CharacterManager
         UpdateCharacterTextData();
 
 #if DEBUG
-        if (Input.GetKey(KeyCode.X))
+        if (Input.GetKey(KeyCode.C))
         {
             SpawnEnemy();
         }
-        if (Input.GetKey(KeyCode.C))
+        if (Input.GetKey(KeyCode.X))
         {
             SpawnSoldier();
         }

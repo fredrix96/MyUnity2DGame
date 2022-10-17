@@ -174,16 +174,17 @@ public static class PathFinding
             else
             {
                 bool done = false;
+                int sideSteps = 3;
 
                 // To get some variety when chosing the new direction
                 int[] dirList = new int[]
                 {
-                    -1, 1
+                    -sideSteps, sideSteps
                 };
 
                 int dir = rand.Next(dirList[0], dirList[1]);
 
-                Tile neighborTile = GridManager.GetTile(new Vector2(currentTilePos.x, currentTilePos.y + (5 * dir)));
+                Tile neighborTile = GridManager.GetTile(new Vector2(currentTilePos.x, currentTilePos.y + dir));
 
                 if (neighborTile != null)
                 {
@@ -198,7 +199,7 @@ public static class PathFinding
                 // Try opposite direction
                 if (!done)
                 {
-                    neighborTile = GridManager.GetTile(new Vector2(currentTilePos.x, currentTilePos.y + (5 * dir * -1)));
+                    neighborTile = GridManager.GetTile(new Vector2(currentTilePos.x, currentTilePos.y + (dir * -1)));
 
                     if (neighborTile != null)
                     {

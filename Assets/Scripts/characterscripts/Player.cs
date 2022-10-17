@@ -235,7 +235,7 @@ public class Player : Character
         boundingBoxOffset = new Vector2(0.0f, -1.5f);
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", "Player", asp, boundingBoxOffset, true, false);
+        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", asp, boundingBoxOffset, true, false);
 
         playerHealth = go.AddComponent<PlayerHealth>();
         playerHealth.Init(maxHealth);
