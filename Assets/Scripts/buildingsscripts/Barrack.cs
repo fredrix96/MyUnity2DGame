@@ -17,7 +17,7 @@ public class Barrack : Building
         coinMan = inCoinMan;
         buildings = inBuildings;
 
-        spawnDelay = 5;
+        spawnDelay = 2;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };
         go.transform.SetParent(parent.transform);

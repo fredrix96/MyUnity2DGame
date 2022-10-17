@@ -63,7 +63,7 @@ public class Enemy : Character
         sm.FlipX();
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
-        Vector2 spawnTile = new Vector2(GridManager.GetRes().x - 1, randomY);
+        spawnTile = new Vector2(GridManager.GetRes().x - 1, randomY);
         go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
 
         // This is to make sure that feet of the character wont walk on another sprite

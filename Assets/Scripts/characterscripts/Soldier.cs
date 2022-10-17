@@ -31,7 +31,7 @@ public class Soldier : Character
         sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", "Character", asp, boundingBoxOffset);
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
-        Vector2 spawnTile = new Vector2(0, randomY);
+        spawnTile = new Vector2(0, randomY);
         go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
 
         // This is to make sure that feet of the character wont walk on another sprite
@@ -167,7 +167,7 @@ public class Soldier : Character
             }
         }
 
-        Object.Destroy(spearBc);
+        Object.Destroy(spearBox);
     }
 
     public bool Remove()

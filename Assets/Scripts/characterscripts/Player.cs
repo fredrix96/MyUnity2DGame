@@ -246,6 +246,7 @@ public class Player : Character
 
         currTile = spawnTile;
         currTile.PlayerOnTile(true);
+        GridManager.SetPlayerTile(currTile);
 
         playerHasSpawned = true;
     }

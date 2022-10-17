@@ -9,7 +9,7 @@ public class Toggles : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        multithreadingOn = false;
+        multithreadingOn = true;
     }
 
     // Update is called once per frame

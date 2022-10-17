@@ -30,6 +30,7 @@ public class Character
     protected bool shouldBeRemoved;
 
     protected Vector2 boundingBoxOffset;
+    protected Vector2 spawnTile;
 
     int pathCounter;
     List<float2> path;
@@ -102,24 +103,18 @@ public class Character
         ph.isDead = IsDead();
         ph.isAttacking = sm.IsAttacking();
 
-        // If the new position is reached, search for a new position
-        //if (pathCounter == nrOfSteps - 1)
-        //{
-            path.Clear();
-            path.Add(ph.path.one);
-            path.Add(ph.path.two);
-            path.Add(ph.path.three);
-            path.Add(ph.path.four);
-            path.Add(ph.path.five);
-            path.Add(ph.path.six);
-            path.Add(ph.path.seven);
-            path.Add(ph.path.eight);
-            path.Add(ph.path.nine);
-            path.Add(ph.path.ten);
-
-        //ph.posReached = true;
-        //pathCounter = 0;
-        //}
+        // Update path
+        path.Clear();
+        path.Add(ph.path.one);
+        path.Add(ph.path.two);
+        path.Add(ph.path.three);
+        path.Add(ph.path.four);
+        path.Add(ph.path.five);
+        path.Add(ph.path.six);
+        path.Add(ph.path.seven);
+        path.Add(ph.path.eight);
+        path.Add(ph.path.nine);
+        path.Add(ph.path.ten);
 
         // Out
         if (ph.isIdle)
@@ -135,15 +130,25 @@ public class Character
 
     protected void WalkToNewPosition()
     {
-        // Notice how we adjust the height based on the pivot difference
-        //go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, ph.position.x, speed * Time.deltaTime),
-        //    Mathf.MoveTowards(go.transform.position.y, ph.position.y + pivotHeightDiff, speed * Time.deltaTime), 0);
-
-        if (path.Count != 0)
+        // Make sure that the path is not interrupted by a newly built building
+        Tile checkTile = GridManager.GetTileFromWorldPosition(path[pathCounter]);
+        if (checkTile != null)
         {
+            if (checkTile.IsObjectPresent())
+            {
+                ph.posReached = true;
+                pathCounter = 0;
+                path.Clear();
+                return;
+            }
+        }
+        
+        if (path[1].x != float.MaxValue)
+        {
+            // Notice how we adjust the height based on the pivot difference
             go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[pathCounter].x, speed * Time.deltaTime),
                 Mathf.MoveTowards(go.transform.position.y, path[pathCounter].y + pivotHeightDiff, speed * Time.deltaTime), 0);
-
+        
             if (pathCounter == nrOfSteps - 1)
             {
                 ph.posReached = true;
@@ -157,9 +162,10 @@ public class Character
         }
         else
         {
+            // Notice how we adjust the height based on the pivot difference
             go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[0].x, speed * Time.deltaTime),
                 Mathf.MoveTowards(go.transform.position.y, path[0].y + pivotHeightDiff, speed * Time.deltaTime), 0);
-
+            
             if (go.transform.position.x == path[0].x && go.transform.position.y == path[0].y + pivotHeightDiff)
             {
                 ph.posReached = true;
@@ -284,6 +290,7 @@ public class Character
                 else
                 {
                     path.one = position;
+                    path.two = new Vector2(float.MaxValue, float.MaxValue);
                 }
             }
         }

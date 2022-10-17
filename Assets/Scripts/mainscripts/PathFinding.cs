@@ -6,7 +6,34 @@ using UnityEngine;
 
 public static class PathFinding
 {
+    static System.Random rand = new System.Random();
+
     public static float2 SearchForTarget(float2 startTilePosition, Character.TYPE_OF_CHARACTER target, Character.TYPE_OF_CHARACTER friend, int nrOfSteps, out bool targetFound, out List<float2> path)
+    {
+        if (friend == Character.TYPE_OF_CHARACTER.Soldier)
+        {
+            return SoldierSearchForTarget(startTilePosition, target, nrOfSteps, out targetFound, out path);
+        }
+        
+        return EnemySearchForTarget(startTilePosition, target, nrOfSteps, out targetFound, out path);
+    }
+
+    static bool SearchListForTile(List<float2> list, float2 inPos)
+    {
+        bool found = false;
+
+        foreach (var pos in list)
+        {
+            if (pos.x == inPos.x && pos.y == inPos.y)
+            {
+                found = true;
+            }
+        }
+
+        return found;
+    }
+
+    public static float2 SoldierSearchForTarget(float2 startTilePosition, Character.TYPE_OF_CHARACTER target, int nrOfSteps, out bool targetFound, out List<float2> path)
     {
         // Starting variables
         Tile startTile = GridManager.GetTile(startTilePosition);
@@ -16,16 +43,8 @@ public static class PathFinding
 
         List<Tile> tilesWithCharacters = GridManager.GetCharacterTiles(target);
 
-        List<Tile> tilesWithObjects = new List<Tile>(); 
-        if (friend == Character.TYPE_OF_CHARACTER.Enemy) tilesWithObjects = GridManager.GetObjectTiles();
-        Tile playerTile = GridManager.GetPlayerTile();
-
         // Nothing to hunt, stay put
-        if (tilesWithCharacters.Count == 0 && friend == Character.TYPE_OF_CHARACTER.Soldier)
-        {
-            return startTile.GetWorldPos();
-        }
-        else if (tilesWithCharacters.Count == 0 && tilesWithObjects.Count == 0 && friend == Character.TYPE_OF_CHARACTER.Enemy && playerTile == null)
+        if (tilesWithCharacters.Count == 0)
         {
             return startTile.GetWorldPos();
         }
@@ -40,35 +59,6 @@ public static class PathFinding
         {
             currentTile = tilesWithCharacters[i];
             if (currentTile.IsCharacterPresent(target))
-            {
-                dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
-                if (dist < shortestDistance)
-                {
-                    shortestDistance = dist;
-                    closestTarget = currentTile;
-                }
-            }
-        }
-
-        // Let the enemies look for objects and the player
-        if (friend == Character.TYPE_OF_CHARACTER.Enemy)
-        {
-            if (tilesWithObjects.Count != 0)
-            {
-                for (int i = 0; i < tilesWithObjects.Count; i++)
-                {
-                    currentTile = tilesWithObjects[i];
-                    dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
-                    if (dist < shortestDistance)
-                    {
-                        shortestDistance = dist;
-                        closestTarget = currentTile;
-                    }
-                }
-            }
-
-            currentTile = playerTile;
-            if (currentTile != null)
             {
                 dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
                 if (dist < shortestDistance)
@@ -104,9 +94,7 @@ public static class PathFinding
         int startY = 0;
         int endY = 0;
 
-        //Unity.Mathematics.Random rnd = new Unity.Mathematics.Random();
-        //rnd.InitState();
-        //bool down = Convert.ToBoolean(rnd.NextInt(0, 1));
+        bool isDistanceUpdated;
 
         while (true)
         {
@@ -116,16 +104,247 @@ public static class PathFinding
             startY = (int)currentTilePos.y - 1;
             endY = (int)currentTilePos.y + 1;
 
-            //if (down)
-            //{
-            //    startY = (int)currentTilePos.y;
-            //    endY = (int)currentTilePos.y + 1;
-            //}
-            //else
-            //{
-            //    startY = (int)currentTilePos.y - 1;
-            //    endY = (int)currentTilePos.y;
-            //}
+            isDistanceUpdated = false;
+
+            // Check neighbors
+            for (int x = startX; x <= endX; x++)
+            {
+                for (int y = startY; y <= endY; y++)
+                {
+                    // Skip start tile
+                    if (x == startTilePosition.x && y == startTilePosition.y)
+                    {
+                        continue;
+                    }
+                    // Skip current tile
+                    else if (x == currentTilePos.x && y == currentTilePos.y)
+                    {
+                        continue;
+                    }
+
+                    Tile currTile = GridManager.GetTile(new Vector2(x, y));
+
+                    // Outisde of grid!
+                    if (currTile == null)
+                    {
+                        continue;
+                    }
+
+                    // Skip tiles inside the current list
+                    if (SearchListForTile(checkList, currTile.GetTilePosition()))
+                    {
+                        continue;
+                    }
+
+                    // Avoid buildings and other soldiers
+                    if (currTile.IsObjectPresent() || currTile.IsCharacterPresent(Character.TYPE_OF_CHARACTER.Soldier))
+                    {
+                        continue;
+                    }
+
+                    float newDistance = Tools.CalculateFloatDistance(currTile.GetWorldPos(), destination);
+
+                    // Try to avoid the building before reaching it by punishing the closest tiles values
+                    Tile checkTile = GridManager.GetTile(new Vector2(currTile.GetTilePosition().x + 1, currTile.GetTilePosition().y));
+                    Tile checkTile2 = GridManager.GetTile(new Vector2(currTile.GetTilePosition().x + 2, currTile.GetTilePosition().y));
+                    if (checkTile.IsObjectPresent())
+                    {
+                        newDistance += GridManager.GetTileWidth();
+                    }
+                    else if (checkTile2.IsObjectPresent())
+                    {
+                        newDistance += GridManager.GetTileWidth() / 2;
+                    }
+
+                    // Is this tile closer to the target?
+                    if (newDistance < distance)
+                    {
+                        distance = newDistance;
+                        nextTile = currTile;
+                        isDistanceUpdated = true;
+                    }
+                }
+            }
+
+            if (isDistanceUpdated)
+            {
+                currentTilePos = nextTile.GetTilePosition();
+            }
+            // If there is no better path to take
+            else
+            {
+                bool done = false;
+
+                // To get some variety when chosing the new direction
+                int[] dirList = new int[]
+                {
+                    -1, 1
+                };
+
+                int dir = rand.Next(dirList[0], dirList[1]);
+
+                Tile neighborTile = GridManager.GetTile(new Vector2(currentTilePos.x, currentTilePos.y + (5 * dir)));
+
+                if (neighborTile != null)
+                {
+                    if (!neighborTile.IsObjectPresent())
+                    {
+                        done = true;
+                        currentTilePos = neighborTile.GetTilePosition();
+                        nextTile = neighborTile;
+                    }
+                }
+
+                // Try opposite direction
+                if (!done)
+                {
+                    neighborTile = GridManager.GetTile(new Vector2(currentTilePos.x, currentTilePos.y + (5 * dir * -1)));
+
+                    if (neighborTile != null)
+                    {
+                        if (!neighborTile.IsObjectPresent())
+                        {
+                            currentTilePos = neighborTile.GetTilePosition();
+                            nextTile = neighborTile;
+                        }
+                    }
+                }
+            }
+
+            checkList.Add(nextTile.GetTilePosition());
+            destinationList.Add(nextTile.GetWorldPos());
+
+            if (destinationList.Count >= pathSize)
+            {
+                break;
+            }
+        }
+
+#if DEBUG
+        if (Tools.DebugMode)
+        {
+            //Draw lines to visualize the path
+            for (int i = 1; i < destinationList.Count; i++)
+            {
+                Vector2 start = new Vector3(destinationList[i - 1].x, destinationList[i - 1].y);
+                Vector2 end = new Vector3(destinationList[i].x, destinationList[i].y);
+                Debug.DrawLine(start, end, Color.white, 0.5f);
+            }
+        }
+#endif
+
+        path = destinationList;
+
+        return destinationList[0];
+    }
+
+    public static float2 EnemySearchForTarget(float2 startTilePosition, Character.TYPE_OF_CHARACTER target, int nrOfSteps, out bool targetFound, out List<float2> path)
+    {
+        // Starting variables
+        Tile startTile = GridManager.GetTile(startTilePosition);
+        int pathSize = nrOfSteps;
+        targetFound = false;
+        path = new List<float2>();
+
+        List<Tile> tilesWithCharacters = GridManager.GetCharacterTiles(target);
+        List<Tile> tilesWithObjects = GridManager.GetObjectTiles();
+        Tile playerTile = GridManager.GetPlayerTile();
+
+        // Nothing to hunt, stay put
+        if (tilesWithCharacters.Count == 0 && tilesWithObjects.Count == 0 && playerTile == null)
+        {
+            return startTile.GetWorldPos();
+        }
+
+        Tile currentTile = startTile;
+        Tile closestTarget = currentTile;
+        float dist = float.MinValue;
+        float shortestDistance = float.MaxValue;
+
+        // Look for target
+        for (int i = 0; i < tilesWithCharacters.Count; i++)
+        {
+            currentTile = tilesWithCharacters[i];
+            if (currentTile.IsCharacterPresent(target))
+            {
+                dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
+                if (dist < shortestDistance)
+                {
+                    shortestDistance = dist;
+                    closestTarget = currentTile;
+                }
+            }
+        }
+
+        // Let the enemies look for objects and the player
+        if (tilesWithObjects.Count != 0)
+        {
+            for (int i = 0; i < tilesWithObjects.Count; i++)
+            {
+                currentTile = tilesWithObjects[i];
+                dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
+                if (dist < shortestDistance)
+                {
+                    shortestDistance = dist;
+                    closestTarget = currentTile;
+                }
+            }
+        }
+
+        currentTile = playerTile;
+        if (currentTile != null)
+        {
+            dist = Tools.CalculateVectorDistance(startTilePosition, currentTile.GetTilePosition());
+            if (dist < shortestDistance)
+            {
+                shortestDistance = dist;
+                closestTarget = currentTile;
+            }
+        }
+
+        float attackRange = 3.0f;
+        float viewRange = 30.0f;
+        if (shortestDistance <= attackRange)
+        {
+            targetFound = true;
+        }
+        else if (shortestDistance == float.MaxValue)
+        {
+            return startTilePosition;
+        }
+        // This is done to make sure that the enemies walk forward and do not gather on the same line
+        else if (shortestDistance >= viewRange)
+        {
+            Tile neighborTile = GridManager.GetTile(new Vector2(startTilePosition.x - 1, startTilePosition.y));
+
+            if (neighborTile != null)
+            {
+                return neighborTile.GetWorldPos();
+            }
+        }
+
+        float2 destination = closestTarget.GetWorldPos();
+
+        // Look for the fastest path to the destination
+
+        List<float2> destinationList = new List<float2>();
+        List<float2> checkList = new List<float2>();
+        float distance = float.MaxValue;
+        Tile nextTile = startTile;
+
+        float2 currentTilePos = startTilePosition;
+        int startX = 0;
+        int endX = 0;
+        int startY = 0;
+        int endY = 0;
+
+        while (true)
+        {
+            startX = (int)currentTilePos.x - 1;
+            endX = (int)currentTilePos.x + 1;
+
+            startY = (int)currentTilePos.y - 1;
+            endY = (int)currentTilePos.y + 1;
 
             // Check neighbors
             for (int x = startX; x <= endX; x++)
@@ -156,19 +375,9 @@ public static class PathFinding
                         continue;
                     }
 
-                    if (friend == Character.TYPE_OF_CHARACTER.Soldier)
+                    if (currTile.IsCharacterPresent(Character.TYPE_OF_CHARACTER.Enemy))
                     {
-                        if (currTile.IsObjectPresent() || currTile.IsCharacterPresent(friend))
-                        {
-                            continue;
-                        }
-                    }
-                    else if (friend == Character.TYPE_OF_CHARACTER.Enemy)
-                    {
-                        if (currTile.IsCharacterPresent(friend))
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     float newDistance = Tools.CalculateFloatDistance(currTile.GetWorldPos(), destination);
@@ -179,17 +388,6 @@ public static class PathFinding
                     }
                 }
             }
-            
-            // This is to prevent the algorithm to "backtrack"
-            // Remember that the y-axis grows in the downward direction
-            //if (nextTile.GetTilePosition().y > currentTilePos.y)
-            //{
-            //    down = true;
-            //}
-            //else
-            //{
-            //    down = false;
-            //}
 
             currentTilePos = nextTile.GetTilePosition();
 
@@ -218,21 +416,6 @@ public static class PathFinding
         path = destinationList;
 
         return destinationList[0];
-    }
-
-    static bool SearchListForTile(List<float2> list, float2 inPos)
-    {
-        bool found = false;
-
-        foreach (var pos in list)
-        {
-            if (pos.x == inPos.x && pos.y == inPos.y)
-            {
-                found = true;
-            }
-        }
-
-        return found;
     }
 
     static float2 FindPathAroundObject(Tile startTile)
