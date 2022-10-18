@@ -76,6 +76,31 @@ public static class AudioManager
         return found;
     }
 
+    public static bool StopBackgroundMusic(string audioName)
+    {
+        bool found = false;
+
+        AudioSource audioSource = GetAudioSource(backgroundMusicList, audioName);
+
+        foreach (AudioClip clip in audioClips)
+        {
+            if (clip.name == audioName)
+            {
+                found = true;
+                audioSource.Stop();
+
+                return found;
+            }
+        }
+
+        if (!found)
+        {
+            Debug.LogWarning("Warning: No audio clip named " + audioName + " was found!");
+        }
+
+        return found;
+    }
+
     public static bool PlayAudio2D(string audioName, float volume, bool loop = false)
     {
         bool found = false;

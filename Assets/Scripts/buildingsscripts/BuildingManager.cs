@@ -13,6 +13,13 @@ public static class BuildingInformation
     private static int houseMax = 15;
     private static int barrackMax = 1;
 
+    public static void Reset()
+    {
+        castleCounter = 0;
+        houseCounter = 0;
+        barrackCounter = 0;
+    }
+
     public enum TYPE_OF_BUILDING
     {
         Castle, House, Barrack

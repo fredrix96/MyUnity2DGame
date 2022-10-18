@@ -17,13 +17,14 @@ public static class CameraManager
 
     static bool onPlayer;
 
-    static CameraManager()
+    static public void Init()
     {
+        mainCam = null;
+
         camOrtoSize = 5.0f;
         zoomSpeed = 100;
         cameraSpeed = 20;
 
-        Camera.main.transform.parent = GameManager.GameManagerObject.transform;
         mainCam = Camera.main;
         mainCam.orthographicSize = camOrtoSize;
 
@@ -50,6 +51,11 @@ public static class CameraManager
 
         SetDirX();
         SetDirY();
+    }
+
+    public static void ResetMainCameraPosition()
+    {
+        mainCam.transform.position = new Vector3(0, 0, -10);
     }
 
     public static void ActivateOnPlayer(bool activate)

@@ -126,13 +126,11 @@ public class Controller
             else CameraManager.ActivateOnPlayer(true);
         }
 
-        // If game over, restart the game
-        //if (GameManager.IsGameOver())
-        //{
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                GameManager.Quit();
-            }
-        //}
+        // If game over, go back to the menu
+        if (Input.GetKeyDown(KeyCode.Escape) && GameManager.IsGameOver())
+        {
+            EventManager.InvokeUnloadLevel();
+            EventManager.InvokeLoadMenu();
+        }
     }
 }

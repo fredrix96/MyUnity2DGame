@@ -130,11 +130,11 @@ public class Character
 
     protected void WalkToNewPosition()
     {
-        // Make sure that the path is not interrupted by a newly built building
+        // Make sure that the path is not interrupted by a newly built building or other characters of the same type
         Tile checkTile = GridManager.GetTileFromWorldPosition(path[pathCounter]);
         if (checkTile != null)
         {
-            if (checkTile.IsObjectPresent())
+            if (checkTile.IsObjectPresent() || checkTile.IsCharacterPresent(type))
             {
                 ph.posReached = true;
                 pathCounter = 0;
@@ -142,7 +142,7 @@ public class Character
                 return;
             }
         }
-        
+
         if (path[1].x != float.MaxValue)
         {
             // Notice how we adjust the height based on the pivot difference

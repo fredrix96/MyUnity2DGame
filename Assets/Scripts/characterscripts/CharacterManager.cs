@@ -131,13 +131,25 @@ public static class HumansCounter
     public static int counter = 0;
     public static int nrOfHumans = 0;
     public static int max = 0; // depends on number of houses
+
+    public static void Reset()
+    {
+        counter = 0;
+        nrOfHumans = 0;
+    }
 }
 
 public static class EnemyCounter
 {
     public static int counter = 0;
     public static int nrOfEnemies = 0;
-    public static int max = 1000;
+    public static int max = 5000;
+
+    public static void Reset()
+    {
+        counter = 0;
+        nrOfEnemies = 0;
+    }
 }
 
 public static class SoldierCounter
@@ -145,7 +157,14 @@ public static class SoldierCounter
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
     public static int nrToSpawn = 0;
-    public static int max = 1000;
+    public static int max = 5000;
+
+    public static void Reset()
+    {
+        counter = 0;
+        nrOfSoldiers = 0;
+        nrToSpawn = 0;
+    }
 }
 
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)

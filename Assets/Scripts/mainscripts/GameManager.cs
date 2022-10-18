@@ -33,7 +33,7 @@ public static class GameManager
 
     public static void GameOver()
     {
-        message.SendPopUpMessage("GAME OVER" + System.Environment.NewLine + "Press ESC to quit", -1);
+        message.SendPopUpMessage("GAME OVER" + System.Environment.NewLine + "Press ESC", -1);
         gameOver = true;
     }
 
@@ -44,7 +44,6 @@ public static class GameManager
 
     public static void Quit()
     {
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Application.Quit();
         gameOver = false;
     }
