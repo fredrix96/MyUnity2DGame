@@ -22,29 +22,21 @@ public static class AudioManager
 
     static AudioSource GetAudioSource(List<AudioSource> list, string audioName)
     {
-        AudioSource audioSource = null;
-
-        bool sourceExists = false;
         foreach (AudioSource source in list)
         {
             if (source.clip != null)
             {
                 if (source.clip.name == audioName && !source.isPlaying)
                 {
-                    sourceExists = true;
-                    audioSource = source;
+                    return source;
                 }
             }
         }
 
-        if (!sourceExists)
-        {
-            AudioSource newAudioSource = go.AddComponent<AudioSource>();
-            list.Add(newAudioSource);
-            audioSource = newAudioSource;
-        }
-
-        return audioSource;
+       AudioSource newAudioSource = go.AddComponent<AudioSource>();
+       newAudioSource.name = audioName;
+       list.Add(newAudioSource);
+       return newAudioSource;
     }
 
     public static bool PlayBackgroundMusic(string audioName, float volume, bool loop = false)
@@ -76,29 +68,15 @@ public static class AudioManager
         return found;
     }
 
-    public static bool StopBackgroundMusic(string audioName)
+    public static void StopAllBackgroundMusic()
     {
-        bool found = false;
-
-        AudioSource audioSource = GetAudioSource(backgroundMusicList, audioName);
-
-        foreach (AudioClip clip in audioClips)
+        foreach (AudioSource audio in backgroundMusicList)
         {
-            if (clip.name == audioName)
+            if (audio.isPlaying)
             {
-                found = true;
-                audioSource.Stop();
-
-                return found;
+                audio.Stop();
             }
         }
-
-        if (!found)
-        {
-            Debug.LogWarning("Warning: No audio clip named " + audioName + " was found!");
-        }
-
-        return found;
     }
 
     public static bool PlayAudio2D(string audioName, float volume, bool loop = false)

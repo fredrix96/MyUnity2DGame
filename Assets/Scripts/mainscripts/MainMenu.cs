@@ -67,7 +67,7 @@ public static class MainMenu
         btn.onClick.AddListener(func);
     }
 
-    public static void HideObjects()
+    public static void Remove()
     {
         Object.Destroy(go);
     }

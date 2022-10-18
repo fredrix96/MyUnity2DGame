@@ -58,6 +58,11 @@ public class Main : MonoBehaviour
 
     void LoadMenu()
     {
+        if (!AudioManager.PlayBackgroundMusic("Menu Music 1", 0.2f, true))
+        {
+            Debug.LogWarning("Warning: Could not play menu background music!");
+        }
+
         MainMenu.Init(LoadLevel, QuitGame);
 
         EventManager.menuLoaded = true;
@@ -65,13 +70,17 @@ public class Main : MonoBehaviour
 
     void UnloadMenu()
     {
-        MainMenu.HideObjects();
+        AudioManager.StopAllBackgroundMusic();
+
+        MainMenu.Remove();
 
         EventManager.menuLoaded = false;
     }
 
     void LoadLevel()
     {
+        EventManager.InvokeUnloadMenu();
+
         if (!AudioManager.PlayBackgroundMusic("Game Background Music", 0.5f, true))
         {
             Debug.LogWarning("Warning: Could not play background music!");
@@ -92,15 +101,11 @@ public class Main : MonoBehaviour
         CameraManager.ActivateOnPlayer(true);
 
         EventManager.levelLoaded = true;
-        EventManager.InvokeUnloadMenu();
     }
 
     void UnloadLevel()
     {
-        if (!AudioManager.StopBackgroundMusic("Game Background Music"))
-        {
-            Debug.LogWarning("Warning: Could not stop background music!");
-        }
+        AudioManager.StopAllBackgroundMusic();
 
         HumansCounter.Reset();
         EnemyCounter.Reset();
