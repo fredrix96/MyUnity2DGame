@@ -112,6 +112,26 @@ public class Enemy : Character
                     Damage();
                 }
             }
+            else if (sm.IsIdle())
+            {
+                UpdatePositionHandler();
+
+                if (ph.targetFound)
+                {
+                    sm.StartWalking();
+                }
+                else
+                {
+                    sm.Idle();
+                }
+            }
+            else if (sm.IsTakingDamage())
+            {
+                if (sm.TakeDamage())
+                {
+                    sm.StartAttacking();
+                }
+            }
 
             // Groan
             if (time > groanDelay)

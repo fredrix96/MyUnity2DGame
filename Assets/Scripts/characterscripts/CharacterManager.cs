@@ -84,6 +84,8 @@ public static class CharacterInformation
             asp.attackEnd = 7;
             asp.die = 17;
             asp.dieEnd = 20;
+            asp.takeDamage = 32;
+            asp.takeDamageEnd = 35;
         }
         else if (type == TYPE_OF_ENEMY.Eye)
         {
@@ -95,6 +97,8 @@ public static class CharacterInformation
             asp.attackEnd = 7;
             asp.die = 16;
             asp.dieEnd = 19;
+            asp.takeDamage = 28;
+            asp.takeDamageEnd = 31;
         }
         else if (type == TYPE_OF_ENEMY.Skeleton)
         {
@@ -106,6 +110,8 @@ public static class CharacterInformation
             asp.attackEnd = 7;
             asp.die = 16;
             asp.dieEnd = 19;
+            asp.takeDamage = 28;
+            asp.takeDamageEnd = 31;
         }
         else
         {
@@ -117,6 +123,8 @@ public static class CharacterInformation
             asp.attackEnd = 0;
             asp.die = 0;
             asp.dieEnd = 0;
+            asp.takeDamage = 0;
+            asp.takeDamageEnd = 0;
 
             Debug.LogWarning("No animations found for " + type.ToString());
         }

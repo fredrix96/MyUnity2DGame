@@ -12,6 +12,8 @@ public struct AnimationStartingPoints
     public int walkEnd;
     public int die;
     public int dieEnd;
+    public int takeDamage;
+    public int takeDamageEnd;
 }
 
 public class SpriteManager : MonoBehaviour
@@ -24,17 +26,17 @@ public class SpriteManager : MonoBehaviour
 
     double animationTimer, deadTimer;
 
-    float idleDelay, walkDelay, attackDelay, dieDelay;
+    float idleDelay, walkDelay, attackDelay, dieDelay, takeDamageDelay;
     bool idleFlip;
 
-    int idle, attack, walk, die;
-    bool isIdle, isAttacking, isWalking, isDead;
+    int idle, attack, walk, die, takeDamage;
+    bool isIdle, isAttacking, isWalking, isDead, isTakingDamage;
 
     /// <summary>
     /// inAsp is a struct filled with information of which sprites the animations starts and stops.
     /// boundingBoxOffset makes sure that the boundingboxes are placed correctly to the incoming sprites
     /// </summary>
-    public void Init(GameObject go, string spritePath, AnimationStartingPoints inAsp, Vector2 boundingBoxOffset, bool isPlayer = false, bool kinematic = true)
+    public void Init(GameObject go, string spritePath, AnimationStartingPoints inAsp, Vector2 boundingBoxOffset, float inAttackDelay = 0.1f, bool isPlayer = false, bool kinematic = true)
     {
         asp = inAsp;
         sprites = Resources.LoadAll<Sprite>(spritePath);
@@ -74,10 +76,37 @@ public class SpriteManager : MonoBehaviour
 
         walkDelay = 0.1f;
         idleDelay = 0.15f;
-        attackDelay = 0.1f;
+        attackDelay = inAttackDelay;
         dieDelay = 0.1f;
+        takeDamageDelay = 0.03f;
 
         StartWalking();
+    }
+
+    public bool TakeDamage()
+    {
+        // Wait for the animation to finish
+        bool readyToContinue = false;
+
+        animationTimer += Time.deltaTime;
+
+        if (animationTimer > takeDamageDelay)
+        {
+            sr.sprite = sprites[takeDamage];
+            takeDamage++;
+
+            if (takeDamage > asp.takeDamageEnd)
+            {
+                takeDamage = asp.takeDamage;
+
+                // Do damage
+                readyToContinue = true;
+            }
+
+            animationTimer = 0;
+        }
+
+        return readyToContinue;
     }
 
     public void Idle()
@@ -215,6 +244,7 @@ public class SpriteManager : MonoBehaviour
         attack = asp.attack;
         walk = asp.walk;
         die = asp.die;
+        takeDamage = asp.takeDamage;
     }
 
     public void StartAttacking()
@@ -223,6 +253,7 @@ public class SpriteManager : MonoBehaviour
         isAttacking = true;
         isWalking = false;
         isDead = false;
+        isTakingDamage = false;
     }
 
     public void StartWalking()
@@ -231,6 +262,7 @@ public class SpriteManager : MonoBehaviour
         isAttacking = false;
         isWalking = true;
         isDead = false;
+        isTakingDamage = false;
     }
 
     public void StartIdle()
@@ -239,6 +271,7 @@ public class SpriteManager : MonoBehaviour
         isAttacking = false;
         isWalking = false;
         isDead = false;
+        isTakingDamage = false;
     }
 
     public void StartDying()
@@ -247,10 +280,25 @@ public class SpriteManager : MonoBehaviour
         isAttacking = false;
         isWalking = false;
         isDead = true;
+        isTakingDamage = false;
 
         bc.isTrigger = true;
 
         if (rb != null) rb.useFullKinematicContacts = false;
+    }
+
+    public void StartTakingDamage()
+    {
+        isIdle = false;
+        isAttacking = false;
+        isWalking = false;
+        isDead = false;
+        isTakingDamage = true;
+    }
+
+    public bool IsTakingDamage()
+    {
+        return isTakingDamage;
     }
 
     public bool IsAttacking()

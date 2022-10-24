@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Health : MonoBehaviour
 {
-    GameObject go;
+    GameObject go, parent;
     Canvas canvas;
     SpriteRenderer sr;
     DamageText dt;
@@ -18,7 +18,8 @@ public class Health : MonoBehaviour
     {
         go = new GameObject();
         go.name = inGo.name + "_healthbar";
-        go.transform.SetParent(inGo.transform);
+        parent = inGo;
+        go.transform.SetParent(parent.transform);
 
         canvas = go.AddComponent<Canvas>();
         sr = go.AddComponent<SpriteRenderer>();
@@ -57,6 +58,11 @@ public class Health : MonoBehaviour
     {
         int oldHealth = health;
         health -= damage;
+
+        if (parent.GetComponent<SpriteManager>() != null)
+        {
+            parent.GetComponent<SpriteManager>().StartTakingDamage();
+        }
 
         if (displayDamage)
         {

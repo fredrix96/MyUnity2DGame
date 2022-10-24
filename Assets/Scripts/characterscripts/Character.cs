@@ -121,6 +121,10 @@ public class Character
         {
             sm.StartIdle();
         }
+        else if (ph.isWalking)
+        {
+            sm.StartWalking();
+        }
         else if (ph.targetFound)
         {
             sm.StartAttacking();
@@ -134,7 +138,7 @@ public class Character
         Tile checkTile = GridManager.GetTileFromWorldPosition(path[pathCounter]);
         if (checkTile != null)
         {
-            if (checkTile.IsObjectPresent() || checkTile.IsCharacterPresent(type))
+            if (checkTile.IsObjectPresent())// || checkTile.IsCharacterPresent(type))
             {
                 ph.posReached = true;
                 pathCounter = 0;
@@ -238,6 +242,7 @@ public class Character
         public bool isDead;
         public bool isAttacking;
         public bool isIdle;
+        public bool isWalking;
         public bool posReached;
         public float speed;
         public float dist;
@@ -248,6 +253,8 @@ public class Character
             if (!isDead && !isAttacking && posReached)
             {
                 isIdle = false;
+                isWalking = false;
+                posReached = false;
                 List<float2> pathList = new List<float2>();
 
                 // Get the length of the struct
@@ -257,21 +264,21 @@ public class Character
                 if (type == TYPE_OF_CHARACTER.Enemy)
                 {
                     position = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Soldier, TYPE_OF_CHARACTER.Enemy, nrOfSteps, out targetFound, out pathList);
-                    posReached = false;
                 }
                 else if (type == TYPE_OF_CHARACTER.Soldier)
                 {
                     position = PathFinding.SearchForTarget(tilePosition, TYPE_OF_CHARACTER.Enemy, TYPE_OF_CHARACTER.Soldier, nrOfSteps, out targetFound, out pathList);
+                }
 
-                    // If the soldier has reached half of the field, then stop if there are no enemies nearby
-                    //if (position.x > Graphics.GetLevelLimits().y / 2 && !targetFound)
-                    //{
-                    //    isIdle = true;
-                    //}
-                    //else
-                    //{
-                        posReached = false;
-                    //}
+                float2 currWorldPos = GridManager.GetTile(tilePosition).GetWorldPos();
+                if (currWorldPos.x == position.x && currWorldPos.y == position.y)
+                {
+                    isIdle = true;
+                    posReached = true;
+                }
+                else if (!targetFound)
+                {
+                    isWalking = true;
                 }
 
                 if (pathList.Count > 0)

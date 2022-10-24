@@ -13,14 +13,10 @@ public class Player : Character
     Vector2 dirVector;
     bool playerHasSpawned; // checks if the player character (the king) has spawned for the first time
     float critChance; // calculate in percent (0.1 = 10%)
+    float attackSpeed;
 
     public Player()
     {
-        maxHealth = 300;
-        regenerationDelay = 0.3f;
-        playerSpeed = 5;
-        damage = 20;
-        critChance = 0.1f;
         playerHasSpawned = false;
         isDead = true;
 
@@ -222,6 +218,13 @@ public class Player : Character
 
         go.AddComponent<CollisionManager>();
 
+        maxHealth = 300;
+        regenerationDelay = 0.3f;
+        playerSpeed = 5;
+        damage = 20;
+        critChance = 0.1f;
+        attackSpeed = 0.08f;
+
         AnimationStartingPoints asp;
         asp.idle = 20;
         asp.idleEnd = 27;
@@ -231,11 +234,13 @@ public class Player : Character
         asp.attackEnd = 3;
         asp.die = 13;
         asp.dieEnd = 17;
+        asp.takeDamage = 38;
+        asp.takeDamageEnd = 41;
 
         boundingBoxOffset = new Vector2(0.0f, -1.5f);
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", asp, boundingBoxOffset, true, false);
+        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", asp, boundingBoxOffset, attackSpeed, true, false);
 
         playerHealth = go.AddComponent<PlayerHealth>();
         playerHealth.Init(maxHealth);

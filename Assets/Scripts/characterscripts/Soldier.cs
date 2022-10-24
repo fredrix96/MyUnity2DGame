@@ -24,11 +24,13 @@ public class Soldier : Character
         asp.attackEnd = 11;
         asp.die = 16;
         asp.dieEnd = 21;
+        asp.takeDamage = 42;
+        asp.takeDamageEnd = 45;
 
         boundingBoxOffset = new Vector2(0.0f, -0.25f);
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", asp, boundingBoxOffset);
+        sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", asp, boundingBoxOffset, 0.2f);
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
         spawnTile = new Vector2(0, randomY);
@@ -86,13 +88,20 @@ public class Soldier : Character
             {
                 UpdatePositionHandler();
 
-                if (ph.targetFound)
-                {
-                    sm.StartWalking();
-                }
-                else
-                {
+                //if (ph.targetFound)
+                //{
+                //    sm.StartWalking();
+                //}
+                //else
+                //{
                     sm.Idle();
+                //}
+            }
+            else if (sm.IsTakingDamage())
+            {
+                if (sm.TakeDamage())
+                {
+                    sm.StartAttacking();
                 }
             }
 
