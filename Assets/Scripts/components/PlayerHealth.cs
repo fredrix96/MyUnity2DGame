@@ -7,15 +7,17 @@ public class PlayerHealth : MonoBehaviour
 {
     Image healthBar, heart;
     Slider slider;
+    GameObject parent;
 
     int health;
     int maxHealth;
 
-    public void Init(int inHealth)
+    public void Init(GameObject inParent, int inHealth)
     {
         slider = UIManager.CreateSlider("healthbarSlider", "healthbarImage", null, new Vector2(70, 500), new Vector2(10.0f, 2.0f), out healthBar, Color.green);
         heart = UIManager.CreateImage(null, "heartImage", Resources.Load<Sprite>("Sprites/Heart"), new Vector2(-880, 505), new Vector2(60, 60)).GetComponent<Image>();
 
+        parent = inParent;
         maxHealth = inHealth;
         health = maxHealth;
     }
@@ -29,6 +31,8 @@ public class PlayerHealth : MonoBehaviour
     {
         int oldHealth = health;
         health -= damage;
+
+        parent.GetComponent<SpriteManager>().StartTakingDamage();
 
         // Health can not go below 0
         if (health <= 0)

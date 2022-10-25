@@ -88,20 +88,13 @@ public class Soldier : Character
             {
                 UpdatePositionHandler();
 
-                //if (ph.targetFound)
-                //{
-                //    sm.StartWalking();
-                //}
-                //else
-                //{
-                    sm.Idle();
-                //}
+                sm.Idle();
             }
             else if (sm.IsTakingDamage())
             {
                 if (sm.TakeDamage())
                 {
-                    sm.StartAttacking();
+                    // SOUND
                 }
             }
 

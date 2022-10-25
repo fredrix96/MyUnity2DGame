@@ -129,7 +129,7 @@ public class Enemy : Character
             {
                 if (sm.TakeDamage())
                 {
-                    sm.StartAttacking();
+                    // SOUND
                 }
             }
 

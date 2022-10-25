@@ -43,6 +43,13 @@ public class Player : Character
             {
                 Walk();
             }
+            else if (sm.IsTakingDamage())
+            {
+                if (sm.TakeDamage())
+                {
+                    // SOUND
+                }
+            }
             else if (sm.IsIdle())
             {
                 sm.Idle();
@@ -243,7 +250,7 @@ public class Player : Character
         sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", asp, boundingBoxOffset, attackSpeed, true, false);
 
         playerHealth = go.AddComponent<PlayerHealth>();
-        playerHealth.Init(maxHealth);
+        playerHealth.Init(go, maxHealth);
 
         dirVector = Vector2.zero;
         isDead = false;

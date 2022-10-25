@@ -24,7 +24,7 @@ public class SpriteManager : MonoBehaviour
     Rigidbody2D rb;
     AnimationStartingPoints asp;
 
-    double animationTimer, deadTimer;
+    double animationTimer, animationTimerTakingDamage, deadTimer;
 
     float idleDelay, walkDelay, attackDelay, dieDelay, takeDamageDelay;
     bool idleFlip;
@@ -88,9 +88,9 @@ public class SpriteManager : MonoBehaviour
         // Wait for the animation to finish
         bool readyToContinue = false;
 
-        animationTimer += Time.deltaTime;
+        animationTimerTakingDamage += Time.deltaTime;
 
-        if (animationTimer > takeDamageDelay)
+        if (animationTimerTakingDamage > takeDamageDelay)
         {
             sr.sprite = sprites[takeDamage];
             takeDamage++;
@@ -98,12 +98,13 @@ public class SpriteManager : MonoBehaviour
             if (takeDamage > asp.takeDamageEnd)
             {
                 takeDamage = asp.takeDamage;
+                isTakingDamage = false;
 
                 // Do damage
                 readyToContinue = true;
             }
 
-            animationTimer = 0;
+            animationTimerTakingDamage = 0;
         }
 
         return readyToContinue;
@@ -159,6 +160,11 @@ public class SpriteManager : MonoBehaviour
         
             animationTimer = 0;
         }
+
+        if (isTakingDamage)
+        {
+            TakeDamage();
+        }
     }
 
     void ResetAttack()
@@ -189,6 +195,11 @@ public class SpriteManager : MonoBehaviour
             animationTimer = 0;
         }
 
+        if (isTakingDamage)
+        {
+            TakeDamage();
+        }
+
         return damage;
     }
 
@@ -203,6 +214,7 @@ public class SpriteManager : MonoBehaviour
 
             if (die == asp.dieEnd)
             {
+                bc.enabled = false;
                 StartDying();
             }
 
@@ -238,6 +250,7 @@ public class SpriteManager : MonoBehaviour
     {
         idleFlip = false;
         animationTimer = 0;
+        animationTimerTakingDamage = 0;
         deadTimer = 0;
 
         idle = asp.idle;
@@ -253,7 +266,6 @@ public class SpriteManager : MonoBehaviour
         isAttacking = true;
         isWalking = false;
         isDead = false;
-        isTakingDamage = false;
     }
 
     public void StartWalking()
@@ -262,7 +274,6 @@ public class SpriteManager : MonoBehaviour
         isAttacking = false;
         isWalking = true;
         isDead = false;
-        isTakingDamage = false;
     }
 
     public void StartIdle()
@@ -271,7 +282,6 @@ public class SpriteManager : MonoBehaviour
         isAttacking = false;
         isWalking = false;
         isDead = false;
-        isTakingDamage = false;
     }
 
     public void StartDying()
@@ -289,10 +299,6 @@ public class SpriteManager : MonoBehaviour
 
     public void StartTakingDamage()
     {
-        isIdle = false;
-        isAttacking = false;
-        isWalking = false;
-        isDead = false;
         isTakingDamage = true;
     }
 

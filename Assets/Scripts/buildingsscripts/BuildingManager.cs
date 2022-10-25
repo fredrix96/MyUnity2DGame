@@ -8,37 +8,40 @@ public static class BuildingInformation
     private static int castleCounter = 0;
     private static int houseCounter = 0;
     private static int barrackCounter = 0;
+    private static int archeryTowerCounter = 0;
 
     private static int castleMax = 1;
     private static int houseMax = 15;
     private static int barrackMax = 1;
+    private static int archeryTowerMax = 5;
 
     public static void Reset()
     {
         castleCounter = 0;
         houseCounter = 0;
         barrackCounter = 0;
+        archeryTowerCounter= 0;
     }
 
     public enum TYPE_OF_BUILDING
     {
-        Castle, House, Barrack
+        Castle, House, Barrack, ArcheryTower
     }
 
     static readonly int[] cost = new int[]
     {
-        500, 250, 800
+        500, 250, 800, 1000
     };
 
     static readonly int[] health = new int[]
     {
-        5000, 500, 1500
+        5000, 500, 1500, 1000
     };
 
     // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
     static readonly Vector2[] size = new Vector2[] 
     {
-        new Vector2(7,11), new Vector2(5,7), new Vector2(7,9)
+        new Vector2(7,11), new Vector2(5,7), new Vector2(7,9), new Vector2(5,13)
     };
 
     public static int GetBuildingHealth(TYPE_OF_BUILDING type)
@@ -81,6 +84,13 @@ public static class BuildingInformation
                 limitReached = true;
             }
         }
+        else if (type is TYPE_OF_BUILDING.ArcheryTower)
+        {
+            if (archeryTowerCounter == archeryTowerMax)
+            {
+                limitReached = true;
+            }
+        }
 
         return limitReached;
     }
@@ -99,6 +109,9 @@ public static class BuildingInformation
                 break;
             case TYPE_OF_BUILDING.Barrack:
                 counter = barrackCounter;
+                break;
+            case TYPE_OF_BUILDING.ArcheryTower:
+                counter = archeryTowerCounter;
                 break;
             default:
                 Debug.LogWarning("Warning! Could not return the " + type.ToString() + "Counter...");
@@ -123,6 +136,9 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.Barrack:
                 max = barrackMax;
                 break;
+            case TYPE_OF_BUILDING.ArcheryTower:
+                max = archeryTowerMax;
+                break;
             default:
                 Debug.LogWarning("Warning! Could not return the " + type.ToString() + "Max...");
                 break;
@@ -144,6 +160,9 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.Barrack:
                 barrackCounter++;
                 break;
+            case TYPE_OF_BUILDING.ArcheryTower:
+                archeryTowerCounter++;
+                break;
             default:
                 Debug.LogWarning("Warning! Could not increase the " + type.ToString() + "Counter...");
                 break;
@@ -162,6 +181,9 @@ public static class BuildingInformation
                 break;
             case TYPE_OF_BUILDING.Barrack:
                 barrackCounter--;
+                break;
+            case TYPE_OF_BUILDING.ArcheryTower:
+                archeryTowerCounter--;
                 break;
             default:
                 Debug.LogWarning("Warning! Could not decrease the " + type.ToString() + "Counter...");
@@ -198,6 +220,7 @@ public class BuildingManager : MonoBehaviour
         sprites.Add(Resources.Load<Sprite>("Sprites/Castle"));
         sprites.Add(Resources.Load<Sprite>("Sprites/House"));
         sprites.Add(Resources.Load<Sprite>("Sprites/Barrack"));
+        sprites.Add(Resources.Load<Sprite>("Sprites/ArcheryTower"));
 
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
@@ -214,15 +237,18 @@ public class BuildingManager : MonoBehaviour
 
     void Update()
     {
-        for (int i = 0; i < buildings.Count; i++)
+        if (!GameManager.IsGameOver())
         {
-            if (buildings[i].ShouldBeRemoved())
+            for (int i = 0; i < buildings.Count; i++)
             {
-                RemoveBuilding(buildings[i]);
-            }
-            else
-            {
-                buildings[i].Update();
+                if (buildings[i].ShouldBeRemoved())
+                {
+                    RemoveBuilding(buildings[i]);
+                }
+                else
+                {
+                    buildings[i].Update();
+                }
             }
         }
     }
@@ -259,6 +285,11 @@ public class BuildingManager : MonoBehaviour
         {
             Barrack barrack = new Barrack(go, inPos, coinMan, buildings);
             buildings.Add(barrack);
+        }
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.ArcheryTower)
+        {
+            ArcheryTower archeryTower = new ArcheryTower(go, inPos, coinMan, buildings);
+            buildings.Add(archeryTower);
         }
     }
 
