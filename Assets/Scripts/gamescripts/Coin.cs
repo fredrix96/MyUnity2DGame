@@ -12,6 +12,7 @@ public class Coin
     SpriteRenderer sr;
 
     Vector3 direction; // z coord is towards the camera
+    Vector3 originalPosition;
     float speed;
     float lifeTime;
     double timer;
@@ -25,6 +26,10 @@ public class Coin
         go.transform.SetParent(inGo.transform);
 
         coin = UIManager.CreateImage(null, "coinUIImage", Resources.Load<Sprite>("Sprites/Coin"), new Vector2(910, 500), new Vector2(50, 50)).GetComponent<Image>();
+        originalPosition = coin.transform.position;
+
+        speed = 2000f;
+        lifeTime = 1f;
 
         shouldBeRemoved = false;
     }
@@ -71,6 +76,25 @@ public class Coin
         {
             shouldBeRemoved = true;
         }
+    }
+
+    public bool Spin()
+    {
+        timer += Time.deltaTime;
+
+        coin.transform.Rotate(new Vector3(0, 1, 0) * speed * Time.deltaTime);
+        coin.transform.position = new Vector2(coin.transform.position.x, coin.transform.position.y + 0.05f * Mathf.Cos((float)timer * 10));
+
+        // We add 180 so that we skip the negative degrees
+        if (timer > lifeTime)
+        {
+            coin.transform.rotation = Quaternion.Euler(0, 0, 0);
+            coin.transform.position = originalPosition;
+            timer = 0;
+            return false;
+        }
+
+        return true;
     }
 
     public bool Remove()

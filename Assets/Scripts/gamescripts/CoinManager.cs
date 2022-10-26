@@ -18,6 +18,11 @@ public class CoinManager
     List<Coin> coinList;
 
     int nrOfCoins;
+    int coinsToAdd;
+    bool spinCoinUI;
+
+    double timer;
+    float addCoinDelay;
 
     public CoinManager(int startAmount)
     {
@@ -32,12 +37,19 @@ public class CoinManager
         coinList = new List<Coin>();
 
         nrOfCoins = startAmount;
+        coinsToAdd = 0;
+        spinCoinUI = false;
+
+        timer = 0;
+        addCoinDelay = 0.01f;
 
         value = UIManager.CreateText(null, "valueText", nrOfCoins.ToString(), 35, new Vector2(780, 500), new Vector2(100, 100), TextAnchor.MiddleRight);
     }
 
     public void Update()
     {
+        timer += Time.deltaTime;
+
         for (int i = 0; i < coinList.Count; i++)
         {
             Coin coin = coinList[i];
@@ -49,6 +61,20 @@ public class CoinManager
                 coin.Destroy();
                 coinList.Remove(coin);
             }
+        }
+
+        if (spinCoinUI)
+        {
+            spinCoinUI = coinUI.Spin();
+        }
+
+        if (coinsToAdd > 0 && timer > addCoinDelay)
+        {
+            nrOfCoins++;
+            coinsToAdd--;
+            timer = 0;
+            spinCoinUI = true;
+            value.text = nrOfCoins.ToString();
         }
 
 #if DEBUG
@@ -68,8 +94,8 @@ public class CoinManager
 
     public void AddCoins(int amount)
     {
-        nrOfCoins += amount;
-        value.text = nrOfCoins.ToString();
+        //nrOfCoins += amount;
+        coinsToAdd += amount;
     }
 
     public void RemoveCoins(int amount)

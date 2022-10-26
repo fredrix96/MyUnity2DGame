@@ -102,7 +102,7 @@ public class PlayerHealth : MonoBehaviour
             // Set the correct color
             ChangeColor(health);
 
-            //AudioManager.PlayAudio3D("Player Hit", 0.1f, playerObject.transform.position);
+            AudioManager.PlayAudio3D("Player Hit", 0.1f, parent.transform.position);
         }
     }
 
