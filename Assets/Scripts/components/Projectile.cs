@@ -86,6 +86,10 @@ public class Projectile
             {
                 col.gameObject.GetComponent<Health>().Damage(damage, false, false);
             }
+            else if (col.gameObject.GetComponent<PlayerHealth>() != null)
+            {
+                col.gameObject.GetComponent<PlayerHealth>().Damage(damage);
+            }
         }
 
         collider.enabled = false;

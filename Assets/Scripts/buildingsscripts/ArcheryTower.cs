@@ -10,8 +10,8 @@ public class ArcheryTower : Building
     int damage;
     double timer;
     Vector2 shootingOrigin;
-    Vector2 shootingDirection;
-
+    CircleCollider2D searchArea;
+    LayerMask target;
     ProjectileManager pm;
     Sprite projSprite;
 
@@ -44,6 +44,10 @@ public class ArcheryTower : Building
         MarkOrUnmarkTiles(type, inPos, true);
 
         collider = go.AddComponent<BoxCollider2D>();
+        searchArea = go.AddComponent<CircleCollider2D>();
+        searchArea.radius = 50;
+        searchArea.enabled = false;
+
         rb = go.AddComponent<Rigidbody2D>();
         rb.isKinematic = true;
         rb.useFullKinematicContacts = true;
@@ -54,7 +58,7 @@ public class ArcheryTower : Building
         collider.size = new Vector2(sr.size.x, sr.size.y / 5);
         collider.offset = new Vector2(0, -(sr.size.y / 3));
 
-        shootingOrigin = new Vector2(go.transform.position.x, go.transform.position.y);
+        shootingOrigin = new Vector2(go.transform.position.x, go.transform.position.y + sr.bounds.size.y * 0.1f);
 
         selector = go.AddComponent<Selector>();
         selector.Init(toolBarObject, sr, textObject, buttonObject);
@@ -63,6 +67,8 @@ public class ArcheryTower : Building
 
         pm = go.AddComponent<ProjectileManager>();
         projSprite = Resources.Load<Sprite>("Sprites/Arrow");
+
+        target = LayerMask.GetMask("Player");
 
         BuildingInformation.IncreaseCounter(type);
     }
@@ -100,21 +106,21 @@ public class ArcheryTower : Building
 
     public void Shoot()
     {
-        List<Vector2> hitPoints = new List<Vector2>();
-
-        // Multithreading?
         // Search for targets
-        for (int i = 0; i < 180; i++)
-        {
-            shootingDirection = new Vector2(Mathf.Cos(i + 1), Mathf.Cos(i));
-            float searchLength = 10;
-            RaycastHit2D hit = Physics2D.Raycast(shootingOrigin, shootingDirection, searchLength, LayerMask.GetMask("Enemies"));
+        ContactFilter2D filter = new ContactFilter2D();
+        filter.SetLayerMask(target);
 
-            if (hit)
-            {
-                hitPoints.Add(hit.point);
-            }
+        List<Collider2D> results = new List<Collider2D>();
+        searchArea.enabled = true;
+        searchArea.OverlapCollider(filter, results);
+
+        List<Vector2> hitPoints = new List<Vector2>();
+        foreach (Collider2D collider2d in results)
+        {
+            hitPoints.Add(collider2d.transform.position);
         }
+
+        searchArea.enabled = false;
 
         // Find closest target
         float distance = float.MaxValue;
@@ -132,14 +138,7 @@ public class ArcheryTower : Building
         if (hitPoints.Count > 0 && index != -1)
         {
             // Send projectile
-            pm.SpawnProjectile(go, shootingOrigin, hitPoints[index], projSprite, new Vector2(0.035f, 0.05f), damage, 1.5f, LayerMask.GetMask("Enemies"));
-
-#if DEBUG
-            if (Tools.DebugMode)
-            {
-              Debug.DrawRay(shootingOrigin, hitPoints[index], Color.white, 15f);
-            }
-#endif
+            pm.SpawnProjectile(go, shootingOrigin, hitPoints[index], projSprite, new Vector2(0.035f, 0.05f), damage, 1.5f, target);
         }
 
         hitPoints.Clear();
