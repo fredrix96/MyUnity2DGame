@@ -11,6 +11,18 @@ public class PlayerHealth : MonoBehaviour
 
     int health;
     int maxHealth;
+    double timer;
+    float timeDelay;
+    float growingSpeed;
+    float growingSpeedOriginal;
+
+    private void Start()
+    {
+        timer = 0;
+        timeDelay = 0.4f;
+        growingSpeed = 0.3f;
+        growingSpeedOriginal = growingSpeed;
+    }
 
     public void Init(GameObject inParent, int inHealth)
     {
@@ -24,6 +36,35 @@ public class PlayerHealth : MonoBehaviour
 
     void Update()
     {
+        if (health > 0)
+        {
+            PlayHeartAnimation();
+        }
+    }
+
+    void PlayHeartAnimation()
+    {
+        timer += Time.deltaTime;
+
+        heart.transform.localScale = new Vector2(heart.transform.localScale.x + growingSpeed * Time.deltaTime, heart.transform.localScale.y + growingSpeed * Time.deltaTime);
+
+        if (timer > timeDelay)
+        {
+            growingSpeed *= -1;
+            timer = 0;
+        }
+    }
+
+    void SetGrowingSpeed(float speed = 1)
+    {
+        if (growingSpeed < 0)
+        {
+            growingSpeed = -growingSpeedOriginal * speed;
+        }
+        else
+        {
+            growingSpeed = growingSpeedOriginal * speed;
+        }
     }
 
     // How much health should the character lose?
@@ -31,6 +72,15 @@ public class PlayerHealth : MonoBehaviour
     {
         int oldHealth = health;
         health -= damage;
+
+        if (health < maxHealth * 0.2f)
+        {
+            SetGrowingSpeed(0.3f);
+        }
+        else if (health < maxHealth * 0.5f)
+        {
+            SetGrowingSpeed(0.7f);
+        }
 
         parent.GetComponent<SpriteManager>().StartTakingDamage();
 
@@ -69,6 +119,11 @@ public class PlayerHealth : MonoBehaviour
 
         // Set the correct color
         ChangeColor(health);
+
+        if (health > maxHealth * 0.5f)
+        {
+            SetGrowingSpeed();
+        }
     }
 
     public int GetHealth()
