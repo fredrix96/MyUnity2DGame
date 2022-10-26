@@ -68,7 +68,7 @@ public class ArcheryTower : Building
         pm = go.AddComponent<ProjectileManager>();
         projSprite = Resources.Load<Sprite>("Sprites/Arrow");
 
-        target = LayerMask.GetMask("Player");
+        target = LayerMask.GetMask("Enemies");
 
         BuildingInformation.IncreaseCounter(type);
     }
@@ -115,9 +115,11 @@ public class ArcheryTower : Building
         searchArea.OverlapCollider(filter, results);
 
         List<Vector2> hitPoints = new List<Vector2>();
+        Vector3 pos;
         foreach (Collider2D collider2d in results)
         {
-            hitPoints.Add(collider2d.transform.position);
+            pos = new Vector2(collider2d.bounds.center.x, collider2d.bounds.center.y);
+            hitPoints.Add(pos);
         }
 
         searchArea.enabled = false;

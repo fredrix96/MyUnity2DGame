@@ -74,8 +74,6 @@ public class Projectile
         ContactFilter2D filter = new ContactFilter2D();
         filter.SetLayerMask(target);
 
-        Vector3 pivotOffsetWorldSpace = go.transform.position - collider.bounds.center;
-
         List<Collider2D> results = new List<Collider2D>();
         collider.enabled = true;
         collider.OverlapCollider(filter, results);
