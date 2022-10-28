@@ -15,12 +15,12 @@ public static class CharacterInformation
     }
     public enum TYPE_OF_SOLDIER
     {
-        Spearman
+        Spearman, Maceman
     }
 
     static readonly Vector2[] soldierSpawnLocations = new Vector2[]
     {
-        Vector2.zero
+        Vector2.zero, Vector2.zero
     };
 
     static readonly int[] enemyDamage = new int[]
@@ -45,7 +45,12 @@ public static class CharacterInformation
 
     static readonly int[] soldierDamage = new int[]
     {
-        20
+        20, 40
+    };
+
+    static readonly int[] soldierHealth = new int[]
+    {
+        100, 200
     };
 
     static public void SetSpawnLocation(TYPE_OF_SOLDIER type, Vector2 spawn)
@@ -82,6 +87,11 @@ public static class CharacterInformation
     public static int GetSoldierDamage(TYPE_OF_SOLDIER type)
     {
         return soldierDamage[(int)type];
+    }
+
+    public static int GetSoldierHealth(TYPE_OF_SOLDIER type)
+    {
+        return soldierHealth[(int)type];
     }
 
 
@@ -146,7 +156,56 @@ public static class CharacterInformation
 
         return asp;
     }
-    
+
+    public static AnimationStartingPoints GetSoldierAnimationStartingPoints(TYPE_OF_SOLDIER type)
+    {
+        AnimationStartingPoints asp;
+
+        if (type == TYPE_OF_SOLDIER.Spearman)
+        {
+            asp.idle = 24;
+            asp.idleEnd = 31;
+            asp.walk = 34;
+            asp.walkEnd = 41;
+            asp.attack = 8;
+            asp.attackEnd = 11;
+            asp.die = 16;
+            asp.dieEnd = 21;
+            asp.takeDamage = 42;
+            asp.takeDamageEnd = 45;
+        }
+        else if (type == TYPE_OF_SOLDIER.Maceman)
+        {
+            asp.idle = 24;
+            asp.idleEnd = 31;
+            asp.walk = 34;
+            asp.walkEnd = 41;
+            asp.attack = 12;
+            asp.attackEnd = 15;
+            asp.die = 16;
+            asp.dieEnd = 21;
+            asp.takeDamage = 42;
+            asp.takeDamageEnd = 45;
+        }
+        else
+        {
+            asp.idle = 0;
+            asp.idleEnd = 0;
+            asp.walk = 0;
+            asp.walkEnd = 0;
+            asp.attack = 0;
+            asp.attackEnd = 0;
+            asp.die = 0;
+            asp.dieEnd = 0;
+            asp.takeDamage = 0;
+            asp.takeDamageEnd = 0;
+
+            Debug.LogWarning("No animations found for " + type.ToString());
+        }
+
+        return asp;
+    }
+
 }
 
 public static class HumansCounter
@@ -175,7 +234,22 @@ public static class EnemyCounter
     }
 }
 
-public static class SoldierCounter
+public static class SoldierCounter_Spearmen
+{
+    public static int counter = 0;
+    public static int nrOfSoldiers = 0;
+    public static int nrToSpawn = 0;
+    public static int max = 5000;
+
+    public static void Reset()
+    {
+        counter = 0;
+        nrOfSoldiers = 0;
+        nrToSpawn = 0;
+    }
+}
+
+public static class SoldierCounter_Macemen
 {
     public static int counter = 0;
     public static int nrOfSoldiers = 0;
@@ -261,7 +335,8 @@ public class CharacterManager
         }
         if (Input.GetKey(KeyCode.X))
         {
-            SpawnSoldier();
+            SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
+            SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Maceman);
         }
 # endif
     }
@@ -397,14 +472,27 @@ public class CharacterManager
 
     void UpdateSoldiers()
     {
-        if (SoldierCounter.nrToSpawn > 0)
+        if (SoldierCounter_Spearmen.nrToSpawn > 0)
         {
-            if (SoldierCounter.nrOfSoldiers < SoldierCounter.max)
+            if (SoldierCounter_Spearmen.nrOfSoldiers < SoldierCounter_Spearmen.max)
             {
                 soldierSpawnTimer += Time.deltaTime;
                 if (soldierSpawnTimer > soldierSpawnDelay)
                 {
-                    SpawnSoldier();
+                    SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
+                    soldierSpawnTimer = 0;
+                }
+            }
+        }
+
+        if (SoldierCounter_Macemen.nrToSpawn > 0)
+        {
+            if (SoldierCounter_Macemen.nrOfSoldiers < SoldierCounter_Macemen.max)
+            {
+                soldierSpawnTimer += Time.deltaTime;
+                if (soldierSpawnTimer > soldierSpawnDelay)
+                {
+                    SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Maceman);
                     soldierSpawnTimer = 0;
                 }
             }
@@ -472,19 +560,37 @@ public class CharacterManager
         EnemyCounter.nrOfEnemies--;
     }
 
-    void SpawnSoldier()
+    void SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER type)
     {
-        soldiers.Add(new Soldier(soldierObjects));
-        SoldierCounter.counter++;
-        SoldierCounter.nrOfSoldiers++;
-        SoldierCounter.nrToSpawn--;
+        soldiers.Add(new Soldier(soldierObjects, type));
+
+        if (type == CharacterInformation.TYPE_OF_SOLDIER.Spearman)
+        {
+            SoldierCounter_Spearmen.counter++;
+            SoldierCounter_Spearmen.nrOfSoldiers++;
+            SoldierCounter_Spearmen.nrToSpawn--;
+        }
+        else if (type == CharacterInformation.TYPE_OF_SOLDIER.Maceman)
+        {
+            SoldierCounter_Macemen.counter++;
+            SoldierCounter_Macemen.nrOfSoldiers++;
+            SoldierCounter_Macemen.nrToSpawn--;
+        }
     }
 
     void RemoveSoldier(Soldier soldier)
     {
         soldier.Destroy();
         soldiers.Remove(soldier);
-        SoldierCounter.nrOfSoldiers--;
+
+        if (soldier.GetSoldierType() == CharacterInformation.TYPE_OF_SOLDIER.Spearman)
+        {
+            SoldierCounter_Spearmen.nrOfSoldiers--;
+        }
+        else if (soldier.GetSoldierType() == CharacterInformation.TYPE_OF_SOLDIER.Maceman)
+        {
+            SoldierCounter_Macemen.nrOfSoldiers--;
+        }
     }
 
     void DisplayCharacterData()
@@ -501,7 +607,7 @@ public class CharacterManager
 
         // Soldiers
         UIManager.CreateImage(null, "soldiersDataImage", Resources.Load<Sprite>("Sprites/SwordIcon"), new Vector2(-80, 500), new Vector2(30f, 30f));
-        text = SoldierCounter.nrOfSoldiers.ToString();
+        text = (SoldierCounter_Spearmen.nrOfSoldiers + SoldierCounter_Macemen.nrOfSoldiers).ToString();
         soldiersDataText = UIManager.CreateText(null, "soldiersDataText", text, 22, new Vector2(40, 500), new Vector2(100f, 100f));
 
         // Enemies
@@ -519,7 +625,7 @@ public class CharacterManager
     void UpdateCharacterTextData()
     {
         humansDataText.text = HumansCounter.nrOfHumans.ToString() + " / " + HumansCounter.max;
-        soldiersDataText.text = SoldierCounter.nrOfSoldiers.ToString();
+        soldiersDataText.text = (SoldierCounter_Spearmen.nrOfSoldiers + SoldierCounter_Macemen.nrOfSoldiers).ToString();
         enemiesDataText.text = EnemyCounter.nrOfEnemies.ToString();
 
         int killed = EnemyCounter.counter - EnemyCounter.nrOfEnemies;

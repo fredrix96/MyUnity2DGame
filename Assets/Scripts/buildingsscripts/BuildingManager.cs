@@ -7,41 +7,44 @@ public static class BuildingInformation
 {
     private static int castleCounter = 0;
     private static int houseCounter = 0;
-    private static int barrackCounter = 0;
+    private static int barrackSpearCounter = 0;
+    private static int barrackMaceCounter = 0;
     private static int archeryTowerCounter = 0;
 
     private static int castleMax = 1;
-    private static int houseMax = 15;
-    private static int barrackMax = 1;
+    private static int houseMax = 10;
+    private static int barrackSpearMax = 1;
+    private static int barrackMaceMax = 1;
     private static int archeryTowerMax = 5;
 
     public static void Reset()
     {
         castleCounter = 0;
         houseCounter = 0;
-        barrackCounter = 0;
-        archeryTowerCounter= 0;
+        barrackSpearCounter = 0;
+        barrackMaceCounter = 0;
+        archeryTowerCounter = 0;
     }
 
     public enum TYPE_OF_BUILDING
     {
-        Castle, House, Barrack, ArcheryTower
+        Castle, House, Barrack_Spear, Barrack_Mace, ArcheryTower
     }
 
     static readonly int[] cost = new int[]
     {
-        500, 250, 800, 1000
+        500, 250, 800, 800, 1000
     };
 
     static readonly int[] health = new int[]
     {
-        5000, 500, 1500, 1000
+        5000, 500, 1500, 1500, 1000
     };
 
     // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
     static readonly Vector2[] size = new Vector2[] 
     {
-        new Vector2(7,11), new Vector2(5,7), new Vector2(7,9), new Vector2(5,13)
+        new Vector2(7,11), new Vector2(5,7), new Vector2(7,9), new Vector2(7,9), new Vector2(5,13)
     };
 
     public static int GetBuildingHealth(TYPE_OF_BUILDING type)
@@ -77,9 +80,16 @@ public static class BuildingInformation
                 limitReached = true;
             }
         }
-        else if (type is TYPE_OF_BUILDING.Barrack)
+        else if (type is TYPE_OF_BUILDING.Barrack_Spear)
         {
-            if (barrackCounter == barrackMax)
+            if (barrackSpearCounter == barrackSpearMax)
+            {
+                limitReached = true;
+            }
+        }
+        else if (type is TYPE_OF_BUILDING.Barrack_Mace)
+        {
+            if (barrackMaceCounter == barrackMaceMax)
             {
                 limitReached = true;
             }
@@ -107,8 +117,11 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.House:
                 counter = houseCounter;
                 break;
-            case TYPE_OF_BUILDING.Barrack:
-                counter = barrackCounter;
+            case TYPE_OF_BUILDING.Barrack_Spear:
+                counter = barrackSpearCounter;
+                break;
+            case TYPE_OF_BUILDING.Barrack_Mace:
+                counter = barrackMaceCounter;
                 break;
             case TYPE_OF_BUILDING.ArcheryTower:
                 counter = archeryTowerCounter;
@@ -133,8 +146,11 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.House:
                 max = houseMax;
                 break;
-            case TYPE_OF_BUILDING.Barrack:
-                max = barrackMax;
+            case TYPE_OF_BUILDING.Barrack_Spear:
+                max = barrackSpearMax;
+                break;
+            case TYPE_OF_BUILDING.Barrack_Mace:
+                max = barrackMaceMax;
                 break;
             case TYPE_OF_BUILDING.ArcheryTower:
                 max = archeryTowerMax;
@@ -157,8 +173,11 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.House:
                 houseCounter++;
                 break;
-            case TYPE_OF_BUILDING.Barrack:
-                barrackCounter++;
+            case TYPE_OF_BUILDING.Barrack_Spear:
+                barrackSpearCounter++;
+                break;
+            case TYPE_OF_BUILDING.Barrack_Mace:
+                barrackMaceCounter++;
                 break;
             case TYPE_OF_BUILDING.ArcheryTower:
                 archeryTowerCounter++;
@@ -179,8 +198,11 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.House:
                 houseCounter--;
                 break;
-            case TYPE_OF_BUILDING.Barrack:
-                barrackCounter--;
+            case TYPE_OF_BUILDING.Barrack_Spear:
+                barrackSpearCounter--;
+                break;
+            case TYPE_OF_BUILDING.Barrack_Mace:
+                barrackMaceCounter--;
                 break;
             case TYPE_OF_BUILDING.ArcheryTower:
                 archeryTowerCounter--;
@@ -219,7 +241,8 @@ public class BuildingManager : MonoBehaviour
 
         sprites.Add(Resources.Load<Sprite>("Sprites/Castle"));
         sprites.Add(Resources.Load<Sprite>("Sprites/House"));
-        sprites.Add(Resources.Load<Sprite>("Sprites/Barrack"));
+        sprites.Add(Resources.Load<Sprite>("Sprites/Barrack_Spear"));
+        sprites.Add(Resources.Load<Sprite>("Sprites/Barrack_Mace"));
         sprites.Add(Resources.Load<Sprite>("Sprites/ArcheryTower"));
 
         // Canvas
@@ -281,9 +304,14 @@ public class BuildingManager : MonoBehaviour
             House house = new House(go, inPos, coinMan, buildings);
             buildings.Add(house);
         }
-        else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack)
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Spear)
         {
-            Barrack barrack = new Barrack(go, inPos, coinMan, buildings);
+            Barrack barrack = new Barrack(go, inPos, coinMan, buildings, type);
+            buildings.Add(barrack);
+        }
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Mace)
+        {
+            Barrack barrack = new Barrack(go, inPos, coinMan, buildings, type);
             buildings.Add(barrack);
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.ArcheryTower)

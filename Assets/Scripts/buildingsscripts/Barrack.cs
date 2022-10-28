@@ -9,17 +9,27 @@ public class Barrack : Building
     float spawnDelay;
     double timer;
 
-    public Barrack(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings)
+    public Barrack(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings, BuildingInformation.TYPE_OF_BUILDING inType)
     {
-        type = BuildingInformation.TYPE_OF_BUILDING.Barrack;
+        type = inType;
 
         centerTile = inPos;
         coinMan = inCoinMan;
         buildings = inBuildings;
 
         Vector2 spawnLocation = new Vector2(centerTile.GetTilePosition().x, centerTile.GetTilePosition().y + BuildingInformation.GetBuildingSize(type).y / 2);
-        Debug.Log(inPos.GetTilePosition() + "   " + spawnLocation);
-        CharacterInformation.SetSpawnLocation(CharacterInformation.TYPE_OF_SOLDIER.Spearman, spawnLocation);
+
+        if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Spear)
+        {
+            Debug.Log("Spearmen spawn location set at: " + spawnLocation);
+            CharacterInformation.SetSpawnLocation(CharacterInformation.TYPE_OF_SOLDIER.Spearman, spawnLocation);
+        }
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Mace)
+        {
+            Debug.Log("Macemen spawn location set at: " + spawnLocation);
+            CharacterInformation.SetSpawnLocation(CharacterInformation.TYPE_OF_SOLDIER.Maceman, spawnLocation);
+        }
+
         spawnDelay = 2;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };
@@ -78,7 +88,14 @@ public class Barrack : Building
 
         CreateToolbarObject(new Vector2(3f, 1f), 2f);
 
-        CreateInfoText("Foot soldiers", 30, TextAnchor.MiddleCenter, new Vector2(65, 75));
+        if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Spear)
+        {
+            CreateInfoText("Spearmen", 25, TextAnchor.MiddleCenter, new Vector2(65, 100));
+        }
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Mace)
+        {
+            CreateInfoText("Macemen", 25, TextAnchor.MiddleCenter, new Vector2(65, 100));
+        }
     }
 
     void SpawnSoldier()
@@ -87,8 +104,16 @@ public class Barrack : Building
         if (HumansCounter.nrOfHumans != 0)
         {
             HumansCounter.nrOfHumans--;
-            SoldierCounter.nrToSpawn++;
             RemoveHumanFromRandomHouse();
+
+            if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Spear)
+            {
+                SoldierCounter_Spearmen.nrToSpawn++;
+            }
+            else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Mace)
+            {
+                SoldierCounter_Macemen.nrToSpawn++;
+            }
         }
     }
 

@@ -28,6 +28,7 @@ public class Character
     protected float speed;
     protected bool isDead;
     protected bool shouldBeRemoved;
+    protected float attackSpeed;
 
     protected Vector2 boundingBoxOffset;
     protected Vector2 spawnTile;

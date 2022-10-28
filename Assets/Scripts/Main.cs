@@ -116,7 +116,8 @@ public class Main : MonoBehaviour
 
         HumansCounter.Reset();
         EnemyCounter.Reset();
-        SoldierCounter.Reset();
+        SoldierCounter_Spearmen.Reset();
+        SoldierCounter_Macemen.Reset();
         BuildingInformation.Reset();
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

@@ -13,7 +13,6 @@ public class Player : Character
     Vector2 dirVector;
     bool playerHasSpawned; // checks if the player character (the king) has spawned for the first time
     float critChance; // calculate in percent (0.1 = 10%)
-    float attackSpeed;
 
     public Player()
     {
