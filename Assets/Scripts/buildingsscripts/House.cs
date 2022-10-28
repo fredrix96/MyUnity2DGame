@@ -11,7 +11,7 @@ public class House : Building
     double time;
     float timeDelay;
 
-    public House(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings)
+    public House(GameObject parent, Tile inPos, List<Building> inBuildings)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.House;
 
@@ -23,7 +23,6 @@ public class House : Building
         timeDelay = 5f;
 
         centerTile = inPos;
-        coinMan = inCoinMan;
         buildings = inBuildings;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };

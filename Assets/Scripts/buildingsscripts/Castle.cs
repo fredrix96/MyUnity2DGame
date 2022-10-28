@@ -9,12 +9,11 @@ public class Castle : Building
     double remainingTime;
     float timeToRespawn;
 
-    public Castle(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings, Player inPlayer)
+    public Castle(GameObject parent, Tile inPos, List<Building> inBuildings, Player inPlayer)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.Castle;
 
         centerTile = inPos;
-        coinMan = inCoinMan;
         buildings = inBuildings;
         player = inPlayer;
 

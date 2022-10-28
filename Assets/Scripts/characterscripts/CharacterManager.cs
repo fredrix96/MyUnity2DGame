@@ -441,17 +441,6 @@ public class CharacterManager
             {
                 SpawnEnemy();
                 enemySpawnTimer = 0;
-
-                if (enemySpawnDelay > 3) enemySpawnDelay -= 0.1f;
-                if (enemySpawnDelay > 2) enemySpawnDelay -= 0.05f;
-                if (enemySpawnDelay > 1) enemySpawnDelay -= 0.01f;
-                if (enemySpawnDelay > 0.5f) enemySpawnDelay -= 0.005f;
-                if (enemySpawnDelay > 0.25f) enemySpawnDelay -= 0.001f;
-
-                if (randomStart < 450)
-                {
-                    randomStart += 1;
-                }
             }
         }
 
@@ -528,18 +517,19 @@ public class CharacterManager
 
     void SpawnEnemy()
     {
-        int randomNumber = Random.Range(0, 1000);
+        int randomNumber = Random.Range(0, 10000);
 
         CharacterInformation.TYPE_OF_ENEMY eType;
-        if (randomNumber > 980)
+        Debug.Log(randomStart);
+        if (randomNumber > 9800 - randomStart)
         {
             eType = CharacterInformation.TYPE_OF_ENEMY.Skeleton;
         }
-        else if (randomNumber > 850)
+        else if (randomNumber > 8500 - randomStart)
         {
             eType = CharacterInformation.TYPE_OF_ENEMY.Goblin;
         }
-        else if (randomNumber > 650)
+        else if (randomNumber > 6500 - randomStart)
         {
             eType = CharacterInformation.TYPE_OF_ENEMY.Eye;
         }
@@ -551,6 +541,17 @@ public class CharacterManager
         enemies.Add(new Enemy(enemyObjects, eType, coinMan));
         EnemyCounter.counter++;
         EnemyCounter.nrOfEnemies++;
+
+        if (enemySpawnDelay > 3) enemySpawnDelay -= 0.1f;
+        if (enemySpawnDelay > 2) enemySpawnDelay -= 0.05f;
+        if (enemySpawnDelay > 1) enemySpawnDelay -= 0.01f;
+        if (enemySpawnDelay > 0.5f) enemySpawnDelay -= 0.005f;
+        if (enemySpawnDelay > 0.25f) enemySpawnDelay -= 0.001f;
+
+        if (randomStart < 5000)
+        {
+            randomStart += 1;
+        }
     }
 
     void RemoveEnemy(Enemy enemy)

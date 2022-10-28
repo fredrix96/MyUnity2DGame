@@ -10,12 +10,14 @@ public static class BuildingInformation
     private static int barrackSpearCounter = 0;
     private static int barrackMaceCounter = 0;
     private static int archeryTowerCounter = 0;
+    private static int goldmineCounter = 0;
 
     private static int castleMax = 1;
     private static int houseMax = 10;
     private static int barrackSpearMax = 1;
     private static int barrackMaceMax = 1;
     private static int archeryTowerMax = 5;
+    private static int goldmineMax = 3;
 
     public static void Reset()
     {
@@ -28,23 +30,23 @@ public static class BuildingInformation
 
     public enum TYPE_OF_BUILDING
     {
-        Castle, House, Barrack_Spear, Barrack_Mace, ArcheryTower
+        Castle, House, Barrack_Spear, Barrack_Mace, ArcheryTower, Goldmine
     }
 
     static readonly int[] cost = new int[]
     {
-        500, 250, 800, 800, 1000
+        500, 250, 800, 800, 1000, 1500
     };
 
     static readonly int[] health = new int[]
     {
-        5000, 500, 1500, 1500, 1000
+        5000, 500, 1500, 1500, 1000, 2000
     };
 
     // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
     static readonly Vector2[] size = new Vector2[] 
     {
-        new Vector2(7,11), new Vector2(5,7), new Vector2(7,9), new Vector2(7,9), new Vector2(5,13)
+        new Vector2(7,11), new Vector2(5,7), new Vector2(7,9), new Vector2(7,9), new Vector2(5,13), new Vector2(7,9)
     };
 
     public static int GetBuildingHealth(TYPE_OF_BUILDING type)
@@ -101,6 +103,13 @@ public static class BuildingInformation
                 limitReached = true;
             }
         }
+        else if (type is TYPE_OF_BUILDING.Goldmine)
+        {
+            if (goldmineCounter == goldmineMax)
+            {
+                limitReached = true;
+            }
+        }
 
         return limitReached;
     }
@@ -125,6 +134,9 @@ public static class BuildingInformation
                 break;
             case TYPE_OF_BUILDING.ArcheryTower:
                 counter = archeryTowerCounter;
+                break;
+            case TYPE_OF_BUILDING.Goldmine:
+                counter = goldmineCounter;
                 break;
             default:
                 Debug.LogWarning("Warning! Could not return the " + type.ToString() + "Counter...");
@@ -155,6 +167,9 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.ArcheryTower:
                 max = archeryTowerMax;
                 break;
+            case TYPE_OF_BUILDING.Goldmine:
+                max = goldmineMax;
+                break;
             default:
                 Debug.LogWarning("Warning! Could not return the " + type.ToString() + "Max...");
                 break;
@@ -182,6 +197,9 @@ public static class BuildingInformation
             case TYPE_OF_BUILDING.ArcheryTower:
                 archeryTowerCounter++;
                 break;
+            case TYPE_OF_BUILDING.Goldmine:
+                goldmineCounter++;
+                break;
             default:
                 Debug.LogWarning("Warning! Could not increase the " + type.ToString() + "Counter...");
                 break;
@@ -206,6 +224,9 @@ public static class BuildingInformation
                 break;
             case TYPE_OF_BUILDING.ArcheryTower:
                 archeryTowerCounter--;
+                break;
+            case TYPE_OF_BUILDING.Goldmine:
+                goldmineCounter--;
                 break;
             default:
                 Debug.LogWarning("Warning! Could not decrease the " + type.ToString() + "Counter...");
@@ -244,6 +265,7 @@ public class BuildingManager : MonoBehaviour
         sprites.Add(Resources.Load<Sprite>("Sprites/Barrack_Spear"));
         sprites.Add(Resources.Load<Sprite>("Sprites/Barrack_Mace"));
         sprites.Add(Resources.Load<Sprite>("Sprites/ArcheryTower"));
+        sprites.Add(Resources.Load<Sprite>("Sprites/Goldmine"));
 
         // Canvas
         canvasObject = new GameObject { name = "canvas" };
@@ -296,12 +318,12 @@ public class BuildingManager : MonoBehaviour
 
         if (type == BuildingInformation.TYPE_OF_BUILDING.Castle)
         {
-            Castle castle = new Castle(go, inPos, coinMan, buildings, player);
+            Castle castle = new Castle(go, inPos, buildings, player);
             buildings.Add(castle);
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.House)
         {
-            House house = new House(go, inPos, coinMan, buildings);
+            House house = new House(go, inPos, buildings);
             buildings.Add(house);
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Spear)
@@ -316,8 +338,13 @@ public class BuildingManager : MonoBehaviour
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.ArcheryTower)
         {
-            ArcheryTower archeryTower = new ArcheryTower(go, inPos, coinMan, buildings);
+            ArcheryTower archeryTower = new ArcheryTower(go, inPos, buildings);
             buildings.Add(archeryTower);
+        }
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.Goldmine)
+        {
+            Goldmine goldmine = new Goldmine(go, inPos, coinMan, buildings);
+            buildings.Add(goldmine);
         }
     }
 

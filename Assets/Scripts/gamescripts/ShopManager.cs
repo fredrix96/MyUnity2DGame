@@ -48,6 +48,7 @@ public class ShopManager
         CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack_Spear, new Vector2(-720, 190));
         CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.ArcheryTower, new Vector2(-880, 80));
         CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack_Mace, new Vector2(-800, 80));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Goldmine, new Vector2(-720, 80));
 
         // Disable at start
         active = false;

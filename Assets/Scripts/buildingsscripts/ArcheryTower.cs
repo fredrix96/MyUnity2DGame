@@ -15,12 +15,11 @@ public class ArcheryTower : Building
     ProjectileManager pm;
     Sprite projSprite;
 
-    public ArcheryTower(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings)
+    public ArcheryTower(GameObject parent, Tile inPos, List<Building> inBuildings)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.ArcheryTower;
 
         centerTile = inPos;
-        coinMan = inCoinMan;
         buildings = inBuildings;
 
         damage = 10;
