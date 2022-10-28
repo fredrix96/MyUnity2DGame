@@ -83,7 +83,7 @@ public class Coin
         timer += Time.deltaTime;
 
         coin.transform.Rotate(new Vector3(0, 1, 0) * speed * Time.deltaTime);
-        coin.transform.position = new Vector2(coin.transform.position.x, coin.transform.position.y + 0.05f * Mathf.Cos((float)timer * 10));
+        coin.transform.position = new Vector2(coin.transform.position.x, coin.transform.position.y + Time.deltaTime * 8 * Mathf.Cos((float)timer * 10));
 
         // We add 180 so that we skip the negative degrees
         if (timer > lifeTime)

@@ -17,6 +17,9 @@ public class Barrack : Building
         coinMan = inCoinMan;
         buildings = inBuildings;
 
+        Vector2 spawnLocation = new Vector2(centerTile.GetTilePosition().x, centerTile.GetTilePosition().y + BuildingInformation.GetBuildingSize(type).y / 2);
+        Debug.Log(inPos.GetTilePosition() + "   " + spawnLocation);
+        CharacterInformation.SetSpawnLocation(CharacterInformation.TYPE_OF_SOLDIER.Spearman, spawnLocation);
         spawnDelay = 2;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };

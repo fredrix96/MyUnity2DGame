@@ -86,7 +86,7 @@ public class Vendor : MonoBehaviour
             if (!AvoidObstacles(tile) || !CheckIfInsidePlacementArea(tile))
             {
                 // Indicate with red color that the building can not be placed here
-                tmpObject.GetComponent<Image>().color = new Color(0.8f, 0.2f, 0.2f, 0.8f);
+                tmpObject.GetComponent<Image>().color = new Color(1.0f, 0.1f, 0.1f, 0.6f);
             }
             else
             {
@@ -115,13 +115,13 @@ public class Vendor : MonoBehaviour
                 else
                 {
                     go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building" + System.Environment.NewLine + "at an obstacle!");
-                    coinMan.AddCoins(cost);
+                    coinMan.AddCoinsInstantly(cost);
                 }
             }
             else
             {
                 go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building" + System.Environment.NewLine + "outside the placement area!");
-                coinMan.AddCoins(cost);
+                coinMan.AddCoinsInstantly(cost);
             }
 
             Destroy(tmpObject);

@@ -30,11 +30,11 @@ public class Soldier : Character
         boundingBoxOffset = new Vector2(0.0f, -0.25f);
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Medieval Warrior Pack 2/Sprites", asp, boundingBoxOffset, 0.2f);
+        sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesSpear", asp, boundingBoxOffset, 0.1f);
 
-        float randomY = Random.Range(0, GridManager.GetRes().y - 1);
-        spawnTile = new Vector2(0, randomY);
-        go.transform.position = GridManager.GetTile(spawnTile).GetWorldPos();
+        //float randomY = Random.Range(0, GridManager.GetRes().y - 1);
+        Vector2 spawn = CharacterInformation.GetSoldierSpawnLocation(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
+        go.transform.position = GridManager.GetTile(spawn).GetWorldPos();
 
         // This is to make sure that feet of the character wont walk on another sprite
         pivotHeightDiff = Mathf.Abs(go.transform.position.y - sm.GetColliderPivotPoint(go).y);
@@ -46,10 +46,10 @@ public class Soldier : Character
         health.Init(go,"Sprites/SoldierHealth", 100, new Vector2(0.2f, 0.15f));
 
         speed = 2.0f;
-        damage = 10;
         direction = 1;
+        damage = CharacterInformation.GetSoldierDamage(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
 
-        currTile = GridManager.GetTile(spawnTile);
+        currTile = GridManager.GetTile(spawn);
         currTile.IncreaseCharacters(this);
         GridManager.GetCharacterTiles(type).Add(currTile);
 

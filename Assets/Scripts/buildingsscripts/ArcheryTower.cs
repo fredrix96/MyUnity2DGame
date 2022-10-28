@@ -23,7 +23,7 @@ public class ArcheryTower : Building
         coinMan = inCoinMan;
         buildings = inBuildings;
 
-        damage = 50;
+        damage = 10;
         shootDelay = 0.5f;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };

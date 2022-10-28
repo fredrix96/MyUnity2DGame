@@ -225,7 +225,7 @@ public class Player : Character
 
         go.AddComponent<CollisionManager>();
 
-        maxHealth = 300;
+        maxHealth = 500;
         regenerationDelay = 0.3f;
         playerSpeed = 5;
         damage = 20;

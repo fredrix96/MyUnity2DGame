@@ -94,8 +94,13 @@ public class CoinManager
 
     public void AddCoins(int amount)
     {
-        //nrOfCoins += amount;
         coinsToAdd += amount;
+    }
+
+    public void AddCoinsInstantly(int amount)
+    {
+        nrOfCoins += amount;
+        value.text = nrOfCoins.ToString();
     }
 
     public void RemoveCoins(int amount)

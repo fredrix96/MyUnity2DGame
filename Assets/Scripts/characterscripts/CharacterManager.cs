@@ -18,30 +18,45 @@ public static class CharacterInformation
         Spearman
     }
 
+    static readonly Vector2[] soldierSpawnLocations = new Vector2[]
+    {
+        Vector2.zero
+    };
+
     static readonly int[] enemyDamage = new int[]
     {
-        20, 40, 60, 80
+        20, 20, 60, 100
     };
 
     static readonly int[] enemyHealth = new int[]
     {
-        40, 80, 100, 120
+        50, 50, 100, 200
     };
 
     static readonly int[] enemyValue = new int[]
     {
-        5, 10, 20, 40
+        10, 10, 30, 50
     };
 
     static readonly float[] enemySpeed = new float[]
     {
-        1.8f, 1.6f, 1.4f, 1.2f
+        2.5f, 1.2f, 1.4f, 1.5f
     };
 
     static readonly int[] soldierDamage = new int[]
     {
-        10
+        20
     };
+
+    static public void SetSpawnLocation(TYPE_OF_SOLDIER type, Vector2 spawn)
+    {
+        soldierSpawnLocations[(int)type] = spawn;
+    }
+
+    static public Vector2 GetSoldierSpawnLocation(TYPE_OF_SOLDIER type)
+    {
+        return soldierSpawnLocations[(int)type];
+    }
 
 
     public static int GetEnemyDamage(TYPE_OF_ENEMY type)
@@ -201,6 +216,7 @@ public class CharacterManager
 
     float enemySpawnDelay, soldierSpawnDelay;
     double enemySpawnTimer, soldierSpawnTimer;
+    int randomStart; // The higher value this is, the more likely it is that stronger enemies will spawn
 
     public CharacterManager(Player inPlayer, CoinManager inCoinMan)
     {
@@ -225,6 +241,8 @@ public class CharacterManager
 
         enemySpawnTimer = 0;
         soldierSpawnTimer = 0;
+
+        randomStart = 0;
 
         DisplayCharacterData();
     }
@@ -354,6 +372,11 @@ public class CharacterManager
                 if (enemySpawnDelay > 1) enemySpawnDelay -= 0.01f;
                 if (enemySpawnDelay > 0.5f) enemySpawnDelay -= 0.005f;
                 if (enemySpawnDelay > 0.25f) enemySpawnDelay -= 0.001f;
+
+                if (randomStart < 450)
+                {
+                    randomStart += 1;
+                }
             }
         }
 
@@ -417,7 +440,25 @@ public class CharacterManager
 
     void SpawnEnemy()
     {
-        CharacterInformation.TYPE_OF_ENEMY eType = (CharacterInformation.TYPE_OF_ENEMY)Random.Range(0, 4);
+        int randomNumber = Random.Range(0, 1000);
+
+        CharacterInformation.TYPE_OF_ENEMY eType;
+        if (randomNumber > 980)
+        {
+            eType = CharacterInformation.TYPE_OF_ENEMY.Skeleton;
+        }
+        else if (randomNumber > 850)
+        {
+            eType = CharacterInformation.TYPE_OF_ENEMY.Goblin;
+        }
+        else if (randomNumber > 650)
+        {
+            eType = CharacterInformation.TYPE_OF_ENEMY.Eye;
+        }
+        else
+        {
+            eType = CharacterInformation.TYPE_OF_ENEMY.Mushroom;
+        }
 
         enemies.Add(new Enemy(enemyObjects, eType, coinMan));
         EnemyCounter.counter++;
