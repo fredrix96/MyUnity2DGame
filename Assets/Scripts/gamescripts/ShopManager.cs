@@ -33,13 +33,14 @@ public class ShopManager
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.worldCamera = CameraManager.GetCamera();
         canvas.sortingLayerName = "UI";
+        canvas.sortingOrder = 100;
 
         scaler = go.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
 
         shop = UIManager.CreateImage(go, "shopImage", Resources.Load<Sprite>("Sprites/WoodenBackground"), new Vector2(-800, 0), new Vector2(300, 700)).GetComponent<Image>();
-        title = UIManager.CreateText(go, "shopTitle", "Shop", 80, new Vector2(-800, 280), new Vector2(100, 100), TextAnchor.MiddleCenter);
+        title = UIManager.CreateText(go, "shopTitle", "Shop", 80, new Vector2(-800, 280), new Vector2(100, 100), TextAnchor.MiddleCenter);    
 
         // Creating building images
         CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Castle, new Vector2(-880, 190));

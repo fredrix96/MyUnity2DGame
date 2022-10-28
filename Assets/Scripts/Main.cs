@@ -47,6 +47,11 @@ public class Main : MonoBehaviour
 
             if (!GameManager.IsGameOver())
             {
+                if (GameManager.UpdateTimer(Time.deltaTime))
+                {
+                    GameManager.GameOver(true);
+                }
+
                 CameraManager.Update(player);
 
                 charMan.Update();
@@ -79,6 +84,8 @@ public class Main : MonoBehaviour
 
     void LoadLevel()
     {
+        GameManager.GameStart(1000);
+
         EventManager.InvokeUnloadMenu();
 
         if (!AudioManager.PlayBackgroundMusic("Game Background Music", 0.5f, true))
