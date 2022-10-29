@@ -25,20 +25,24 @@ public class Soldier : Character
         health = go.AddComponent<Health>();
 
         int hp = CharacterInformation.GetSoldierHealth(sType);
+        float attackSpeed = CharacterInformation.GetSoldierAttackSpeed(sType);
         AnimationStartingPoints asp = CharacterInformation.GetSoldierAnimationStartingPoints(sType);
         switch (sType)
         {
             case CharacterInformation.TYPE_OF_SOLDIER.Spearman:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
                 health.Init(go, "Sprites/SoldierHealth", hp, new Vector2(0.2f, 0.15f));
-                attackSpeed = 0.1f;
                 sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesSpear", asp, boundingBoxOffset, attackSpeed);
                 break;
             case CharacterInformation.TYPE_OF_SOLDIER.Maceman:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
                 health.Init(go, "Sprites/SoldierHealth", hp, new Vector2(0.2f, 0.15f));
-                attackSpeed = 0.2f;
                 sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesMace", asp, boundingBoxOffset, attackSpeed);
+                break;
+            case CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman:
+                boundingBoxOffset = new Vector2(0.0f, -0.5f);
+                health.Init(go, "Sprites/SoldierHealth", hp, new Vector2(0.2f, 0.15f));
+                sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesHeavySword", asp, boundingBoxOffset, attackSpeed);
                 break;
             default:
                 boundingBoxOffset = new Vector2(0.0f, 0.0f);
@@ -48,7 +52,6 @@ public class Soldier : Character
         }
 
 
-        //float randomY = Random.Range(0, GridManager.GetRes().y - 1);
         Vector2 spawn = CharacterInformation.GetSoldierSpawnLocation(sType);
         go.transform.position = GridManager.GetTile(spawn).GetWorldPos();
 
@@ -146,6 +149,11 @@ public class Soldier : Character
         {
             weaponBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
             weaponBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 2.0f, GridManager.GetTileHeight() * 2.0f);
+        }
+        else if (sType == CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman)
+        {
+            weaponBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
+            weaponBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 3.0f, GridManager.GetTileHeight() * 3.0f);
         }
 
         BoxCollider2D weaponBc = weaponBox.AddComponent<BoxCollider2D>();

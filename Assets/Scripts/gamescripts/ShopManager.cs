@@ -45,10 +45,11 @@ public class ShopManager
         // Creating building images
         CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Castle, new Vector2(-880, 190));
         CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.House, new Vector2(-800, 190));
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack_Spear, new Vector2(-720, 190));
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.ArcheryTower, new Vector2(-880, 80));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Goldmine, new Vector2(-720, 190));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack_Spear, new Vector2(-880, 80));
         CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack_Mace, new Vector2(-800, 80));
-        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Goldmine, new Vector2(-720, 80));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.Barrack_HeavySword, new Vector2(-720, 80));
+        CreateNewBuildingImage(BuildingInformation.TYPE_OF_BUILDING.ArcheryTower, new Vector2(-880, -30));
 
         // Disable at start
         active = false;

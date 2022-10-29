@@ -29,6 +29,11 @@ public class Barrack : Building
             Debug.Log("Macemen spawn location set at: " + spawnLocation);
             CharacterInformation.SetSpawnLocation(CharacterInformation.TYPE_OF_SOLDIER.Maceman, spawnLocation);
         }
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_HeavySword)
+        {
+            Debug.Log("HeavySwordmen spawn location set at: " + spawnLocation);
+            CharacterInformation.SetSpawnLocation(CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman, spawnLocation);
+        }
 
         spawnDelay = 2;
 
@@ -96,6 +101,10 @@ public class Barrack : Building
         {
             CreateInfoText("Macemen", 25, TextAnchor.MiddleCenter, new Vector2(65, 100));
         }
+        else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_HeavySword)
+        {
+            CreateInfoText("HeavySwordmen", 20, TextAnchor.MiddleCenter, new Vector2(65, 100));
+        }
     }
 
     void SpawnSoldier()
@@ -113,6 +122,10 @@ public class Barrack : Building
             else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_Mace)
             {
                 SoldierCounter_Macemen.nrToSpawn++;
+            }
+            else if (type == BuildingInformation.TYPE_OF_BUILDING.Barrack_HeavySword)
+            {
+                SoldierCounter_HeavySwordmen.nrToSpawn++;
             }
         }
     }

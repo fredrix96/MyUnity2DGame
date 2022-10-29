@@ -7,263 +7,6 @@ using Unity.Collections;
 using Unity.Burst;
 using Unity.Jobs.LowLevel.Unsafe;
 
-public static class CharacterInformation
-{
-    public enum TYPE_OF_ENEMY
-    {
-        Eye, Mushroom, Goblin, Skeleton
-    }
-    public enum TYPE_OF_SOLDIER
-    {
-        Spearman, Maceman
-    }
-
-    static readonly Vector2[] soldierSpawnLocations = new Vector2[]
-    {
-        Vector2.zero, Vector2.zero
-    };
-
-    static readonly int[] enemyDamage = new int[]
-    {
-        20, 20, 60, 100
-    };
-
-    static readonly int[] enemyHealth = new int[]
-    {
-        50, 50, 100, 200
-    };
-
-    static readonly int[] enemyValue = new int[]
-    {
-        10, 10, 30, 50
-    };
-
-    static readonly float[] enemySpeed = new float[]
-    {
-        2.5f, 1.2f, 1.4f, 1.5f
-    };
-
-    static readonly int[] soldierDamage = new int[]
-    {
-        20, 40
-    };
-
-    static readonly int[] soldierHealth = new int[]
-    {
-        100, 200
-    };
-
-    static public void SetSpawnLocation(TYPE_OF_SOLDIER type, Vector2 spawn)
-    {
-        soldierSpawnLocations[(int)type] = spawn;
-    }
-
-    static public Vector2 GetSoldierSpawnLocation(TYPE_OF_SOLDIER type)
-    {
-        return soldierSpawnLocations[(int)type];
-    }
-
-
-    public static int GetEnemyDamage(TYPE_OF_ENEMY type)
-    {
-        return enemyDamage[(int)type];
-    }
-
-    public static int GetEnemyHealth(TYPE_OF_ENEMY type)
-    {
-        return enemyHealth[(int)type];
-    }
-
-    public static int GetEnemyValue(TYPE_OF_ENEMY type)
-    {
-        return enemyValue[(int)type];
-    }
-
-    public static float GetEnemySpeed(TYPE_OF_ENEMY type)
-    {
-        return enemySpeed[(int)type];
-    }
-
-    public static int GetSoldierDamage(TYPE_OF_SOLDIER type)
-    {
-        return soldierDamage[(int)type];
-    }
-
-    public static int GetSoldierHealth(TYPE_OF_SOLDIER type)
-    {
-        return soldierHealth[(int)type];
-    }
-
-
-    public static AnimationStartingPoints GetEnemyAnimationStartingPoints(TYPE_OF_ENEMY type)
-    {
-        AnimationStartingPoints asp;
-
-        if (type == TYPE_OF_ENEMY.Mushroom || type == TYPE_OF_ENEMY.Goblin)
-        {
-            asp.idle = 20;
-            asp.idleEnd = 23;
-            asp.walk = 24;
-            asp.walkEnd = 31;
-            asp.attack = 0;
-            asp.attackEnd = 7;
-            asp.die = 17;
-            asp.dieEnd = 20;
-            asp.takeDamage = 32;
-            asp.takeDamageEnd = 35;
-        }
-        else if (type == TYPE_OF_ENEMY.Eye)
-        {
-            asp.idle = 20;
-            asp.idleEnd = 27;
-            asp.walk = 20;
-            asp.walkEnd = 27;
-            asp.attack = 0;
-            asp.attackEnd = 7;
-            asp.die = 16;
-            asp.dieEnd = 19;
-            asp.takeDamage = 28;
-            asp.takeDamageEnd = 31;
-        }
-        else if (type == TYPE_OF_ENEMY.Skeleton)
-        {
-            asp.idle = 20;
-            asp.idleEnd = 23;
-            asp.walk = 32;
-            asp.walkEnd = 35;
-            asp.attack = 0;
-            asp.attackEnd = 7;
-            asp.die = 16;
-            asp.dieEnd = 19;
-            asp.takeDamage = 28;
-            asp.takeDamageEnd = 31;
-        }
-        else
-        {
-            asp.idle = 0;
-            asp.idleEnd = 0;
-            asp.walk = 0;
-            asp.walkEnd = 0;
-            asp.attack = 0;
-            asp.attackEnd = 0;
-            asp.die = 0;
-            asp.dieEnd = 0;
-            asp.takeDamage = 0;
-            asp.takeDamageEnd = 0;
-
-            Debug.LogWarning("No animations found for " + type.ToString());
-        }
-
-        return asp;
-    }
-
-    public static AnimationStartingPoints GetSoldierAnimationStartingPoints(TYPE_OF_SOLDIER type)
-    {
-        AnimationStartingPoints asp;
-
-        if (type == TYPE_OF_SOLDIER.Spearman)
-        {
-            asp.idle = 24;
-            asp.idleEnd = 31;
-            asp.walk = 34;
-            asp.walkEnd = 41;
-            asp.attack = 8;
-            asp.attackEnd = 11;
-            asp.die = 16;
-            asp.dieEnd = 21;
-            asp.takeDamage = 42;
-            asp.takeDamageEnd = 45;
-        }
-        else if (type == TYPE_OF_SOLDIER.Maceman)
-        {
-            asp.idle = 24;
-            asp.idleEnd = 31;
-            asp.walk = 34;
-            asp.walkEnd = 41;
-            asp.attack = 12;
-            asp.attackEnd = 15;
-            asp.die = 16;
-            asp.dieEnd = 21;
-            asp.takeDamage = 42;
-            asp.takeDamageEnd = 45;
-        }
-        else
-        {
-            asp.idle = 0;
-            asp.idleEnd = 0;
-            asp.walk = 0;
-            asp.walkEnd = 0;
-            asp.attack = 0;
-            asp.attackEnd = 0;
-            asp.die = 0;
-            asp.dieEnd = 0;
-            asp.takeDamage = 0;
-            asp.takeDamageEnd = 0;
-
-            Debug.LogWarning("No animations found for " + type.ToString());
-        }
-
-        return asp;
-    }
-
-}
-
-public static class HumansCounter
-{
-    public static int counter = 0;
-    public static int nrOfHumans = 0;
-    public static int max = 0; // depends on number of houses
-
-    public static void Reset()
-    {
-        counter = 0;
-        nrOfHumans = 0;
-    }
-}
-
-public static class EnemyCounter
-{
-    public static int counter = 0;
-    public static int nrOfEnemies = 0;
-    public static int max = 5000;
-
-    public static void Reset()
-    {
-        counter = 0;
-        nrOfEnemies = 0;
-    }
-}
-
-public static class SoldierCounter_Spearmen
-{
-    public static int counter = 0;
-    public static int nrOfSoldiers = 0;
-    public static int nrToSpawn = 0;
-    public static int max = 5000;
-
-    public static void Reset()
-    {
-        counter = 0;
-        nrOfSoldiers = 0;
-        nrToSpawn = 0;
-    }
-}
-
-public static class SoldierCounter_Macemen
-{
-    public static int counter = 0;
-    public static int nrOfSoldiers = 0;
-    public static int nrToSpawn = 0;
-    public static int max = 5000;
-
-    public static void Reset()
-    {
-        counter = 0;
-        nrOfSoldiers = 0;
-        nrToSpawn = 0;
-    }
-}
-
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)
 public struct CharacterUpdatePositionJob : IJobParallelFor
 {
@@ -337,6 +80,7 @@ public class CharacterManager
         {
             SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
             SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Maceman);
+            SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman);
         }
 # endif
     }
@@ -487,6 +231,19 @@ public class CharacterManager
             }
         }
 
+        if (SoldierCounter_HeavySwordmen.nrToSpawn > 0)
+        {
+            if (SoldierCounter_HeavySwordmen.nrOfSoldiers < SoldierCounter_HeavySwordmen.max)
+            {
+                soldierSpawnTimer += Time.deltaTime;
+                if (soldierSpawnTimer > soldierSpawnDelay)
+                {
+                    SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman);
+                    soldierSpawnTimer = 0;
+                }
+            }
+        }
+
         UpdateCharacterPosition(soldiers, GameManager.toggles.GetMultithreadingOn());
 
         for (int i = 0; i < soldiers.Count; i++)
@@ -520,7 +277,6 @@ public class CharacterManager
         int randomNumber = Random.Range(0, 10000);
 
         CharacterInformation.TYPE_OF_ENEMY eType;
-        Debug.Log(randomStart);
         if (randomNumber > 9800 - randomStart)
         {
             eType = CharacterInformation.TYPE_OF_ENEMY.Skeleton;
@@ -577,6 +333,12 @@ public class CharacterManager
             SoldierCounter_Macemen.nrOfSoldiers++;
             SoldierCounter_Macemen.nrToSpawn--;
         }
+        else if (type == CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman)
+        {
+            SoldierCounter_HeavySwordmen.counter++;
+            SoldierCounter_HeavySwordmen.nrOfSoldiers++;
+            SoldierCounter_HeavySwordmen.nrToSpawn--;
+        }
     }
 
     void RemoveSoldier(Soldier soldier)
@@ -591,6 +353,10 @@ public class CharacterManager
         else if (soldier.GetSoldierType() == CharacterInformation.TYPE_OF_SOLDIER.Maceman)
         {
             SoldierCounter_Macemen.nrOfSoldiers--;
+        }
+        else if (soldier.GetSoldierType() == CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman)
+        {
+            SoldierCounter_HeavySwordmen.nrOfSoldiers--;
         }
     }
 
@@ -608,7 +374,7 @@ public class CharacterManager
 
         // Soldiers
         UIManager.CreateImage(null, "soldiersDataImage", Resources.Load<Sprite>("Sprites/SwordIcon"), new Vector2(-80, 500), new Vector2(30f, 30f));
-        text = (SoldierCounter_Spearmen.nrOfSoldiers + SoldierCounter_Macemen.nrOfSoldiers).ToString();
+        text = (SoldierCounter_Spearmen.nrOfSoldiers + SoldierCounter_Macemen.nrOfSoldiers + SoldierCounter_HeavySwordmen.nrOfSoldiers).ToString();
         soldiersDataText = UIManager.CreateText(null, "soldiersDataText", text, 22, new Vector2(40, 500), new Vector2(100f, 100f));
 
         // Enemies
@@ -626,7 +392,7 @@ public class CharacterManager
     void UpdateCharacterTextData()
     {
         humansDataText.text = HumansCounter.nrOfHumans.ToString() + " / " + HumansCounter.max;
-        soldiersDataText.text = (SoldierCounter_Spearmen.nrOfSoldiers + SoldierCounter_Macemen.nrOfSoldiers).ToString();
+        soldiersDataText.text = (SoldierCounter_Spearmen.nrOfSoldiers + SoldierCounter_Macemen.nrOfSoldiers + SoldierCounter_HeavySwordmen.nrOfSoldiers).ToString();
         enemiesDataText.text = EnemyCounter.nrOfEnemies.ToString();
 
         int killed = EnemyCounter.counter - EnemyCounter.nrOfEnemies;
