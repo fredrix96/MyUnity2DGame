@@ -147,13 +147,19 @@ public static class PathFinding
                     // Try to avoid the building before reaching it by punishing the closest tiles values
                     Tile checkTile = GridManager.GetTile(new Vector2(currTile.GetTilePosition().x + 1, currTile.GetTilePosition().y));
                     Tile checkTile2 = GridManager.GetTile(new Vector2(currTile.GetTilePosition().x + 2, currTile.GetTilePosition().y));
-                    if (checkTile.IsObjectPresent())
+                    if (checkTile != null)
                     {
-                        newDistance += GridManager.GetTileWidth();
+                        if (checkTile.IsObjectPresent())
+                        {
+                            newDistance += GridManager.GetTileWidth();
+                        }
                     }
-                    else if (checkTile2.IsObjectPresent())
+                    else if (checkTile2 != null)
                     {
-                        newDistance += GridManager.GetTileWidth() / 2;
+                        if (checkTile2.IsObjectPresent())
+                        {
+                            newDistance += GridManager.GetTileWidth() / 2;
+                        }
                     }
 
                     // Is this tile closer to the target?

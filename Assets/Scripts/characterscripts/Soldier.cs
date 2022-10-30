@@ -96,7 +96,7 @@ public class Soldier : Character
             {
                 if (sm.Attack())
                 {
-                    PlaySwordSound();
+                    //PlayWeaponSound(sType); // Gets too noisy
                     Damage();
                 }
             }
@@ -108,10 +108,7 @@ public class Soldier : Character
             }
             else if (sm.IsTakingDamage())
             {
-                if (sm.TakeDamage())
-                {
-                    // SOUND
-                }
+                sm.TakeDamage();
             }
 
             if (health.GetHealth() <= 0)
@@ -214,5 +211,52 @@ public class Soldier : Character
     public override void Destroy()
     {
         Object.Destroy(go);
+    }
+
+    void PlayWeaponSound(CharacterInformation.TYPE_OF_SOLDIER type)
+    {
+        if (type == CharacterInformation.TYPE_OF_SOLDIER.Spearman)
+        {
+            int index = Random.Range(0, 3);
+
+            switch (index)
+            {
+                case 0:
+                    AudioManager.PlayWeaponsAudio3D("Spear Stab", 0.15f, go.transform.position);
+                    break;
+                case 1:
+                    AudioManager.PlayWeaponsAudio3D("Spear Stab2", 0.15f, go.transform.position);
+                    break;
+                case 2:
+                    AudioManager.PlayWeaponsAudio3D("Spear Stab3", 0.15f, go.transform.position);
+                    break;
+                default:
+                    AudioManager.PlayWeaponsAudio3D("Spear Stab", 0.15f, go.transform.position);
+                    break;
+            }
+        }
+        else
+        {
+            int index = Random.Range(0, 4);
+
+            switch (index)
+            {
+                case 0:
+                    AudioManager.PlayWeaponsAudio3D("Sword Swing", 0.1f, go.transform.position);
+                    break;
+                case 1:
+                    AudioManager.PlayWeaponsAudio3D("Sword Swing2", 0.1f, go.transform.position);
+                    break;
+                case 2:
+                    AudioManager.PlayWeaponsAudio3D("Sword Swing3", 0.1f, go.transform.position);
+                    break;
+                case 3:
+                    AudioManager.PlayWeaponsAudio3D("Sword Swing4", 0.1f, go.transform.position);
+                    break;
+                default:
+                    AudioManager.PlayWeaponsAudio3D("Sword Swing", 0.1f, go.transform.position);
+                    break;
+            }
+        }
     }
 }

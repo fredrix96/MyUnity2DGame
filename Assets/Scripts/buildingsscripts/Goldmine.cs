@@ -18,8 +18,8 @@ public class Goldmine : Building
         coinMan = inCoinMan;
         buildings = inBuildings;
 
-        moneyDelay = 3.0f;
-        moneyToGenerate = 10;
+        moneyDelay = 5.0f;
+        moneyToGenerate = 50;
 
         go = new GameObject { name = "building_" + type.ToString() + BuildingInformation.GetCounter(type).ToString() };
         go.transform.SetParent(parent.transform);

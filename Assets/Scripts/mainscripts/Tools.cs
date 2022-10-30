@@ -105,6 +105,16 @@ public static class Tools
         }
     }
 
+    public static bool CalculateChance(float chance)
+    {
+        if (UnityEngine.Random.value < chance)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     public static void LogFPS()
     {
         Debug.Log("FPS: " + (int)(1f / Time.unscaledDeltaTime));

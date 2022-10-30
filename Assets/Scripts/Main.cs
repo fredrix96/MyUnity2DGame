@@ -40,7 +40,9 @@ public class Main : MonoBehaviour
     }
 
     void Update()
-    {   
+    {
+        AudioManager.Update();
+
         if (EventManager.levelLoaded)
         {
             ctrl.Update();

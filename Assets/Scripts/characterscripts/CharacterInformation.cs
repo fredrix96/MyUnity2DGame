@@ -30,12 +30,17 @@ public static class CharacterInformation
 
     static readonly int[] enemyValue = new int[]
     {
-        10, 10, 30, 50
+        100, 100, 200, 400
     };
 
     static readonly float[] enemySpeed = new float[]
     {
         2.5f, 1.2f, 1.4f, 1.5f
+    };
+
+    static readonly float[] enemyDropChance = new float[]
+    {
+        0.1f, 0.1f, 0.2f, 0.4f
     };
 
     static readonly int[] soldierDamage = new int[]
@@ -82,6 +87,11 @@ public static class CharacterInformation
     public static float GetEnemySpeed(TYPE_OF_ENEMY type)
     {
         return enemySpeed[(int)type];
+    }
+
+    public static float GetEnemyDropChance(TYPE_OF_ENEMY type)
+    {
+        return enemyDropChance[(int)type];
     }
 
     public static int GetSoldierDamage(TYPE_OF_SOLDIER type)

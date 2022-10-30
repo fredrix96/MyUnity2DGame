@@ -8,6 +8,7 @@ public class Enemy : Character
     int value;
     float groanDelay;
     double time;
+    float dropChance;
     CharacterInformation.TYPE_OF_ENEMY eType;
     
     public Enemy(GameObject inGo, CharacterInformation.TYPE_OF_ENEMY inType, CoinManager inCoinMan)
@@ -60,7 +61,9 @@ public class Enemy : Character
                 Debug.LogError("No enemy type " + eType.ToString() + " was found!");
                 break;
         }
-        sm.FlipX();
+        sm.FlipX(); // Enemies start to go to the left
+
+        dropChance = CharacterInformation.GetEnemyDropChance(eType);
 
         float randomY = Random.Range(0, GridManager.GetRes().y - 1);
         spawnTile = new Vector2(GridManager.GetRes().x - 1, randomY);
@@ -145,8 +148,13 @@ public class Enemy : Character
                 isDead = true;
                 currTile.DecreaseCharacters(this);
                 GridManager.GetCharacterTiles(type).Remove(currTile);
-                coinMan.CreateCoin(go.transform.position, new Vector2(0.01f, 0.01f), Vector3.up, 1, 1.5f, true);
-                coinMan.AddCoins(value);
+
+                if (Tools.CalculateChance(dropChance))
+                {
+                    coinMan.CreateCoin(go.transform.position, new Vector2(0.01f, 0.01f), Vector3.up, 1, 1.5f, true);
+                    coinMan.AddCoins(value);
+                }
+
                 AudioManager.PlayAudio3D("Enemy Death", 0.2f, go.transform.position);
             }
         }

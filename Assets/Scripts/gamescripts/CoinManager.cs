@@ -75,6 +75,7 @@ public class CoinManager
             timer = 0;
             spinCoinUI = true;
             value.text = nrOfCoins.ToString();
+            AudioManager.PlayAudio2D("Coin Sound", 0.05f);
         }
 
 #if DEBUG
@@ -89,7 +90,6 @@ public class CoinManager
     {
         Coin coin = new Coin(go, pos, scale, dir, speed, lifeTime, rotate);
         coinList.Add(coin);
-        AudioManager.PlayAudio3D("Coin Sound", 0.1f, pos);
     }
 
     public void AddCoins(int amount)
