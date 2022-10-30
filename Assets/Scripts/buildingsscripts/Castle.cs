@@ -8,14 +8,25 @@ public class Castle : Building
     Player player;
     double remainingTime;
     float timeToRespawn;
+    double timer;
+    float spawnDelay;
 
-    public Castle(GameObject parent, Tile inPos, List<Building> inBuildings, Player inPlayer)
+    public Castle(GameObject parent, Tile inPos, CoinManager inCoinMan, List<Building> inBuildings, Player inPlayer)
     {
         type = BuildingInformation.TYPE_OF_BUILDING.Castle;
 
         centerTile = inPos;
         buildings = inBuildings;
+        coinMan = inCoinMan;
         player = inPlayer;
+
+        timer = 0;
+        spawnDelay = 10.0f;
+
+        Vector2 spawnLocation = new Vector2(centerTile.GetTilePosition().x, centerTile.GetTilePosition().y + BuildingInformation.GetBuildingSize(type).y / 2);
+
+        Debug.Log("Knights spawn location set at: " + spawnLocation);
+        CharacterInformation.SetSpawnLocation(CharacterInformation.TYPE_OF_SOLDIER.Knight, spawnLocation);
 
         timeToRespawn = 3.0f;
         remainingTime = timeToRespawn;
@@ -65,6 +76,13 @@ public class Castle : Building
 
         LookIfIgnored();
 
+        timer += Time.deltaTime;
+        if (timer > spawnDelay)
+        {
+            SpawnSoldier();
+            timer = 0;
+        }
+
         //RespawnTimer();
     }
 
@@ -74,7 +92,38 @@ public class Castle : Building
 
         CreateToolbarObject(new Vector2(3.5f, 1.5f), 2f);
 
-        CreateInfoText("The king is alive", 25, TextAnchor.MiddleCenter, new Vector2(60, 70));
+        CreateInfoText("Knights", 25, TextAnchor.MiddleCenter, new Vector2(60, 70));
+    }
+
+    void SpawnSoldier()
+    {
+        // Are there any humans available?
+        if (HumansCounter.nrOfHumans != 0)
+        {
+            HumansCounter.nrOfHumans--;
+            RemoveHumanFromRandomHouse();
+
+            SoldierCounter_Knights.nrToSpawn++;
+        }
+    }
+
+    void RemoveHumanFromRandomHouse()
+    {
+        List<House> houses = new List<House>();
+        foreach (Building building in buildings)
+        {
+            if (building is House)
+            {
+                House house = building as House;
+                if (house.GetNrOfHumans() > 0)
+                {
+                    houses.Add(house);
+                }
+            }
+        }
+
+        int index = UnityEngine.Random.Range(0, houses.Count - 1);
+        houses[index].RemoveHuman();
     }
 
     public void CheckIfDestroyed()

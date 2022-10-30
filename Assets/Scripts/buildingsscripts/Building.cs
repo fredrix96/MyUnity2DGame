@@ -139,10 +139,10 @@ public class Building
         go.transform.localScale = new Vector3(inPos.GetSize().x * size.x / sr.size.x, inPos.GetSize().y * size.y / sr.size.y, 1);
     }
 
-    public void CreateHealthBar(BuildingInformation.TYPE_OF_BUILDING type)
+    public void CreateHealthBar(BuildingInformation.TYPE_OF_BUILDING type, float heightChange = 0)
     {
         health = go.AddComponent<Health>();
-        health.Init(go, "Sprites/SoldierHealth", BuildingInformation.GetBuildingHealth(type), new Vector2(0.6f, 0.3f), 0, true);
+        health.Init(go, "Sprites/SoldierHealth", BuildingInformation.GetBuildingHealth(type), new Vector2(0.6f, 0.3f), heightChange, true);
     }
 
     public Vector3 GetPosition()

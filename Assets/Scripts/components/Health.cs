@@ -33,7 +33,7 @@ public class Health : MonoBehaviour
 
         if (!building)
         {
-            height = sr.sprite.bounds.max.y / 2;
+            height = sr.sprite.bounds.max.y;
         }
         else if (go.transform.parent.GetComponent<BoxCollider2D>() == null)
         {

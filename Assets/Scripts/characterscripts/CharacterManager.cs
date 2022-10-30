@@ -31,8 +31,8 @@ public class CharacterManager
 
     GameObject characterObjects, enemyObjects, soldierObjects;
 
-    float enemySpawnDelay, soldierSpawnDelay;
-    double enemySpawnTimer, soldierSpawnTimer;
+    float enemySpawnDelay;
+    double enemySpawnTimer;
     int randomStart; // The higher value this is, the more likely it is that stronger enemies will spawn
 
     public CharacterManager(Player inPlayer, CoinManager inCoinMan)
@@ -54,10 +54,7 @@ public class CharacterManager
         soldiers = new List<Soldier>();
 
         enemySpawnDelay = 4.0f; // decreases with time
-        soldierSpawnDelay = 0.6f;
-
         enemySpawnTimer = 0;
-        soldierSpawnTimer = 0;
 
         randomStart = 0;
 
@@ -81,6 +78,7 @@ public class CharacterManager
             SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
             SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Maceman);
             SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman);
+            SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Knight);
         }
 # endif
     }
@@ -209,12 +207,7 @@ public class CharacterManager
         {
             if (SoldierCounter_Spearmen.nrOfSoldiers < SoldierCounter_Spearmen.max)
             {
-                soldierSpawnTimer += Time.deltaTime;
-                if (soldierSpawnTimer > soldierSpawnDelay)
-                {
-                    SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
-                    soldierSpawnTimer = 0;
-                }
+                SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
             }
         }
 
@@ -222,12 +215,7 @@ public class CharacterManager
         {
             if (SoldierCounter_Macemen.nrOfSoldiers < SoldierCounter_Macemen.max)
             {
-                soldierSpawnTimer += Time.deltaTime;
-                if (soldierSpawnTimer > soldierSpawnDelay)
-                {
-                    SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Maceman);
-                    soldierSpawnTimer = 0;
-                }
+                SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Maceman);
             }
         }
 
@@ -235,12 +223,15 @@ public class CharacterManager
         {
             if (SoldierCounter_HeavySwordmen.nrOfSoldiers < SoldierCounter_HeavySwordmen.max)
             {
-                soldierSpawnTimer += Time.deltaTime;
-                if (soldierSpawnTimer > soldierSpawnDelay)
-                {
-                    SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman);
-                    soldierSpawnTimer = 0;
-                }
+                SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman);
+            }
+        }
+
+        if (SoldierCounter_Knights.nrToSpawn > 0)
+        {
+            if (SoldierCounter_Knights.nrOfSoldiers < SoldierCounter_Knights.max)
+            {
+                SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER.Knight);
             }
         }
 
@@ -339,6 +330,12 @@ public class CharacterManager
             SoldierCounter_HeavySwordmen.nrOfSoldiers++;
             SoldierCounter_HeavySwordmen.nrToSpawn--;
         }
+        else if (type == CharacterInformation.TYPE_OF_SOLDIER.Knight)
+        {
+            SoldierCounter_Knights.counter++;
+            SoldierCounter_Knights.nrOfSoldiers++;
+            SoldierCounter_Knights.nrToSpawn--;
+        }
     }
 
     void RemoveSoldier(Soldier soldier)
@@ -358,6 +355,10 @@ public class CharacterManager
         {
             SoldierCounter_HeavySwordmen.nrOfSoldiers--;
         }
+        else if (soldier.GetSoldierType() == CharacterInformation.TYPE_OF_SOLDIER.Knight)
+        {
+            SoldierCounter_Knights.nrOfSoldiers--;
+        }
     }
 
     void DisplayCharacterData()
@@ -374,7 +375,10 @@ public class CharacterManager
 
         // Soldiers
         UIManager.CreateImage(null, "soldiersDataImage", Resources.Load<Sprite>("Sprites/SwordIcon"), new Vector2(-80, 500), new Vector2(30f, 30f));
-        text = (SoldierCounter_Spearmen.nrOfSoldiers + SoldierCounter_Macemen.nrOfSoldiers + SoldierCounter_HeavySwordmen.nrOfSoldiers).ToString();
+        text = (SoldierCounter_Spearmen.nrOfSoldiers
+            + SoldierCounter_Macemen.nrOfSoldiers
+            + SoldierCounter_HeavySwordmen.nrOfSoldiers
+            + SoldierCounter_Knights.nrOfSoldiers).ToString();
         soldiersDataText = UIManager.CreateText(null, "soldiersDataText", text, 22, new Vector2(40, 500), new Vector2(100f, 100f));
 
         // Enemies
@@ -392,7 +396,10 @@ public class CharacterManager
     void UpdateCharacterTextData()
     {
         humansDataText.text = HumansCounter.nrOfHumans.ToString() + " / " + HumansCounter.max;
-        soldiersDataText.text = (SoldierCounter_Spearmen.nrOfSoldiers + SoldierCounter_Macemen.nrOfSoldiers + SoldierCounter_HeavySwordmen.nrOfSoldiers).ToString();
+        soldiersDataText.text = (SoldierCounter_Spearmen.nrOfSoldiers
+            + SoldierCounter_Macemen.nrOfSoldiers
+            + SoldierCounter_HeavySwordmen.nrOfSoldiers
+            + SoldierCounter_Knights.nrOfSoldiers).ToString();
         enemiesDataText.text = EnemyCounter.nrOfEnemies.ToString();
 
         int killed = EnemyCounter.counter - EnemyCounter.nrOfEnemies;

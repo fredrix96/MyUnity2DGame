@@ -4,19 +4,11 @@ using UnityEngine;
 
 public static class CharacterInformation
 {
+    // ENEMIES 
     public enum TYPE_OF_ENEMY
     {
         Eye, Mushroom, Goblin, Skeleton
     }
-    public enum TYPE_OF_SOLDIER
-    {
-        Spearman, Maceman, HeavySwordman
-    }
-
-    static readonly Vector2[] soldierSpawnLocations = new Vector2[]
-    {
-        Vector2.zero, Vector2.zero, Vector2.zero
-    };
 
     static readonly int[] enemyDamage = new int[]
     {
@@ -48,14 +40,26 @@ public static class CharacterInformation
         20, 40, 30
     };
 
+    // SOLDIERS
+
+    public enum TYPE_OF_SOLDIER
+    {
+        Spearman, Maceman, HeavySwordman, Knight
+    }
+
+    static readonly Vector2[] soldierSpawnLocations = new Vector2[]
+    {
+        Vector2.zero, Vector2.zero, Vector2.zero, Vector2.zero
+    };
+
     static readonly int[] soldierHealth = new int[]
     {
-        100, 200, 125
+        100, 200, 125, 500
     };
 
     static readonly float[] soldierAttackSpeed = new float[]
     {
-        0.1f, 0.2f, 0.1f
+        0.1f, 0.2f, 0.1f, 0.1f
     };
 
     static public void SetSpawnLocation(TYPE_OF_SOLDIER type, Vector2 spawn)
@@ -202,6 +206,19 @@ public static class CharacterInformation
             asp.takeDamage = 31;
             asp.takeDamageEnd = 34;
         }
+        else if (type == TYPE_OF_SOLDIER.Knight)
+        {
+            asp.idle = 23;
+            asp.idleEnd = 33;
+            asp.walk = 38;
+            asp.walkEnd = 45;
+            asp.attack = 0;
+            asp.attackEnd = 5;
+            asp.die = 10;
+            asp.dieEnd = 18;
+            asp.takeDamage = 46;
+            asp.takeDamageEnd = 49;
+        }
         else
         {
             asp.idle = 0;
@@ -280,6 +297,21 @@ public static class SoldierCounter_Macemen
 }
 
 public static class SoldierCounter_HeavySwordmen
+{
+    public static int counter = 0;
+    public static int nrOfSoldiers = 0;
+    public static int nrToSpawn = 0;
+    public static int max = 5000;
+
+    public static void Reset()
+    {
+        counter = 0;
+        nrOfSoldiers = 0;
+        nrToSpawn = 0;
+    }
+}
+
+public static class SoldierCounter_Knights
 {
     public static int counter = 0;
     public static int nrOfSoldiers = 0;

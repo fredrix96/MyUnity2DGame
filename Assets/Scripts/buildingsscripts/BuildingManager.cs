@@ -83,11 +83,11 @@ public class BuildingManager : MonoBehaviour
 
     public void CreateBuilding(BuildingInformation.TYPE_OF_BUILDING type, Tile inPos)
     {
-        AudioManager.PlayAudio2D("Construct", 0.4f);
+        AudioManager.PlayAudio2D("Construct", 0.3f);
 
         if (type == BuildingInformation.TYPE_OF_BUILDING.Castle)
         {
-            Castle castle = new Castle(go, inPos, buildings, player);
+            Castle castle = new Castle(go, inPos, coinMan, buildings, player);
             buildings.Add(castle);
         }
         else if (type == BuildingInformation.TYPE_OF_BUILDING.House)

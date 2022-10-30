@@ -51,7 +51,7 @@ public class ArcheryTower : Building
         rb.isKinematic = true;
         rb.useFullKinematicContacts = true;
 
-        CreateHealthBar(type);
+        CreateHealthBar(type, -0.2f);
         CreateToolBar();
 
         collider.size = new Vector2(sr.size.x, sr.size.y / 5);

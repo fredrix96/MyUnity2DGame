@@ -37,12 +37,12 @@ public static class BuildingInformation
 
     static readonly int[] cost = new int[]
     {
-        500, 250, 800, 800, 800, 1000, 1500
+        2000, 250, 800, 800, 800, 1000, 1500
     };
 
     static readonly int[] health = new int[]
     {
-        5000, 500, 1500, 1500, 1500, 1000, 2000
+        3000, 500, 1500, 1500, 1500, 1000, 2000
     };
 
     // The scaling works better for now if the sizes are in odd numbers to make sure that there is always a tile in the center
