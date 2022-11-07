@@ -13,11 +13,16 @@ public class Player : Character
     Vector2 dirVector;
     bool playerHasSpawned; // checks if the player character (the king) has spawned for the first time
     float critChance; // calculate in percent (0.1 = 10%)
+    float experience;
+    float levelExp;
+    float gatheringArea;
+    int level;
 
     public Player()
     {
         playerHasSpawned = false;
         isDead = true;
+        gatheringArea = 5.0f;
 
         Respawn(GridManager.GetTile(new Vector2(5, 5)));
     }
@@ -27,6 +32,7 @@ public class Player : Character
         if (!isDead)
         {
             RegenerateHealth();
+            GatherExperienceOrbs();
 
             // Is the player attacking?
             if (sm.IsAttacking())
@@ -75,6 +81,16 @@ public class Player : Character
                 //}
             }
         }
+    }
+
+    public float GetLevelXp()
+    {
+        return levelExp;
+    }
+
+    public float GetCurrentXp()
+    {
+        return experience;
     }
 
     void Damage()
@@ -230,6 +246,9 @@ public class Player : Character
         damage = 20;
         critChance = 0.1f;
         attackSpeed = 0.08f;
+        experience = 0;
+        levelExp = 100;
+        level = 1;
 
         AnimationStartingPoints asp;
         asp.idle = 20;
@@ -265,6 +284,44 @@ public class Player : Character
     public GameObject GetPlayerObject()
     {
         return go;
+    }
+
+    public void GatherExperienceOrbs()
+    {
+        GameObject gatherArea = new GameObject { name = "GatherArea" };
+
+        gatherArea.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
+        gatherArea.transform.localScale = new Vector2(GridManager.GetTileWidth() * gatheringArea, GridManager.GetTileHeight() * gatheringArea);
+
+        BoxCollider2D gatherBc = gatherArea.AddComponent<BoxCollider2D>();
+        Physics2D.IgnoreCollision(sm.GetBoxCollider2D(), gatherBc);
+
+        List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Experience"), gatherBc);
+        
+        foreach (Collider2D col in results)
+        {
+            ExperienceOrb orb = ExperienceManager.GetOrb(col.gameObject.name);
+
+            if (orb != null)
+            {
+                orb.SetCollected();
+                experience += orb.GetExpPoints();
+                ExperienceManager.UpdateXpBar();
+            }
+        }
+
+        Object.Destroy(gatherArea);
+    }
+
+    public void LevelUp()
+    {
+        experience = experience - levelExp;
+        levelExp += levelExp * 0.2f; // Increase with 20%
+        ExperienceManager.UpdateXpBar();
+
+        level++;
+
+        Debug.Log("LEVEL UP: " + level.ToString());
     }
 
     void PlayWeaponSound()

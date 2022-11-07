@@ -55,6 +55,7 @@ public class Main : MonoBehaviour
                 }
 
                 CameraManager.Update(player);
+                ExperienceManager.Update();
 
                 charMan.Update();
                 coinMan.Update();
@@ -96,8 +97,12 @@ public class Main : MonoBehaviour
         }
 
         player = new Player();
-        int moneyToStartWith = 15000;
+
+        ExperienceManager.Init(player);
+
+        int moneyToStartWith = 5000;
         coinMan = new CoinManager(moneyToStartWith);
+
         charMan = new CharacterManager(player, coinMan);
 
         buildMan = GameManager.GameManagerObject.AddComponent<BuildingManager>();

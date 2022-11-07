@@ -9,6 +9,7 @@ public class Enemy : Character
     float groanDelay;
     double time;
     float dropChance;
+    int expPoints;
     CharacterInformation.TYPE_OF_ENEMY eType;
     
     public Enemy(GameObject inGo, CharacterInformation.TYPE_OF_ENEMY inType, CoinManager inCoinMan)
@@ -21,6 +22,7 @@ public class Enemy : Character
 
         groanDelay = 5.0f;
         time = 0;
+        expPoints = 10;
 
         go = new GameObject { name = "enemy" + EnemyCounter.counter };
         go.transform.parent = inGo.transform;
@@ -130,10 +132,7 @@ public class Enemy : Character
             }
             else if (sm.IsTakingDamage())
             {
-                if (sm.TakeDamage())
-                {
-                    // SOUND
-                }
+                sm.TakeDamage();
             }
 
             // Groan
@@ -148,6 +147,7 @@ public class Enemy : Character
                 isDead = true;
                 currTile.DecreaseCharacters(this);
                 GridManager.GetCharacterTiles(type).Remove(currTile);
+                ExperienceManager.DropOrb(go.transform.position, expPoints);
 
                 if (Tools.CalculateChance(dropChance))
                 {

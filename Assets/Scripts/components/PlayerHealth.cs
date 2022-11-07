@@ -8,25 +8,32 @@ public class PlayerHealth : MonoBehaviour
     Image healthBar, heart;
     Slider slider;
     GameObject parent;
+    Sprite[] barSprites;
 
+    int spriteCounter;
     int health;
     int maxHealth;
-    double timer;
-    float timeDelay;
+    double timerHeart, timerBar;
+    float timeDelayHeart, timeDelayBar;
     float growingSpeed;
     float growingSpeedOriginal;
 
     private void Start()
     {
-        timer = 0;
-        timeDelay = 0.4f;
+        timerHeart = 0;
+        timerBar = 0;
+        timeDelayHeart = 0.4f;
+        timeDelayBar = 0.15f;
         growingSpeed = 0.3f;
         growingSpeedOriginal = growingSpeed;
+        spriteCounter = 0;
+
+        barSprites = Resources.LoadAll<Sprite>("Sprites/PlayerHealth_Anim");
     }
 
     public void Init(GameObject inParent, int inHealth)
     {
-        slider = UIManager.CreateSlider("healthbarSlider", "healthbarImage", null, new Vector2(70, 500), new Vector2(10.0f, 2.0f), out healthBar, Color.green);
+        slider = UIManager.CreateSlider("healthbarSlider", "healthbarImage", Resources.Load<Sprite>("Sprites/PlayerHealth"), new Vector2(70, 500), new Vector2(12.0f, 2.3f), out healthBar, Color.green);
         heart = UIManager.CreateImage(null, "heartImage", Resources.Load<Sprite>("Sprites/Heart"), new Vector2(-880, 505), new Vector2(60, 60)).GetComponent<Image>();
 
         parent = inParent;
@@ -39,19 +46,38 @@ public class PlayerHealth : MonoBehaviour
         if (health > 0)
         {
             PlayHeartAnimation();
+            PlayBarAnimation();
         }
     }
 
     void PlayHeartAnimation()
     {
-        timer += Time.deltaTime;
+        timerHeart += Time.deltaTime;
 
         heart.transform.localScale = new Vector2(heart.transform.localScale.x + growingSpeed * Time.deltaTime, heart.transform.localScale.y + growingSpeed * Time.deltaTime);
 
-        if (timer > timeDelay)
+        if (timerHeart > timeDelayHeart)
         {
             growingSpeed *= -1;
-            timer = 0;
+            timerHeart = 0;
+        }
+    }
+
+    void PlayBarAnimation()
+    {
+        timerBar += Time.deltaTime;
+
+        if (timerBar > timeDelayBar)
+        {
+            healthBar.sprite = barSprites[spriteCounter];
+            spriteCounter++;
+            
+            if (spriteCounter == barSprites.Length)
+            {
+                spriteCounter = 0;
+            }
+
+            timerBar = 0;
         }
     }
 
@@ -135,14 +161,14 @@ public class PlayerHealth : MonoBehaviour
     {
         float percentage = newHealth / maxHealth;
 
-        if (percentage >= 0.66f)
+        if (percentage >= 0.33f)
         {
-            healthBar.color = Color.green;
+            healthBar.color = Color.white;
         }
-        else if (percentage < 0.66f && percentage >= 0.33f)
-        {
-            healthBar.color = Color.yellow;
-        }
+        //else if (percentage < 0.66f && percentage >= 0.33f)
+        //{
+        //    healthBar.color = Color.yellow;
+        //}
         else
         {
             healthBar.color = Color.red;

@@ -84,7 +84,7 @@ public static class UIManager
 
         GameObject imageObject = new GameObject { name = imageName };
         imageObject.transform.SetParent(go.transform);
-        
+
         image = imageObject.AddComponent<Image>();
 
         if (inSprite != null)

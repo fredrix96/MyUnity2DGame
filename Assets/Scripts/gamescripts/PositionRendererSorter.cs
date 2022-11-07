@@ -2,31 +2,44 @@
 
 public class PositionRendererSorter : MonoBehaviour 
 {
-    int sortingOrderBase = 9999999; // This number should be higher than what any of your sprites will be on the position.y
-    int offset = 0;
+    int sortingOrderBase = 32767; // Maximum layer
     bool runOnlyOnce = false;
 
     float timer;
     float timerMax = .1f;
     Renderer myRenderer;
+    float offsetY;
+    Vector2 originalPos;
 
     private void Start() 
     {
         myRenderer = gameObject.GetComponent<SpriteRenderer>();
+        originalPos = gameObject.transform.position;
+        offsetY = myRenderer.bounds.extents.y * 2;
     }
 
     private void LateUpdate() 
     {
+        if (gameObject != null)
+        {
+            originalPos = gameObject.transform.position;
+        }
+
         timer -= Time.deltaTime;
         if (timer <= 0f) 
         {
             timer = timerMax;
-            myRenderer.sortingOrder = (int)(sortingOrderBase - transform.position.y * 10 - offset);
+            myRenderer.sortingOrder = (int)(sortingOrderBase - originalPos.y * 10 - offsetY * 10);
             if (runOnlyOnce) 
             {
                 Destroy(this);
             }
         }
+    }
+
+    public void UpdateOrder()
+    {
+        //myRenderer.sortingOrder = (int)(sortingOrderBase - originalPos.y * 10 - offsetY * 10);
     }
 
 }
