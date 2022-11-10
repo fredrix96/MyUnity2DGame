@@ -1,58 +1,70 @@
 fileFormatVersion: 2
-guid: 51e68743dae27c74daa65b367a8f4257
+guid: 33e9bdcbc80527b44acdb5af3ea9f3b3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4842840661249963238
-    second: ManaBar_Anim_0
+      213: -6633145160892516728
+    second: ExpBar_Anim2_0
   - first:
-      213: 6210468419511416707
-    second: ManaBar_Anim_1
+      213: -381344823218694792
+    second: ExpBar_Anim2_1
   - first:
-      213: -5982735369335832908
-    second: ManaBar_Anim_2
+      213: 6291540697839763961
+    second: ExpBar_Anim2_2
   - first:
-      213: -7899594622546507357
-    second: ManaBar_Anim_3
+      213: 6037328856674270649
+    second: ExpBar_Anim2_3
   - first:
-      213: 3238083590677530138
-    second: ManaBar_Anim_4
+      213: 2968762569494596217
+    second: ExpBar_Anim2_4
   - first:
-      213: -2709019763464028247
-    second: ManaBar_Anim_5
+      213: 5348810351980823070
+    second: ExpBar_Anim2_5
   - first:
-      213: 2719348823733645672
-    second: ManaBar_Anim_6
+      213: 3726343466615364176
+    second: ExpBar_Anim2_6
   - first:
-      213: -731215196880303422
-    second: ManaBar_Anim_7
+      213: 5201273999179277305
+    second: ExpBar_Anim2_7
   - first:
-      213: -1325932600441328320
-    second: ManaBar_Anim_8
+      213: 4671870959997172978
+    second: ExpBar_Anim2_8
   - first:
-      213: -4840348439388157294
-    second: ManaBar_Anim_9
+      213: 2635631899549372308
+    second: ExpBar_Anim2_9
   - first:
-      213: 3062894724093135010
-    second: ManaBar_Anim_10
+      213: 2646844408237455218
+    second: ExpBar_Anim2_10
   - first:
-      213: -592808853651896106
-    second: ManaBar_Anim_11
+      213: -8577076606509380635
+    second: ExpBar_Anim2_0
   - first:
-      213: -5153515419586380689
-    second: ManaBar_Anim_12
+      213: -5634921931032299928
+    second: ExpBar_Anim2_1
   - first:
-      213: 3729056408266855080
-    second: ManaBar_Anim_13
+      213: 8096289426761705392
+    second: ExpBar_Anim2_2
   - first:
-      213: 4562436781103763027
-    second: ManaBar_Anim_14
+      213: 1251967470502727206
+    second: ExpBar_Anim2_3
   - first:
-      213: 5467810918933764886
-    second: ManaBar_Anim_15
+      213: 4055999047873532250
+    second: ExpBar_Anim2_4
   - first:
-      213: 7066642104650246218
-    second: ManaBar_Anim_16
+      213: 8929093208834075926
+    second: ExpBar_Anim2_5
+  - first:
+      213: -6397880566570124150
+    second: ExpBar_Anim2_6
+  - first:
+      213: -3082844993872561504
+    second: ExpBar_Anim2_7
+  - first:
+      213: 2251023334125980297
+    second: ExpBar_Anim2_8
+  - first:
+      213: 941198425523748458
+    second: ExpBar_Anim2_9
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -94,10 +106,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 200
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -140,148 +152,211 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: ManaBar_Anim_0
+      name: ExpBar_Anim2_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 2048
+        width: 1433
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a1bc06ab316caccb0800000000000000
-      internalID: -4842840661249963238
+      spriteID: 5eb02b9054a18f880800000000000000
+      internalID: -8577076606509380635
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ManaBar_Anim_1
+      name: ExpBar_Anim2_1
       rect:
         serializedVersion: 2
-        x: 2048
+        x: 1433
         y: 0
-        width: 2048
+        width: 1434
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 38772c18f14003650800000000000000
-      internalID: 6210468419511416707
+      spriteID: 866f2cbdb5cbcc1b0800000000000000
+      internalID: -5634921931032299928
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ManaBar_Anim_2
+      name: ExpBar_Anim2_2
       rect:
         serializedVersion: 2
-        x: 4096
+        x: 2866
         y: 0
-        width: 2048
+        width: 1433.6
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4be729521ed09fca0800000000000000
-      internalID: -5982735369335832908
+      spriteID: 0b7e1e0765ccb5070800000000000000
+      internalID: 8096289426761705392
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ManaBar_Anim_3
+      name: ExpBar_Anim2_3
       rect:
         serializedVersion: 2
-        x: 6144
+        x: 4299
         y: 0
-        width: 2048
+        width: 1433.6
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3a9878d6b800f5290800000000000000
-      internalID: -7899594622546507357
+      spriteID: 62ec8adf7c1ef5110800000000000000
+      internalID: 1251967470502727206
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ManaBar_Anim_4
+      name: ExpBar_Anim2_4
       rect:
         serializedVersion: 2
-        x: 8192
+        x: 5732
         y: 0
-        width: 2048
+        width: 1433.6
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a160b5f9edbffec20800000000000000
-      internalID: 3238083590677530138
+      spriteID: a5113d9f4adc94830800000000000000
+      internalID: 4055999047873532250
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ManaBar_Anim_5
+      name: ExpBar_Anim2_5
       rect:
         serializedVersion: 2
-        x: 10240
+        x: 7165
         y: 0
-        width: 2048
+        width: 1434
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 9afb63dc0e0a76ad0800000000000000
-      internalID: -2709019763464028247
+      spriteID: 61d68ee07f28aeb70800000000000000
+      internalID: 8929093208834075926
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: ManaBar_Anim_6
+      name: ExpBar_Anim2_6
       rect:
         serializedVersion: 2
-        x: 12288
+        x: 8598
         y: 0
-        width: 2048
+        width: 1433.6
         height: 512
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8613503f8511db520800000000000000
-      internalID: 2719348823733645672
+      spriteID: a8c763aa5892637a0800000000000000
+      internalID: -6397880566570124150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ExpBar_Anim2_7
+      rect:
+        serializedVersion: 2
+        x: 10031
+        y: 0
+        width: 1433.6
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0aa72aacfc88735d0800000000000000
+      internalID: -3082844993872561504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ExpBar_Anim2_8
+      rect:
+        serializedVersion: 2
+        x: 11464
+        y: 0
+        width: 1433.6
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98ac1b3cbcd3d3f10800000000000000
+      internalID: 2251023334125980297
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: ExpBar_Anim2_9
+      rect:
+        serializedVersion: 2
+        x: 12897
+        y: 0
+        width: 1433.6
+        height: 512
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 143, y: 109, z: 143, w: 109}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6eff783bfecf0d00800000000000000
+      internalID: 941198425523748458
       vertices: []
       indices: 
       edges: []

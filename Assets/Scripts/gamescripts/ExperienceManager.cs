@@ -10,13 +10,18 @@ public static class ExperienceManager
     static List<ExperienceOrb> orbList;
     static Player player;
     static double timerBar;
+    static double levelUpDisplayTimer;
     static float timeDelayBar;
+    static float levelDownDisplayDelay;
     static int spriteCounter;
     static Sprite[] sprites;
     static Slider slider;
     static Image expBar;
     static Image expCapsule;
     static Image expCapsuleBg;
+    static Image expBarLevelUp;
+    static bool isLevelUp;
+    static Text levelText;
 
     static public void Init(Player inPlayer)
     {
@@ -28,7 +33,7 @@ public static class ExperienceManager
         go = new GameObject("experienceManager");
         go.transform.SetParent(GameManager.GameManagerObject.transform);
 
-        sprites = Resources.LoadAll<Sprite>("Sprites/ExpBar_Anim2");
+        sprites = Resources.LoadAll<Sprite>("Sprites/ExpBar_Anim");
         spriteCounter = 0;
 
         float yPos = -520f;
@@ -39,9 +44,18 @@ public static class ExperienceManager
         slider.value = 0;
         expBar.type = Image.Type.Sliced;
         expCapsule = UIManager.CreateImage(null, "expBarCapsule", Resources.Load<Sprite>("Sprites/ExpCapsule"), new Vector2(0, yPos), new Vector2(1020, 30)).GetComponent<Image>();
+        expBarLevelUp = UIManager.CreateImage(null, "expBarLevelUp", Resources.Load<Sprite>("Sprites/ExpBar_LevelUp"), new Vector2(0, yPos), new Vector2(1030, 33)).GetComponent<Image>();
+        expBarLevelUp.enabled = false;
+
+        levelText = UIManager.CreateText(null, "levelUpText", "Level Up!", 30, new Vector2(0, yPos + 45), new Vector2(100, 100), TextAnchor.MiddleCenter);
+        levelText.enabled = false;
 
         timerBar = 0;
+        levelUpDisplayTimer = 0;
         timeDelayBar = 0.1f;
+        levelDownDisplayDelay = 0.7f;
+
+        isLevelUp = false;
     }
 
     static public void UpdateXpBar()
@@ -56,6 +70,7 @@ public static class ExperienceManager
 
         if (slider.value >= 1)
         {
+            LevelUp();
             player.LevelUp();
         }
     }
@@ -96,6 +111,16 @@ public static class ExperienceManager
                 orbList.Remove(orbList[i]);
             }
         }
+
+        if (isLevelUp)
+        {
+            levelUpDisplayTimer += Time.deltaTime;
+            
+            if (levelUpDisplayTimer > levelDownDisplayDelay)
+            {
+                ResetLevelUp();
+            }
+        }
     }
 
     static void PlayBarAnimation()
@@ -114,5 +139,21 @@ public static class ExperienceManager
 
             timerBar = 0;
         }
+    }
+
+    static void LevelUp()
+    {
+        AudioManager.PlayAudio2D("LevelUp", 0.4f);
+        isLevelUp = true;
+        expBarLevelUp.enabled = true;
+        levelText.enabled = true;
+    }
+
+    static void ResetLevelUp()
+    {
+        isLevelUp = false;
+        expBarLevelUp.enabled = false;
+        levelUpDisplayTimer = 0;
+        levelText.enabled = false;
     }
 }

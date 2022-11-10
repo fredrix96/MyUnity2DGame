@@ -58,6 +58,9 @@ public static class UIManager
         if (parentObject == null) textGameObject.transform.SetParent(go.transform);
         else textGameObject.transform.SetParent(parentObject.transform);
 
+        Outline outline = textGameObject.AddComponent<Outline>();
+        outline.effectDistance = new Vector2((inSize.x / 100), (inSize.y / 100));
+
         Text text = textGameObject.AddComponent<Text>();
         text.text = inText;
         text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");

@@ -133,28 +133,4 @@ public class Castle : Building
             shouldBeRemoved = true;
         }
     }
-
-    void RespawnTimer()
-    {
-        if (!player.IsDead())
-        {
-            text.text = "The king is alive";
-        }
-        else if (player.GetPlayerObject() == null)
-        {
-            remainingTime -= Time.deltaTime;
-            text.text = "The king" + System.Environment.NewLine + "respawns in" + System.Environment.NewLine + remainingTime.ToString("F2") + " sec";
-
-            if (remainingTime <= 0)
-            {
-                float offset = BuildingInformation.GetBuildingSize(type).y;
-                Tile spawnTile = GridManager.GetTile(new Vector2(centerTile.GetTilePosition().x, centerTile.GetTilePosition().y + offset / 2));
-
-                player.Respawn(spawnTile);
-                message.SendPopUpMessage("A new King has arrived!" + System.Environment.NewLine + "All hail the new King!", 2.5f);
-                remainingTime = timeToRespawn;
-            }
-        }
-    }
-
 }
