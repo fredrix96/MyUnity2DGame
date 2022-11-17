@@ -178,7 +178,7 @@ public class Vendor : MonoBehaviour
             Vector2 size = BuildingInformation.GetBuildingSize(type);
             int startX = -Mathf.FloorToInt(size.x / 2f);
             int endX = Mathf.CeilToInt(size.x / 2f);
-            int startY = -Mathf.FloorToInt(size.y / 2f);
+            int startY = 0;// -Mathf.FloorToInt(size.y / 2f);
             int endY = Mathf.CeilToInt(size.y / 2f);
 
             Tile bottomRightTile = GridManager.GetTile(new Vector2(tile.GetTilePosition().x + endX - 1, tile.GetTilePosition().y + endY - 1));

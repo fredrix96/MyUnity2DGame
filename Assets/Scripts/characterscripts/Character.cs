@@ -13,6 +13,18 @@ public class Character
     }
     public TYPE_OF_CHARACTER type;
 
+    protected struct STATS
+    {
+        public float critChance; // calculate in percent (0.1 = 10%)
+        public int maxHealth;
+        public float gatheringArea;
+        public int level;
+        public int damage;
+        public float attackSpeed; // lower is faster
+        public float walkSpeed;
+        public int healthGen;
+    }
+
     public PositionHandler ph;
 
     protected GameObject go;
@@ -24,11 +36,8 @@ public class Character
     protected float lastXPos;
     protected float pivotHeightDiff;
     protected int direction;
-    protected int damage;
-    protected float speed;
     protected bool isDead;
     protected bool shouldBeRemoved;
-    protected float attackSpeed;
 
     protected Vector2 boundingBoxOffset;
     protected Vector2 spawnTile;
@@ -96,11 +105,11 @@ public class Character
         return isDead;
     }
 
-    public void UpdatePositionHandler()
+    public void UpdatePositionHandler(float walkSpeed)
     {
         // In
         ph.tilePosition = currTile.GetTilePosition();
-        ph.speed = speed;
+        ph.speed = walkSpeed;
         ph.isDead = IsDead();
         ph.isAttacking = sm.IsAttacking();
 
@@ -133,7 +142,7 @@ public class Character
         }
     }
 
-    protected void WalkToNewPosition()
+    protected void WalkToNewPosition(float walkSpeed)
     {
         // Make sure that the path is not interrupted by a newly built building or other characters of the same type
         Tile checkTile = GridManager.GetTileFromWorldPosition(path[pathCounter]);
@@ -151,8 +160,8 @@ public class Character
         if (path[1].x != float.MaxValue)
         {
             // Notice how we adjust the height based on the pivot difference
-            go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[pathCounter].x, speed * Time.deltaTime),
-                Mathf.MoveTowards(go.transform.position.y, path[pathCounter].y + pivotHeightDiff, speed * Time.deltaTime), 0);
+            go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[pathCounter].x, walkSpeed * Time.deltaTime),
+                Mathf.MoveTowards(go.transform.position.y, path[pathCounter].y + pivotHeightDiff, walkSpeed * Time.deltaTime), 0);
         
             if (pathCounter == nrOfSteps - 1)
             {
@@ -168,8 +177,8 @@ public class Character
         else
         {
             // Notice how we adjust the height based on the pivot difference
-            go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[0].x, speed * Time.deltaTime),
-                Mathf.MoveTowards(go.transform.position.y, path[0].y + pivotHeightDiff, speed * Time.deltaTime), 0);
+            go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[0].x, walkSpeed * Time.deltaTime),
+                Mathf.MoveTowards(go.transform.position.y, path[0].y + pivotHeightDiff, walkSpeed * Time.deltaTime), 0);
             
             if (go.transform.position.x == path[0].x && go.transform.position.y == path[0].y + pivotHeightDiff)
             {

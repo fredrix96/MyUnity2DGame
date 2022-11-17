@@ -31,9 +31,11 @@ public class CharacterManager
 
     GameObject characterObjects, enemyObjects, soldierObjects;
 
-    float enemySpawnDelay;
-    double enemySpawnTimer;
+    float enemySpawnDelay, enemyLevelDelay;
+    double enemySpawnTimer, enemyLevelTimer;
     int randomStart; // The higher value this is, the more likely it is that stronger enemies will spawn
+    int enemyLevel;
+    int soldierLevel;
 
     public CharacterManager(Player inPlayer, CoinManager inCoinMan)
     {
@@ -54,9 +56,14 @@ public class CharacterManager
         soldiers = new List<Soldier>();
 
         enemySpawnDelay = 4.0f; // decreases with time
+        enemyLevelDelay = 20.0f; // how fast the enemies will level up
         enemySpawnTimer = 0;
+        enemyLevelTimer = 0;
 
         randomStart = 0;
+
+        enemyLevel = 1;
+        soldierLevel = 1;
 
         DisplayCharacterData();
     }
@@ -186,6 +193,14 @@ public class CharacterManager
             }
         }
 
+        enemyLevelTimer += Time.deltaTime;
+        if (enemyLevelTimer > enemyLevelDelay)
+        {
+            enemyLevel++;
+            enemyLevelTimer = 0;
+            Debug.Log("Enemy level is now: " + enemyLevel);
+        }
+
         UpdateCharacterPosition(enemies, GameManager.toggles.GetMultithreadingOn());
 
         for (int i = 0; i < enemies.Count; i++)
@@ -285,15 +300,30 @@ public class CharacterManager
             eType = CharacterInformation.TYPE_OF_ENEMY.Mushroom;
         }
 
-        enemies.Add(new Enemy(enemyObjects, eType, coinMan));
+        enemies.Add(new Enemy(enemyObjects, eType, coinMan, enemyLevel));
         EnemyCounter.counter++;
         EnemyCounter.nrOfEnemies++;
 
-        if (enemySpawnDelay > 3) enemySpawnDelay -= 0.1f;
-        if (enemySpawnDelay > 2) enemySpawnDelay -= 0.05f;
-        if (enemySpawnDelay > 1) enemySpawnDelay -= 0.01f;
-        if (enemySpawnDelay > 0.5f) enemySpawnDelay -= 0.005f;
-        if (enemySpawnDelay > 0.25f) enemySpawnDelay -= 0.001f;
+        if (enemySpawnDelay > 3)
+        {
+            enemySpawnDelay -= 0.1f;
+        }
+        else if (enemySpawnDelay > 2)
+        {
+            enemySpawnDelay -= 0.05f;
+        }
+        else if (enemySpawnDelay > 1)
+        {
+            enemySpawnDelay -= 0.01f;
+        }
+        else if (enemySpawnDelay > 0.5f)
+        {
+            enemySpawnDelay -= 0.005f;
+        }
+        else if (enemySpawnDelay > 0.25f)
+        {
+            enemySpawnDelay -= 0.001f;
+        }
 
         if (randomStart < 5000)
         {
@@ -310,7 +340,7 @@ public class CharacterManager
 
     void SpawnSoldier(CharacterInformation.TYPE_OF_SOLDIER type)
     {
-        soldiers.Add(new Soldier(soldierObjects, type));
+        soldiers.Add(new Soldier(soldierObjects, type, soldierLevel));
 
         if (type == CharacterInformation.TYPE_OF_SOLDIER.Spearman)
         {

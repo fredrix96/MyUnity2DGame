@@ -5,8 +5,9 @@ using UnityEngine;
 public class Soldier : Character
 {
     CharacterInformation.TYPE_OF_SOLDIER sType;
+    STATS soldierStats;
 
-    public Soldier(GameObject inGo, CharacterInformation.TYPE_OF_SOLDIER inSType)
+    public Soldier(GameObject inGo, CharacterInformation.TYPE_OF_SOLDIER inSType, int level)
     {
         type = TYPE_OF_CHARACTER.Soldier;
         sType = inSType;
@@ -16,6 +17,8 @@ public class Soldier : Character
         go.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         go.layer = LayerMask.NameToLayer("Soldiers");
 
+        InitStats(level);
+
         cm = go.AddComponent<CollisionManager>();
 
         boundingBoxOffset = new Vector2(0.0f, -0.25f);
@@ -24,30 +27,28 @@ public class Soldier : Character
 
         health = go.AddComponent<Health>();
 
-        int hp = CharacterInformation.GetSoldierHealth(sType);
-        float attackSpeed = CharacterInformation.GetSoldierAttackSpeed(sType);
         AnimationStartingPoints asp = CharacterInformation.GetSoldierAnimationStartingPoints(sType);
         switch (sType)
         {
             case CharacterInformation.TYPE_OF_SOLDIER.Spearman:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
-                health.Init(go, "Sprites/SoldierHealth", hp, new Vector2(0.2f, 0.15f), -0.1f);
-                sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesSpear", asp, boundingBoxOffset, attackSpeed);
+                health.Init(go, "Sprites/SoldierHealth", soldierStats.maxHealth, new Vector2(0.2f, 0.15f), -0.1f);
+                sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesSpear", asp, boundingBoxOffset, soldierStats.attackSpeed);
                 break;
             case CharacterInformation.TYPE_OF_SOLDIER.Maceman:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
-                health.Init(go, "Sprites/SoldierHealth", hp, new Vector2(0.2f, 0.15f), -0.1f);
-                sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesMace", asp, boundingBoxOffset, attackSpeed);
+                health.Init(go, "Sprites/SoldierHealth", soldierStats.maxHealth, new Vector2(0.2f, 0.15f), -0.1f);
+                sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesMace", asp, boundingBoxOffset, soldierStats.attackSpeed);
                 break;
             case CharacterInformation.TYPE_OF_SOLDIER.HeavySwordman:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
-                health.Init(go, "Sprites/SoldierHealth", hp, new Vector2(0.2f, 0.15f), -0.1f);
-                sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesHeavySword", asp, boundingBoxOffset, attackSpeed);
+                health.Init(go, "Sprites/SoldierHealth", soldierStats.maxHealth, new Vector2(0.2f, 0.15f), -0.1f);
+                sm.Init(go, "Sprites/Medieval Warrior Pack 2/SpritesHeavySword", asp, boundingBoxOffset, soldierStats.attackSpeed);
                 break;
             case CharacterInformation.TYPE_OF_SOLDIER.Knight:
                 boundingBoxOffset = new Vector2(0.0f, -0.3f);
-                health.Init(go, "Sprites/SoldierHealth", hp, new Vector2(0.2f, 0.15f));
-                sm.Init(go, "Sprites/Hero_Knight_2/Sprites", asp, boundingBoxOffset, attackSpeed);
+                health.Init(go, "Sprites/SoldierHealth", soldierStats.maxHealth, new Vector2(0.2f, 0.15f));
+                sm.Init(go, "Sprites/Hero_Knight_2/Sprites", asp, boundingBoxOffset, soldierStats.attackSpeed);
                 break;
             default:
                 boundingBoxOffset = new Vector2(0.0f, 0.0f);
@@ -66,9 +67,7 @@ public class Soldier : Character
         ph.position = new Vector2(go.transform.position.x, go.transform.position.y);
         lastXPos = ph.position.x;
 
-        speed = 2.0f;
         direction = 1;
-        damage = CharacterInformation.GetSoldierDamage(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
 
         currTile = GridManager.GetTile(spawn);
         currTile.IncreaseCharacters(this);
@@ -77,7 +76,16 @@ public class Soldier : Character
         ph.type = type;
         ph.isIdle = false;
 
-        UpdatePositionHandler();
+        UpdatePositionHandler(soldierStats.walkSpeed);
+    }
+
+    void InitStats(int level)
+    {
+        soldierStats.maxHealth = CharacterInformation.GetSoldierHealth(sType);
+        soldierStats.level = level;
+        soldierStats.damage = CharacterInformation.GetSoldierDamage(CharacterInformation.TYPE_OF_SOLDIER.Spearman);
+        soldierStats.attackSpeed = CharacterInformation.GetSoldierAttackSpeed(sType);
+        soldierStats.walkSpeed = 2.0f;
     }
 
     public override void Update()
@@ -88,9 +96,9 @@ public class Soldier : Character
             {
                 sm.Walk();
 
-                UpdatePositionHandler();
+                UpdatePositionHandler(soldierStats.walkSpeed);
 
-                WalkToNewPosition();
+                WalkToNewPosition(soldierStats.walkSpeed);
 
                 MarkTile(type);
 
@@ -107,7 +115,7 @@ public class Soldier : Character
             }
             else if (sm.IsIdle())
             {
-                UpdatePositionHandler();
+                UpdatePositionHandler(soldierStats.walkSpeed);
 
                 sm.Idle();
             }
@@ -172,7 +180,7 @@ public class Soldier : Character
         {
             if (col.gameObject.GetComponent<Health>() != null)
             {
-                col.gameObject.GetComponent<Health>().Damage(damage, false, false);
+                col.gameObject.GetComponent<Health>().Damage(soldierStats.damage, false, false);
 
                 // Turn towards the target
                 if (go.transform.position.x > col.transform.position.x && direction == 1)

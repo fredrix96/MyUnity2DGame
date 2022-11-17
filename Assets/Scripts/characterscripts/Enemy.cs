@@ -11,14 +11,17 @@ public class Enemy : Character
     float dropChance;
     int expPoints;
     CharacterInformation.TYPE_OF_ENEMY eType;
-    
-    public Enemy(GameObject inGo, CharacterInformation.TYPE_OF_ENEMY inType, CoinManager inCoinMan)
+    STATS enemyStats;
+
+    public Enemy(GameObject inGo, CharacterInformation.TYPE_OF_ENEMY inType, CoinManager inCoinMan, int level)
     {
         type = TYPE_OF_CHARACTER.Enemy;
         eType = inType;
 
         coinMan = inCoinMan;
         value = CharacterInformation.GetEnemyValue(eType);
+
+        InitStats(level);
 
         groanDelay = 5.0f;
         time = 0;
@@ -33,29 +36,28 @@ public class Enemy : Character
         sm = go.AddComponent<SpriteManager>();
         health = go.AddComponent<Health>();
 
-        int hp = CharacterInformation.GetEnemyHealth(eType);
         AnimationStartingPoints asp = CharacterInformation.GetEnemyAnimationStartingPoints(eType);
         switch (eType)
         {
             case CharacterInformation.TYPE_OF_ENEMY.Mushroom:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
-                health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f), -0.1f);
-                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", asp, boundingBoxOffset);
+                health.Init(go, "Sprites/EnemyHealth", enemyStats.maxHealth, new Vector2(0.2f, 0.15f), -0.1f);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Mushroom", asp, boundingBoxOffset, enemyStats.attackSpeed);
                 break;
             case CharacterInformation.TYPE_OF_ENEMY.Goblin:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
-                health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f), -0.1f);
-                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Goblin", asp, boundingBoxOffset);
+                health.Init(go, "Sprites/EnemyHealth", enemyStats.maxHealth, new Vector2(0.2f, 0.15f), -0.1f);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Goblin", asp, boundingBoxOffset, enemyStats.attackSpeed);
                 break;
             case CharacterInformation.TYPE_OF_ENEMY.Eye:
                 boundingBoxOffset = new Vector2(0.0f, 0.0f);
-                health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f), -0.1f);
-                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Flying Eye", asp, boundingBoxOffset);
+                health.Init(go, "Sprites/EnemyHealth", enemyStats.maxHealth, new Vector2(0.2f, 0.15f), -0.1f);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Flying Eye", asp, boundingBoxOffset, enemyStats.attackSpeed);
                 break;
             case CharacterInformation.TYPE_OF_ENEMY.Skeleton:
                 boundingBoxOffset = new Vector2(0.0f, -0.5f);
-                health.Init(go, "Sprites/EnemyHealth", hp, new Vector2(0.2f, 0.15f), 0.1f);
-                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Skeleton", asp, boundingBoxOffset);
+                health.Init(go, "Sprites/EnemyHealth", enemyStats.maxHealth, new Vector2(0.2f, 0.15f), 0.1f);
+                sm.Init(go, "Sprites/Monsters Creatures Fantasy/Sprites/Skeleton", asp, boundingBoxOffset, enemyStats.attackSpeed);
                 break;
             default:
                 boundingBoxOffset = new Vector2(0.0f, 0.0f);
@@ -77,8 +79,6 @@ public class Enemy : Character
         ph.position = new Vector2(go.transform.position.x, go.transform.position.y);
         lastXPos = ph.position.x;
 
-        speed = CharacterInformation.GetEnemySpeed(eType);
-        damage = CharacterInformation.GetEnemyDamage(eType);
         direction = -1;
 
         currTile = GridManager.GetTile(spawnTile);
@@ -88,7 +88,24 @@ public class Enemy : Character
         ph.type = type;
         ph.isIdle = false;
 
-        UpdatePositionHandler();
+        UpdatePositionHandler(enemyStats.walkSpeed);
+    }
+
+    void InitStats(int level)
+    {
+        enemyStats.level = level;
+        enemyStats.maxHealth = CharacterInformation.GetEnemyHealth(eType) * (level);
+        enemyStats.damage = CharacterInformation.GetEnemyDamage(eType);
+        enemyStats.attackSpeed = 0.1f;
+        enemyStats.walkSpeed = CharacterInformation.GetEnemySpeed(eType);
+
+        if (level > 1)
+        {
+            enemyStats.maxHealth += (level / 2) * 10;
+            enemyStats.damage += level;
+            enemyStats.attackSpeed -= level * 0.002f;
+            enemyStats.walkSpeed += level * 0.002f;
+        }
     }
 
     public override void Update()
@@ -101,9 +118,9 @@ public class Enemy : Character
             {
                 sm.Walk();
 
-                UpdatePositionHandler();
+                UpdatePositionHandler(enemyStats.walkSpeed);
 
-                WalkToNewPosition();
+                WalkToNewPosition(enemyStats.walkSpeed);
 
                 MarkTile(type);
 
@@ -119,7 +136,7 @@ public class Enemy : Character
             }
             else if (sm.IsIdle())
             {
-                UpdatePositionHandler();
+                UpdatePositionHandler(enemyStats.walkSpeed);
 
                 if (ph.targetFound)
                 {
@@ -204,7 +221,7 @@ public class Enemy : Character
         {
             if (col.gameObject.GetComponent<Health>() != null)
             {
-                col.gameObject.GetComponent<Health>().Damage(damage, false, false);
+                col.gameObject.GetComponent<Health>().Damage(enemyStats.damage, false, false);
 
                 // Turn towards the target
                 if (go.transform.position.x < col.transform.position.x && direction == -1)
@@ -223,7 +240,7 @@ public class Enemy : Character
             }
             else if (col.gameObject.GetComponent<PlayerHealth>() != null)
             {
-                col.gameObject.GetComponent<PlayerHealth>().Damage(damage);
+                col.gameObject.GetComponent<PlayerHealth>().Damage(enemyStats.damage);
 
                 // Turn towards the target
                 if (go.transform.position.x < col.transform.position.x && direction == -1)

@@ -29,7 +29,6 @@ public class ArcheryTower : Building
         go.transform.SetParent(parent.transform);
         go.layer = LayerMask.NameToLayer("Buildings");
 
-        go.AddComponent<PositionRendererSorter>();
         go.AddComponent<CollisionManager>();
 
         message = go.AddComponent<PopUpMessage>();
@@ -55,7 +54,7 @@ public class ArcheryTower : Building
         CreateToolBar();
 
         collider.size = new Vector2(sr.size.x, sr.size.y / 5);
-        collider.offset = new Vector2(0, -(sr.size.y / 3));
+        collider.offset = new Vector2(0, -(sr.size.y / 2.5f));
 
         shootingOrigin = new Vector2(go.transform.position.x, go.transform.position.y + sr.bounds.size.y * 0.1f);
 
@@ -68,6 +67,8 @@ public class ArcheryTower : Building
         projSprite = Resources.Load<Sprite>("Sprites/Arrow");
 
         target = LayerMask.GetMask("Enemies");
+
+        go.AddComponent<PositionRendererSorter>();
 
         BuildingInformation.IncreaseCounter(type);
     }

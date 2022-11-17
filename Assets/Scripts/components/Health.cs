@@ -22,7 +22,9 @@ public class Health : MonoBehaviour
         go.transform.SetParent(parent.transform);
 
         canvas = go.AddComponent<Canvas>();
+
         sr = go.AddComponent<SpriteRenderer>();
+        sr.sortingLayerName = "UI";
 
         sr.sprite = Resources.Load<Sprite>(spriteSource);
         sr.drawMode = SpriteDrawMode.Sliced;

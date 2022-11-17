@@ -4,16 +4,6 @@ using UnityEngine;
 
 public class Player : Character
 {   
-    struct STATS
-    {
-        public float critChance; // calculate in percent (0.1 = 10%)
-        public int maxHealth;
-        public float playerSpeed;
-        public float gatheringArea;
-        public int level;
-        public int damage;
-    }
-
     PlayerHealth playerHealth;
     STATS playerStats;
 
@@ -37,15 +27,9 @@ public class Player : Character
 
         go.AddComponent<CollisionManager>();
 
-        playerStats.maxHealth = 500;
-        playerStats.playerSpeed = 5;
-        playerStats.critChance = 0.1f;
-        playerStats.level = 1;
-        playerStats.damage = 20;
-        playerStats.gatheringArea = 5.0f;
+        InitStats();
 
         regenerationDelay = 0.3f;
-        attackSpeed = 0.08f;
         experience = 0;
         levelExp = 100;
 
@@ -64,7 +48,7 @@ public class Player : Character
         boundingBoxOffset = new Vector2(0.0f, -1.5f);
 
         sm = go.AddComponent<SpriteManager>();
-        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", asp, boundingBoxOffset, attackSpeed, true, false);
+        sm.Init(go, "Sprites/Medieval King Pack 2/Sprites", asp, boundingBoxOffset, playerStats.attackSpeed, true, false);
 
         playerHealth = go.AddComponent<PlayerHealth>();
         playerHealth.Init(go, playerStats.maxHealth);
@@ -76,6 +60,18 @@ public class Player : Character
         currTile = spawnTile;
         currTile.PlayerOnTile(true);
         GridManager.SetPlayerTile(currTile);
+    }
+
+    void InitStats()
+    {
+        playerStats.maxHealth = 500;
+        playerStats.critChance = 0.1f;
+        playerStats.level = 1;
+        playerStats.damage = 15;
+        playerStats.gatheringArea = 2.0f;
+        playerStats.attackSpeed = 0.08f;
+        playerStats.walkSpeed = 4.0f;
+        playerStats.healthGen = 1;
     }
 
     public override void Update()
@@ -122,12 +118,7 @@ public class Player : Character
         else if (sm.Die() > 3 && go != null)
         {
             shouldBeRemoved = true;
-
-            // End the game if the player dies without any castle to respawn in
-            //if (BuildingInformation.GetCounter(BuildingInformation.TYPE_OF_BUILDING.Castle) < 1)
-            //{
-                GameManager.GameOver();
-            //}
+            GameManager.GameOver();
         }
     }
 
@@ -159,13 +150,13 @@ public class Player : Character
 
         List<Collider2D> results = sm.GetListOfOverlapColliders(LayerMask.GetMask("Enemies"), swordBc);
 
-        int damageDone = playerStats.damage;
+        int damageDone = Random.Range(playerStats.damage - (int)(playerStats.damage * 0.3f), playerStats.damage + (int)(playerStats.damage * 0.3f));
         bool crit = false;
 
         // Calculate if the player crits
         if (Tools.CalculateChance(playerStats.critChance))
         {
-            float critDamage = Random.Range(playerStats.damage * 0.1f, playerStats.damage * 1);
+            float critDamage = Random.Range(playerStats.damage * 0.3f, playerStats.damage * 1.3f);
             damageDone += (int)critDamage;
             crit = true;
         }
@@ -225,13 +216,22 @@ public class Player : Character
         // To avoid faster speeds at the diagonal
         dirVector = dirVector.normalized;
 
-        go.transform.position = new Vector2(go.transform.position.x + playerStats.playerSpeed * Time.deltaTime * dirVector.x, go.transform.position.y + playerStats.playerSpeed * Time.deltaTime * dirVector.y);
+        Vector2 newPos = new Vector2(go.transform.position.x + playerStats.walkSpeed * Time.deltaTime * dirVector.x, go.transform.position.y + playerStats.walkSpeed * Time.deltaTime * dirVector.y);
 
-        ResetDir();
+        // "-(GridManager.GetTileHeight() * 2.5f))" is necessary to get the correct tile placement because of the sprite size
+        Tile bottom = GridManager.GetTileFromWorldPosition(new Vector2(newPos.x, newPos.y - (GridManager.GetTileHeight() * 2.5f)));
+        Tile top = GridManager.GetTile(new Vector2(bottom.GetTilePosition().x, bottom.GetTilePosition().y - 1));
+
+        // The player cant walk on the same tiles as enemies
+        if (!bottom.IsCharacterPresent(TYPE_OF_CHARACTER.Enemy) && !top.IsCharacterPresent(TYPE_OF_CHARACTER.Enemy))
+        {
+            go.transform.position = newPos;
+
+            ResetDir();
+            MarkTile();
+        }
 
         sm.Walk();
-
-        MarkTile();
     }
 
     void MarkTile()
@@ -256,7 +256,7 @@ public class Player : Character
 
             if (regenerationTimer > regenerationDelay)
             {
-                playerHealth.IncreaseHealth(1);
+                playerHealth.IncreaseHealth(playerStats.healthGen);
                 regenerationTimer = 0;
             }
         }
