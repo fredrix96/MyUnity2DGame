@@ -29,12 +29,25 @@ public class PositionRendererSorter : MonoBehaviour
         if (timer <= 0f) 
         {
             timer = timerMax;
-            myRenderer.sortingOrder = (int)(sortingOrderBase - originalPos.y * 10 - offsetY * 10);
+            myRenderer.sortingOrder = (int)(sortingOrderBase - originalPos.y * 10 - offsetY);
             if (runOnlyOnce) 
             {
                 Destroy(this);
             }
         }
+    }
+
+    /// <summary>
+    /// This function sets the offset of the rendering sorting order manually
+    /// </summary>
+    public void SetOffsetManually(float inOffsetY)
+    {
+        offsetY = inOffsetY;
+    }
+
+    public void SetIsOnlyRunOnce()
+    {
+        runOnlyOnce = true;
     }
 
     public void UpdateOrder()

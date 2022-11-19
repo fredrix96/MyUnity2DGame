@@ -25,7 +25,8 @@ public class Goldmine : Building
         go.transform.SetParent(parent.transform);
         go.layer = LayerMask.NameToLayer("Buildings");
 
-        go.AddComponent<PositionRendererSorter>();
+        PositionRendererSorter prs = go.AddComponent<PositionRendererSorter>();
+        prs.SetIsOnlyRunOnce();
         go.AddComponent<CollisionManager>();
 
         message = go.AddComponent<PopUpMessage>();

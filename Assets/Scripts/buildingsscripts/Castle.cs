@@ -38,7 +38,8 @@ public class Castle : Building
         message = go.AddComponent<PopUpMessage>();
         message.Init(go);
 
-        go.AddComponent<PositionRendererSorter>();
+        PositionRendererSorter prs = go.AddComponent<PositionRendererSorter>();
+        prs.SetIsOnlyRunOnce();
         go.AddComponent<CollisionManager>();
 
         sr = go.AddComponent<SpriteRenderer>();

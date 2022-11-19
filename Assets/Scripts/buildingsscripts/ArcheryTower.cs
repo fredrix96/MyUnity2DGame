@@ -37,6 +37,10 @@ public class ArcheryTower : Building
         sr = go.AddComponent<SpriteRenderer>();
         sr.sprite = Resources.Load<Sprite>("Sprites/" + type.ToString());
 
+        PositionRendererSorter prs = go.AddComponent<PositionRendererSorter>();
+        prs.SetIsOnlyRunOnce();
+        prs.SetOffsetManually(-100);
+
         go.transform.position = inPos.GetWorldPos();
 
         MarkOrUnmarkTiles(type, inPos, true);
@@ -53,8 +57,8 @@ public class ArcheryTower : Building
         CreateHealthBar(type, -0.2f);
         CreateToolBar();
 
-        collider.size = new Vector2(sr.size.x, sr.size.y / 5);
-        collider.offset = new Vector2(0, -(sr.size.y / 2.5f));
+        collider.size = new Vector2(sr.size.x, sr.size.y / 3.5f);
+        collider.offset = new Vector2(0, -(sr.size.y / 3.0f));
 
         shootingOrigin = new Vector2(go.transform.position.x, go.transform.position.y + sr.bounds.size.y * 0.1f);
 
@@ -67,8 +71,6 @@ public class ArcheryTower : Building
         projSprite = Resources.Load<Sprite>("Sprites/Arrow");
 
         target = LayerMask.GetMask("Enemies");
-
-        go.AddComponent<PositionRendererSorter>();
 
         BuildingInformation.IncreaseCounter(type);
     }
