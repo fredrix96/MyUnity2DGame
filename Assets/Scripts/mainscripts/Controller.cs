@@ -94,7 +94,7 @@ public class Controller
             }
 
             Vector2 playerPos = player.GetPosition();
-            if (Input.GetKey(KeyCode.W) && playerPos.y <= GridManager.GetTile(new Vector2(0,0)).GetWorldPos().y)
+            if (Input.GetKey(KeyCode.W) && playerPos.y <= GridManager.GetTile(new Vector2(0,0)).GetWorldPos().y + GridManager.GetTileHeight() * 1.5f)
             {
                 player.SetDirY(1);
             }

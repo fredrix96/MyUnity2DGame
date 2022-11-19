@@ -167,7 +167,8 @@ public static class CameraManager
     static void PlayerMove(Player player)
     {
         Vector2 playerPos = player.GetPosition();
-        mainCam.transform.position = new Vector3(playerPos.x, playerPos.y, mainCam.transform.position.z);
+        mainCam.transform.position = new Vector3(Mathf.Lerp(mainCam.transform.position.x, playerPos.x, 3 * Time.deltaTime),
+                Mathf.Lerp(mainCam.transform.position.y, playerPos.y, 3 * Time.deltaTime), mainCam.transform.position.z);
 
         // Stay inside of border
         if (Graphics.GetWorldLimits().x > GetPosX() - GetWorldSpaceWidth() / 2)

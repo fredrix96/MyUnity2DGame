@@ -39,7 +39,6 @@ public class ArcheryTower : Building
 
         PositionRendererSorter prs = go.AddComponent<PositionRendererSorter>();
         prs.SetIsOnlyRunOnce();
-        prs.SetOffsetManually(-100);
 
         go.transform.position = inPos.GetWorldPos();
 

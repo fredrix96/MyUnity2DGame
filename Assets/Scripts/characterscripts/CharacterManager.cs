@@ -96,7 +96,7 @@ public class CharacterManager
 
         if (characters.Count < targetFrame)
         {
-          chunkSize = characters.Count;
+            chunkSize = characters.Count;
         }
         else
         {
@@ -131,7 +131,7 @@ public class CharacterManager
         // This is done because it allows us to have a "clever" AI while also having good FPS
         if (characters.Count > 0)
         {
-            int framesToWait = 10; // = n:th frame
+            int framesToWait = 1; // = n:th frame
             List<T> listToUpdate = GetListToUpdate(characters, framesToWait);
 
             if (multithreading)

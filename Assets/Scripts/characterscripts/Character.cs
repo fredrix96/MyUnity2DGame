@@ -148,7 +148,7 @@ public class Character
         Tile checkTile = GridManager.GetTileFromWorldPosition(path[pathCounter]);
         if (checkTile != null)
         {
-            if (checkTile.IsObjectPresent())// || checkTile.IsCharacterPresent(type))
+            if (checkTile.IsObjectPresent() || checkTile.IsCharacterPresent(type))
             {
                 ph.posReached = true;
                 pathCounter = 0;
@@ -162,7 +162,7 @@ public class Character
             // Notice how we adjust the height based on the pivot difference
             go.transform.position = new float3(Mathf.MoveTowards(go.transform.position.x, path[pathCounter].x, walkSpeed * Time.deltaTime),
                 Mathf.MoveTowards(go.transform.position.y, path[pathCounter].y + pivotHeightDiff, walkSpeed * Time.deltaTime), 0);
-        
+
             if (pathCounter == nrOfSteps - 1)
             {
                 ph.posReached = true;

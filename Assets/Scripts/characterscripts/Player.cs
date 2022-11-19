@@ -220,15 +220,20 @@ public class Player : Character
 
         // "-(GridManager.GetTileHeight() * 2.5f))" is necessary to get the correct tile placement because of the sprite size
         Tile bottom = GridManager.GetTileFromWorldPosition(new Vector2(newPos.x, newPos.y - (GridManager.GetTileHeight() * 2.5f)));
-        Tile top = GridManager.GetTile(new Vector2(bottom.GetTilePosition().x, bottom.GetTilePosition().y - 1));
-
-        // The player cant walk on the same tiles as enemies
-        if (!bottom.IsCharacterPresent(TYPE_OF_CHARACTER.Enemy) && !top.IsCharacterPresent(TYPE_OF_CHARACTER.Enemy))
+        if (bottom != null)
         {
-            go.transform.position = newPos;
+            Tile top = GridManager.GetTile(new Vector2(bottom.GetTilePosition().x, bottom.GetTilePosition().y - 1));
+            if (top != null)
+            {
+                // The player cant walk on the same tiles as enemies
+                if (!bottom.IsCharacterPresent(TYPE_OF_CHARACTER.Enemy) && !top.IsCharacterPresent(TYPE_OF_CHARACTER.Enemy))
+                {
+                    go.transform.position = newPos;
 
-            ResetDir();
-            MarkTile();
+                    ResetDir();
+                    MarkTile();
+                }
+            }
         }
 
         sm.Walk();
