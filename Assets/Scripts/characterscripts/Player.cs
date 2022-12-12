@@ -60,6 +60,9 @@ public class Player : Character
         currTile = spawnTile;
         currTile.PlayerOnTile(true);
         GridManager.SetPlayerTile(currTile);
+
+        // Do not collide with soldiers
+        Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Soldiers"));
     }
 
     void InitStats()
@@ -143,7 +146,7 @@ public class Player : Character
         }
 
         swordSwingBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
-        swordSwingBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 3, GridManager.GetTileHeight() * 3);
+        swordSwingBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 4, GridManager.GetTileHeight() * 3);
 
         BoxCollider2D swordBc = swordSwingBox.AddComponent<BoxCollider2D>();
         Physics2D.IgnoreCollision(sm.GetBoxCollider2D(), swordBc);

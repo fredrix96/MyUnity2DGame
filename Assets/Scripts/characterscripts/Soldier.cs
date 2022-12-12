@@ -92,6 +92,15 @@ public class Soldier : Character
     {
         if (!isDead)
         {
+            if (currTile.IsCharacterPresent(TYPE_OF_CHARACTER.Enemy))
+            {
+                sm.StartAttacking();
+            }
+            else if (sm.IsAttacking())
+            {
+                sm.StartWalking();
+            }
+
             if (sm.IsWalking())
             {
                 sm.Walk();

@@ -137,9 +137,15 @@ public class Character
         }
         else if (ph.targetFound)
         {
-            sm.StartAttacking();
             ph.targetFound = false;
         }
+    }
+
+    protected void SetPositionReached()
+    {
+        ph.posReached = true;
+        pathCounter = 0;
+        path.Clear();
     }
 
     protected void WalkToNewPosition(float walkSpeed)
@@ -150,9 +156,7 @@ public class Character
         {
             if (checkTile.IsObjectPresent() || checkTile.IsCharacterPresent(type))
             {
-                ph.posReached = true;
-                pathCounter = 0;
-                path.Clear();
+                SetPositionReached();
                 return;
             }
         }
@@ -165,9 +169,7 @@ public class Character
 
             if (pathCounter == nrOfSteps - 1)
             {
-                ph.posReached = true;
-                pathCounter = 0;
-                path.Clear();
+                SetPositionReached();
             }
             else if (go.transform.position.x == path[pathCounter].x && go.transform.position.y == path[pathCounter].y + pivotHeightDiff)
             {
@@ -182,9 +184,7 @@ public class Character
             
             if (go.transform.position.x == path[0].x && go.transform.position.y == path[0].y + pivotHeightDiff)
             {
-                ph.posReached = true;
-                pathCounter = 0;
-                path.Clear();
+                SetPositionReached();
             }
         }
     }

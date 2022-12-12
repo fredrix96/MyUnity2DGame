@@ -96,14 +96,13 @@ public class Enemy : Character
         enemyStats.level = level;
         enemyStats.maxHealth = CharacterInformation.GetEnemyHealth(eType) * (level);
         enemyStats.damage = CharacterInformation.GetEnemyDamage(eType);
-        enemyStats.attackSpeed = 0.1f;
+        enemyStats.attackSpeed = 0.05f;
         enemyStats.walkSpeed = CharacterInformation.GetEnemySpeed(eType);
 
         if (level > 1)
         {
             enemyStats.maxHealth += (level / 2) * 10;
             enemyStats.damage += level;
-            enemyStats.attackSpeed -= level * 0.002f;
             enemyStats.walkSpeed += level * 0.002f;
         }
     }
@@ -113,6 +112,16 @@ public class Enemy : Character
         if (!isDead)
         {
             time += Time.deltaTime;
+
+            if (currTile.IsCharacterPresent(TYPE_OF_CHARACTER.Soldier) || currTile.IsCharacterPresent(TYPE_OF_CHARACTER.Player))
+            {
+                sm.StartAttacking();
+            }
+            else if (sm.IsAttacking())
+            {
+                sm.StartWalking();
+                ph.posReached = true;
+            }
 
             if (sm.IsWalking())
             {
@@ -165,6 +174,7 @@ public class Enemy : Character
                 currTile.DecreaseCharacters(this);
                 GridManager.GetCharacterTiles(type).Remove(currTile);
                 ExperienceManager.DropOrb(go.transform.position, expPoints);
+                go.GetComponent<SpriteRenderer>().sortingLayerName = "Dead";
 
                 if (Tools.CalculateChance(dropChance))
                 {

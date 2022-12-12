@@ -7,6 +7,8 @@ using Unity.Collections;
 using Unity.Burst;
 using Unity.Jobs.LowLevel.Unsafe;
 
+using System.Threading;
+
 //[BurstCompile] // Burst compiler is making the code more streamlined to SIMD (more optimized)
 public struct CharacterUpdatePositionJob : IJobParallelFor
 {
@@ -149,7 +151,6 @@ public class CharacterManager
                 {
                     characterDataArray = characterDataArray,
                 };
-
 
                 int nrOfBatches = listToUpdate.Count / JobsUtility.JobWorkerCount;
                 if (nrOfBatches < 1)

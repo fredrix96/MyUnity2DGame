@@ -1,8 +1,17 @@
 ﻿using UnityEngine;
 
+public static class MaximumSortingOrder
+{
+    public static int sortingOrderBase = 32767; // Maximum possible layer
+
+    public static int GetID()
+    {
+        return sortingOrderBase;
+    }
+}
+
 public class PositionRendererSorter : MonoBehaviour 
 {
-    int sortingOrderBase = 32767; // Maximum layer
     bool runOnlyOnce = false;
 
     float timer;
@@ -29,7 +38,7 @@ public class PositionRendererSorter : MonoBehaviour
         if (timer <= 0f) 
         {
             timer = timerMax;
-            myRenderer.sortingOrder = (int)(sortingOrderBase - originalPos.y * 10 - offsetY);
+            myRenderer.sortingOrder = (int)(MaximumSortingOrder.GetID() - originalPos.y * 10 - offsetY);
             if (runOnlyOnce) 
             {
                 Destroy(this);
