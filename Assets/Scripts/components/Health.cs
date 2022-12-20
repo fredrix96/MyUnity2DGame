@@ -13,6 +13,7 @@ public class Health : MonoBehaviour
     float height;
 
     int health;
+    int maxHealth;
 
     public void Init(GameObject inGo, string spriteSource, int inHealth, Vector2 size, float inExtraHeight = 0, bool building = false)
     {
@@ -32,6 +33,7 @@ public class Health : MonoBehaviour
         sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, 0.8f);
 
         health = inHealth;
+        maxHealth = inHealth;
 
         if (!building)
         {
@@ -90,7 +92,7 @@ public class Health : MonoBehaviour
         else
         {
             // Calculate how many percentages are left
-            float percentage = (float)health / (float)oldHealth;
+            float percentage = (float)health / (float)maxHealth;
 
             // Change the scale to match the new percentage
             sr.size = new Vector2(sr.size.x * percentage, sr.size.y);
@@ -103,14 +105,25 @@ public class Health : MonoBehaviour
         health += increase;
 
         // Calculate how many percentages are left
-        float percentage = (float)health / (float)oldHealth;
+        float percentage = (float)health / (float)maxHealth;
 
         // Change the scale to match the new percentage
         sr.size = new Vector2(sr.size.x * percentage, sr.size.y);
     }
 
+    public void IncreaseMaxHealth(int increase)
+    {
+        maxHealth += increase;
+        health += increase;
+    }
+
     public int GetHealth()
     {
         return health;
+    }
+
+    public int GetMaxHealth()
+    {
+        return maxHealth;
     }
 }

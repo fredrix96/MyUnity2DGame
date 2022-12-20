@@ -35,12 +35,12 @@ public static class BuildingInformation
         Castle, House, Barrack_Spear, Barrack_Mace, Barrack_HeavySword, ArcheryTower, Goldmine
     }
 
-    static readonly int[] cost = new int[]
+    static int[] cost = new int[]
     {
         2000, 250, 800, 800, 800, 1000, 1500
     };
 
-    static readonly int[] health = new int[]
+    static int[] health = new int[]
     {
         3000, 500, 1500, 1500, 1500, 1000, 2000
     };
@@ -54,6 +54,14 @@ public static class BuildingInformation
     public static int GetBuildingHealth(TYPE_OF_BUILDING type)
     {
         return health[(int)type];
+    }
+
+    public static void IncreaseBuildingHealth(int amount)
+    {
+        for (int i = 0; i < health.Length; i++)
+        {
+            health[i] += amount;
+        }
     }
 
     public static int GetBuildingCost(TYPE_OF_BUILDING type)

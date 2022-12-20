@@ -61,10 +61,7 @@ public class ArcheryTower : Building
 
         shootingOrigin = new Vector2(go.transform.position.x, go.transform.position.y + sr.bounds.size.y * 0.1f);
 
-        selector = go.AddComponent<Selector>();
-        selector.Init(toolBarObject, sr, textObject, buttonObject);
-        selector.SetOutlineColor(Color.blue);
-        selector.SetWidth(5);
+        AddSelector();
 
         pm = go.AddComponent<ProjectileManager>();
         projSprite = Resources.Load<Sprite>("Sprites/Arrow");

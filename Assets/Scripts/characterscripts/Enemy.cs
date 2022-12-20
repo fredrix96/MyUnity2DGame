@@ -113,7 +113,7 @@ public class Enemy : Character
         {
             time += Time.deltaTime;
 
-            if (currTile.IsCharacterPresent(TYPE_OF_CHARACTER.Soldier) || currTile.IsCharacterPresent(TYPE_OF_CHARACTER.Player))
+            if (currTile.IsCharacterPresent(TYPE_OF_CHARACTER.Soldier) || currTile.IsCharacterPresent(TYPE_OF_CHARACTER.Player) || currTile.IsObjectPresent())
             {
                 sm.StartAttacking();
             }
@@ -207,7 +207,7 @@ public class Enemy : Character
         if (CharacterInformation.TYPE_OF_ENEMY.Mushroom == eType || CharacterInformation.TYPE_OF_ENEMY.Eye == eType)
         {
             attackBox.transform.position = new Vector2(sm.GetBoxCollider2D().transform.position.x + range, sm.GetBoxCollider2D().transform.position.y + (GridManager.GetTileHeight() * boundingBoxOffset.y));
-            attackBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 1.5f, GridManager.GetTileHeight() * 1.5f);
+            attackBox.transform.localScale = new Vector2(GridManager.GetTileWidth() * 2.0f, GridManager.GetTileHeight() * 2.0f);
         }
         else if (CharacterInformation.TYPE_OF_ENEMY.Goblin == eType)
         {

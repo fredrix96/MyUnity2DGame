@@ -9,7 +9,10 @@ public class Vendor : MonoBehaviour
     Image img;
     CoinManager coinMan;
 
-    BuildingInformation.TYPE_OF_BUILDING type;
+    BuildingInformation.TYPE_OF_BUILDING bType;
+    UpgradeManager.TYPE_OF_UPGRADE uType;
+
+    bool isBuilding, isUpgrade;
 
     int cost;
     bool draging;
@@ -19,118 +22,183 @@ public class Vendor : MonoBehaviour
         img = GetComponent<Image>();
     }
 
-    public void Init(GameObject inGo, CoinManager inCoinMan, BuildingInformation.TYPE_OF_BUILDING inType)
+    public void InitBuilding(GameObject inGo, CoinManager inCoinMan, BuildingInformation.TYPE_OF_BUILDING inType)
     {
         go = inGo;
         coinMan = inCoinMan;
 
+        isUpgrade = false;
+        isBuilding = true;
+
         img = go.GetComponent<Image>();
         img.color = Color.white;
-        type = inType;
-        cost = BuildingInformation.GetBuildingCost(type);
+        bType = inType;
+        cost = BuildingInformation.GetBuildingCost(bType);
+    }
+
+    public void InitUpgrade(GameObject inGo, CoinManager inCoinMan, UpgradeManager.TYPE_OF_UPGRADE inType)
+    {
+        go = inGo;
+        coinMan = inCoinMan;
+
+        isUpgrade = true;
+        isBuilding = false;
+
+        img = go.GetComponent<Image>();
+        img.color = Color.white;
+        uType = inType;
+        cost = UpgradeManager.GetUpgradeCost(uType);
     }
 
     void OnMouseEnter()
     {
-        if (!BuildingInformation.MaxLimitReached(type))
+        if (isBuilding)
         {
-            img.color = new Color(0.3f, 0.3f, 0.6f, 1.0f);
+            if (!BuildingInformation.MaxLimitReached(bType))
+            {
+                img.color = new Color(0.3f, 0.3f, 0.6f, 1.0f);
+            }
+        }
+        else if (isUpgrade)
+        {
+            if (!UpgradeManager.MaxUpgradeLevelReached(uType))
+            {
+                img.color = new Color(0.3f, 0.3f, 0.6f, 1.0f);
+            }
         }
     }
 
     void OnMouseExit()
     {
-        if (!BuildingInformation.MaxLimitReached(type))
+        if (isBuilding)
         {
-            img.color = Color.white;
+            if (!BuildingInformation.MaxLimitReached(bType))
+            {
+                img.color = Color.white;
+            }
+        }
+        else if (isUpgrade)
+        {
+            if (!UpgradeManager.MaxUpgradeLevelReached(uType))
+            {
+                img.color = Color.white;
+            }
         }
     }
 
     void OnMouseDown()
     {
-        if (!BuildingInformation.MaxLimitReached(type))
+        if (isBuilding)
         {
-            if (coinMan.SpendMoney(cost))
+            if (!BuildingInformation.MaxLimitReached(bType))
             {
-                CreateBuildingImage();
+                if (coinMan.SpendMoney(cost))
+                {
+                    CreateBuildingImage();
 
-                Vector3 screenPoint = Input.mousePosition;
-                screenPoint.z = CameraManager.GetCamera().nearClipPlane;
-                tmpObject.transform.position = CameraManager.GetCamera().ScreenToWorldPoint(screenPoint);
+                    Vector3 screenPoint = Input.mousePosition;
+                    screenPoint.z = CameraManager.GetCamera().nearClipPlane;
+                    tmpObject.transform.position = CameraManager.GetCamera().ScreenToWorldPoint(screenPoint);
 
-                draging = true;
+                    draging = true;
 
-                // Hide shop UI
-                go.GetComponentInParent<Canvas>().enabled = false;
-                go.transform.parent.GetComponentInChildren<Image>().enabled = false;
+                    // Hide shop UI
+                    go.GetComponentInParent<Canvas>().enabled = false;
+                    go.transform.parent.GetComponentInChildren<Image>().enabled = false;
+                }
+            }
+            else
+            {
+                go.GetComponent<PopUpMessage>().SendPopUpMessage("You have reached the max limit!", 1.5f);
             }
         }
-        else
+    }
+
+    void OnMouseUpAsButton()
+    {
+        if (isUpgrade)
         {
-            go.GetComponent<PopUpMessage>().SendPopUpMessage("You have reached the max limit!", 1.5f);
+            if (!UpgradeManager.MaxUpgradeLevelReached(uType))
+            {
+               if (coinMan.SpendMoney(cost))
+               {
+                    UpgradeManager.IncreaseUpgradeLevel(uType);
+                    AudioManager.PlayAudio2D("Button", 0.4f);
+               }
+            }
+            else
+            {
+                go.GetComponent<PopUpMessage>().SendPopUpMessage("You have reached the max level!", 1.5f);
+            }
         }
     }
 
     void OnMouseDrag()
     {
-        if (draging)
+        if (isBuilding)
         {
-            GridManager.ActivateAreaImage(true);
-
-            Tile tile = MousePosToTilePos();
-
-            // Follow the mouse
-            tmpObject.transform.position = tile.GetWorldPos();
-
-            // If there is obstacles on the tiles, mark the building red
-            if (!AvoidObstacles(tile) || !CheckIfInsidePlacementArea(tile))
+            if (draging)
             {
-                // Indicate with red color that the building can not be placed here
-                tmpObject.GetComponent<Image>().color = new Color(1.0f, 0.1f, 0.1f, 0.6f);
-            }
-            else
-            {
-                tmpObject.GetComponent<Image>().color = Color.white;
+                GridManager.ActivateAreaImage(true);
+
+                Tile tile = MousePosToTilePos();
+
+                // Follow the mouse
+                tmpObject.transform.position = tile.GetWorldPos();
+
+                // If there is obstacles on the tiles, mark the building red
+                if (!AvoidObstacles(tile) || !CheckIfInsidePlacementArea(tile))
+                {
+                    // Indicate with red color that the building can not be placed here
+                    tmpObject.GetComponent<Image>().color = new Color(1.0f, 0.1f, 0.1f, 0.6f);
+                }
+                else
+                {
+                    tmpObject.GetComponent<Image>().color = Color.white;
+                }
             }
         }
     }
 
     void OnMouseUp()
     {
-        if (draging)
+        if (isBuilding)
         {
-            GridManager.ActivateAreaImage(false);
-
-            Tile tile = MousePosToTilePos();
-
-            // If inside the placement area
-            if (CheckIfInsidePlacementArea(tile))
+            if (draging)
             {
-                // If there is no obstacle, create the building
-                if (AvoidObstacles(tile))
+                GridManager.ActivateAreaImage(false);
+
+                Tile tile = MousePosToTilePos();
+
+                // If inside the placement area
+                if (CheckIfInsidePlacementArea(tile))
                 {
-                    // Use Gameobject.find?
-                    GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding(type, tile);
+                    // If there is no obstacle, create the building
+                    if (AvoidObstacles(tile))
+                    {
+                        // Use Gameobject.find?
+                        GameManager.GameManagerObject.GetComponent<BuildingManager>().CreateBuilding(bType, tile);
+                    }
+                    else
+                    {
+                        go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building" + System.Environment.NewLine + "at an obstacle!");
+                        coinMan.AddCoinsInstantly(cost);
+                    }
                 }
                 else
                 {
-                    go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building" + System.Environment.NewLine + "at an obstacle!");
+                    go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building" + System.Environment.NewLine + "outside the placement area!");
                     coinMan.AddCoinsInstantly(cost);
                 }
+
+                Destroy(tmpObject);
+
+                draging = false;
+
+                // Show shop UI
+                go.GetComponentInParent<Canvas>().enabled = true;
+                go.transform.parent.GetComponentInChildren<Image>().enabled = true;
             }
-            else
-            {
-                go.GetComponent<PopUpMessage>().SendPopUpMessage("You can not place the building" + System.Environment.NewLine + "outside the placement area!");
-                coinMan.AddCoinsInstantly(cost);
-            }
-
-            Destroy(tmpObject);
-
-            draging = false;
-
-            // Show shop UI
-            go.GetComponentInParent<Canvas>().enabled = true;
-            go.transform.parent.GetComponentInChildren<Image>().enabled = true;
         }
     }
 
@@ -145,7 +213,7 @@ public class Vendor : MonoBehaviour
         
         Tile tmpTile = GridManager.GetTile(new Vector2(0, 0));
         RectTransform rect = tmpObject.GetComponent<RectTransform>();
-        Vector2 size = BuildingInformation.GetBuildingSize(type) * 12 * Graphics.resolution;
+        Vector2 size = BuildingInformation.GetBuildingSize(bType) * 12 * Graphics.resolution;
         tmpObject.transform.localScale = new Vector3(tmpTile.GetSize().x * size.x / rect.sizeDelta.x, tmpTile.GetSize().y * size.y / rect.sizeDelta.y, 1);
     }
 
@@ -175,7 +243,7 @@ public class Vendor : MonoBehaviour
         }
         else
         {
-            Vector2 size = BuildingInformation.GetBuildingSize(type);
+            Vector2 size = BuildingInformation.GetBuildingSize(bType);
             int startX = -Mathf.FloorToInt(size.x / 2f);
             int endX = Mathf.CeilToInt(size.x / 2f);
             int startY = 0;// -Mathf.FloorToInt(size.y / 2f);

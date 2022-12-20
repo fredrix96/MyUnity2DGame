@@ -5,14 +5,13 @@ using UnityEngine;
 public class Selector : MonoBehaviour
 {
     GameObject toolBarObject, textObject, btnObject;
+    BoxCollider2D selectionBox;
     SpriteRenderer sr;
 
-    bool mouseOnObject;
     bool objectPressed;
 
     void Start()
     {
-        mouseOnObject = false;
         objectPressed = false;
     }
 
@@ -23,7 +22,7 @@ public class Selector : MonoBehaviour
         {
             SelectionActivated(false);
         }
-        else if (Input.GetMouseButtonDown(0) && !mouseOnObject)
+        else if (Input.GetMouseButtonDown(0))
         {
             if (btnObject == null)
             {
@@ -49,13 +48,14 @@ public class Selector : MonoBehaviour
         if (btnObject != null) btnObject.SetActive(activated);
     }
 
-    public void Init(GameObject inGo, SpriteRenderer inSr, GameObject inTextGo = null, GameObject inBtnGo = null)
+    public void Init(GameObject inGo, SpriteRenderer inSr, BoxCollider2D inSelectionBox, GameObject inTextGo = null, GameObject inBtnGo = null)
     {
         sr = inSr;
         sr.material = Resources.Load<Material>("Materials/Outline");
         toolBarObject = inGo;
         textObject = inTextGo;
         btnObject = inBtnGo;
+        selectionBox = inSelectionBox;
     }
 
     public void SetOutlineColor(Color color)
@@ -70,21 +70,18 @@ public class Selector : MonoBehaviour
 
     void OnMouseEnter()
     {
-        mouseOnObject = true;
         Tools.OutlineMaterialSettings.Enable(ref sr, true);
     }
 
     void OnMouseExit()
     {
-        mouseOnObject = false;
-
         if (!objectPressed)
         {
             Tools.OutlineMaterialSettings.Enable(ref sr, false);
         }
     }
 
-    void OnMouseDown()
+    void OnMouseUpAsButton()
     {
         if (!ShopManager.active)
         {
@@ -93,17 +90,21 @@ public class Selector : MonoBehaviour
         }
     }
 
+    //void OnMouseDown()
+    //{
+    //    if (!ShopManager.active)
+    //    {
+    //        AudioManager.PlayAudio2D("Select", 0.1f);
+    //        SelectionActivated(true);
+    //    }
+    //}
+
     void OnMouseDrag()
     {
     }
 
     void OnMouseUp()
     {
-    }
-
-    public bool MouseOnObject()
-    {
-        return mouseOnObject;
     }
 
     public bool ObjectPressed()

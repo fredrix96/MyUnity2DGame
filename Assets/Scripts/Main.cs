@@ -108,6 +108,8 @@ public class Main : MonoBehaviour
         buildMan = GameManager.GameManagerObject.AddComponent<BuildingManager>();
         buildMan.Init(coinMan, player);
 
+        UpgradeManager.Init(buildMan);
+
         shopMan = new ShopManager(coinMan, buildMan);
         ctrl = new Controller(player, shopMan);
 

@@ -9,7 +9,7 @@ public class Building
 {
     protected GameObject go, canvasObject, toolBarObject, textObject, buttonObject;
     protected SpriteRenderer sr;
-    protected BoxCollider2D collider;
+    protected BoxCollider2D collider, selectionBox;
     protected Rigidbody2D rb;
     protected Selector selector;
     protected CoinManager coinMan;
@@ -35,6 +35,17 @@ public class Building
     }
 
     public virtual void Update() { }
+
+    protected void AddSelector()
+    {
+        selectionBox = go.AddComponent<BoxCollider2D>();
+        selectionBox.isTrigger = true;
+
+        selector = go.AddComponent<Selector>();
+        selector.Init(toolBarObject, sr, selectionBox, textObject, null);
+        selector.SetOutlineColor(Color.blue);
+        selector.SetWidth(30);
+    }
 
     protected void CreateCanvas()
     {
@@ -143,6 +154,11 @@ public class Building
     {
         health = go.AddComponent<Health>();
         health.Init(go, "Sprites/SoldierHealth", BuildingInformation.GetBuildingHealth(type), new Vector2(0.6f, 0.3f), heightChange, true);
+    }
+
+    public Health GetHealth()
+    {
+        return health;
     }
 
     public Vector3 GetPosition()

@@ -61,10 +61,7 @@ public class Castle : Building
         collider.size = new Vector2(sr.size.x, sr.size.y / 2);
         collider.offset = new Vector2(0, -(sr.size.y / 4));
 
-        selector = go.AddComponent<Selector>();
-        selector.Init(toolBarObject, sr, textObject);
-        selector.SetOutlineColor(Color.blue);
-        selector.SetWidth(5);
+        AddSelector();
 
         shouldBeRemoved = false;
 

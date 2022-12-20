@@ -154,10 +154,21 @@ public class Character
         Tile checkTile = GridManager.GetTileFromWorldPosition(path[pathCounter]);
         if (checkTile != null)
         {
-            if (checkTile.IsObjectPresent() || checkTile.IsCharacterPresent(type))
+            if (type == TYPE_OF_CHARACTER.Soldier)
             {
-                SetPositionReached();
-                return;
+                if (checkTile.IsObjectPresent() || checkTile.IsCharacterPresent(type))
+                {
+                    SetPositionReached();
+                    return;
+                }
+            }
+            else if (type == TYPE_OF_CHARACTER.Enemy)
+            {
+                if (checkTile.IsCharacterPresent(type))
+                {
+                    SetPositionReached();
+                    return;
+                }
             }
         }
 

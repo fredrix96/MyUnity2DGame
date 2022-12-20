@@ -51,10 +51,7 @@ public class Goldmine : Building
         collider.size = new Vector2(sr.size.x, sr.size.y / 5);
         collider.offset = new Vector2(0, -(sr.size.y / 3));
 
-        selector = go.AddComponent<Selector>();
-        selector.Init(toolBarObject, sr, textObject, buttonObject);
-        selector.SetOutlineColor(Color.blue);
-        selector.SetWidth(5);
+        AddSelector();
 
         BuildingInformation.IncreaseCounter(type);
     }
@@ -73,6 +70,11 @@ public class Goldmine : Building
         }
     }
 
+    public void Press()
+    {
+        GenerateMoney();
+    }
+
     void CreateToolBar()
     {
         CreateCanvas();
@@ -80,6 +82,8 @@ public class Goldmine : Building
         CreateToolbarObject(new Vector2(3f, 1f), 2f);
 
         CreateInfoText("Goldmine", 30, TextAnchor.MiddleCenter, new Vector2(65, 75));
+
+        //CreateButton(Resources.Load<Sprite>("Sprites/RecruitButton"), Vector2.zero, new Vector2(50, 50), Press);
     }
 
     public void CheckIfDestroyed()
